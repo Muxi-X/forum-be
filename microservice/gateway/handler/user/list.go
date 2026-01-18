@@ -3,13 +3,13 @@ package user
 import (
 	"context"
 	. "forum-gateway/handler"
-	"forum-gateway/service"
 	"forum-gateway/util"
 	pb "forum-user/proto"
 	"forum/log"
 	"forum/pkg/errno"
 	"strconv"
 
+	"github.com/Muxi-X/forum-be/client"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
@@ -55,7 +55,7 @@ func List(c *gin.Context) {
 		Limit:  uint32(limit),
 	}
 
-	listResp, err := service.UserClient.List(context.TODO(), listReq)
+	listResp, err := client.UserClient.List(context.TODO(), listReq)
 	if err != nil {
 		SendError(c, err, nil, "", GetLine())
 		return

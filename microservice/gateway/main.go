@@ -3,17 +3,18 @@ package main
 import (
 	"errors"
 	"fmt"
+	"forum-gateway/service"
 	"net/http"
 	"time"
 
 	"forum-gateway/dao"
 	"forum-gateway/router"
 	"forum-gateway/router/middleware"
-	"forum-gateway/service"
 	"forum/config"
 	"forum/log"
 
 	_ "github.com/go-micro/plugins/v4/registry/kubernetes"
+	"github.com/joho/godotenv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/pflag"
@@ -24,6 +25,11 @@ import (
 var (
 	cfg = pflag.StringP("config", "c", "", "apiserver config file path.")
 )
+
+func init() {
+	// 预加载.env文件,用于本地开发
+	_ = godotenv.Load()
+}
 
 // @Title forum-gateway
 // @Version 1.0

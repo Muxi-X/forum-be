@@ -3,14 +3,15 @@ package post
 import (
 	"context"
 	. "forum-gateway/handler"
-	"forum-gateway/service"
 	"forum-gateway/util"
 	pb "forum-post/proto"
 	"forum/log"
 	"forum/pkg/errno"
+	"strconv"
+
+	"github.com/Muxi-X/forum-be/client"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
-	"strconv"
 )
 
 // ListUserPost ... 获取用户发布的帖子
@@ -60,7 +61,7 @@ func (a *Api) ListUserPost(c *gin.Context) {
 		Pagination: limit != 0 || page != 0,
 	}
 
-	postResp, err := service.PostClient.ListUserCreatedPost(context.TODO(), listReq)
+	postResp, err := client.PostClient.ListUserCreatedPost(context.TODO(), listReq)
 	if err != nil {
 		SendError(c, err, nil, "", GetLine())
 		return

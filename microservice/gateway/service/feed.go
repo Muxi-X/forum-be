@@ -3,6 +3,7 @@ package service
 import (
 	pbf "forum-feed/proto"
 	"forum/pkg/handler"
+
 	"github.com/go-micro/plugins/v4/registry/etcd"
 	"github.com/spf13/viper"
 	"go-micro.dev/v4/registry"

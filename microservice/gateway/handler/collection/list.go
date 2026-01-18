@@ -4,16 +4,17 @@ import (
 	"context"
 	. "forum-gateway/handler"
 	"forum-gateway/handler/post"
-	"forum-gateway/service"
 	"forum-gateway/util"
 	pb "forum-post/proto"
 	"forum/log"
 	"forum/model"
 	"forum/pkg/constvar"
 	"forum/pkg/errno"
+	"strconv"
+
+	"github.com/Muxi-X/forum-be/client"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
-	"strconv"
 )
 
 // List ... list收藏
@@ -80,7 +81,7 @@ func (a *Api) List(c *gin.Context) {
 		Pagination:   limit != 0 || page != 0,
 	}
 
-	listResp, err := service.PostClient.ListCollection(context.TODO(), listReq)
+	listResp, err := client.PostClient.ListCollection(context.TODO(), listReq)
 	if err != nil {
 		SendError(c, err, listResp, "", GetLine())
 		return

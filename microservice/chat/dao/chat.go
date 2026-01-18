@@ -36,7 +36,7 @@ func (d *Dao) GetList(id uint32, expiration time.Duration, wait bool) ([]string,
 	defer func() {
 		fmt.Println(time.Now().Sub(t))
 	}()
-	//使用用户的id创建一个key
+	// 使用用户的id创建一个key
 	key := GetKey(id)
 	// 如果数列里面为空的话则阻塞等待
 	if d.Redis.LLen(key).Val() == 0 {

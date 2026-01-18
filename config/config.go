@@ -2,6 +2,7 @@ package config
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"github.com/nacos-group/nacos-sdk-go/clients"
 	"github.com/nacos-group/nacos-sdk-go/common/constant"
@@ -13,6 +14,8 @@ import (
 	"strconv"
 	"strings"
 )
+
+const NACOS_ENV = "NACOSDSN"
 
 type Config struct {
 	Name string
@@ -37,7 +40,7 @@ func (c *Config) initConfig(prefix string) error {
 	viper.SetEnvPrefix(prefix)
 
 	// 尝试从 Nacos 拉取配置
-	content, err := getConfigFromNacos()
+	content, err := GetConfigFromNacos(NACOS_ENV)
 	if err != nil {
 		log.Println("降级到本地配置文件拉取...")
 		if c.Name != "" {
@@ -62,9 +65,14 @@ func (c *Config) initConfig(prefix string) error {
 	return nil
 }
 
-// nacos获取代码示例
-func getConfigFromNacos() (string, error) {
-	server, port, namespace, user, pass, group, dataId := parseNacosDSN()
+func GetConfigFromNacos(env string) (string, error) {
+	dsn := os.Getenv(env)
+	if dsn == "" {
+		log.Printf("%s 环境变量未设置", env)
+		return "", errors.New("环境变量未设置")
+	}
+
+	server, port, namespace, user, pass, group, dataId := ParseNacosDSN(dsn)
 
 	serverConfigs := []constant.ServerConfig{
 		{
@@ -80,7 +88,8 @@ func getConfigFromNacos() (string, error) {
 		Password:            pass,
 		TimeoutMs:           5000,
 		NotLoadCacheAtStart: true,
-		CacheDir:            "./data/configCache",
+		CacheDir:            "/tmp/nacos/cache",
+		LogDir:              "/tmp/nacos/log",
 	}
 
 	configClient, err := clients.CreateConfigClient(map[string]interface{}{
@@ -101,12 +110,7 @@ func getConfigFromNacos() (string, error) {
 	return content, nil
 }
 
-// DSN 示例： localhost:8848?namespace=default&username=nacos&password=1234&group=QA&dataId=my-service
-func parseNacosDSN() (server string, port uint64, ns, user, pass, group, dataId string) {
-	dsn := os.Getenv("NACOSDSN")
-	if dsn == "" {
-		log.Fatal("环境变量 NACOSDSN 未设置")
-	}
+func ParseNacosDSN(dsn string) (server string, port uint64, ns, user, pass, group, dataId string) {
 
 	parts := strings.SplitN(dsn, "?", 2)
 	host := parts[0]

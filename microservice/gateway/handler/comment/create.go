@@ -4,13 +4,14 @@ import (
 	"context"
 	pbf "forum-feed/proto"
 	. "forum-gateway/handler"
-	"forum-gateway/service"
 	"forum-gateway/util"
 	pb "forum-post/proto"
 	"forum/log"
 	"forum/model"
 	"forum/pkg/constvar"
 	"forum/pkg/errno"
+
+	"github.com/Muxi-X/forum-be/client"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
@@ -65,7 +66,7 @@ func (a *Api) Create(c *gin.Context) {
 		ImgUrl:    req.ImgUrl,
 	}
 
-	createResp, err := service.PostClient.CreateComment(context.TODO(), &createReq)
+	createResp, err := client.PostClient.CreateComment(context.TODO(), &createReq)
 	if err != nil {
 		SendError(c, err, nil, "", GetLine())
 		return
@@ -83,7 +84,7 @@ func (a *Api) Create(c *gin.Context) {
 		TargetUserId: createResp.UserId,
 		Content:      req.Content,
 	}
-	_, err = service.FeedClient.Push(context.TODO(), pushReq)
+	_, err = client.FeedClient.Push(context.TODO(), pushReq)
 
 	resp := &Comment{
 		Id:            createResp.Id,

@@ -3,13 +3,14 @@ package like
 import (
 	"context"
 	. "forum-gateway/handler"
-	"forum-gateway/service"
 	"forum-gateway/util"
 	pb "forum-post/proto"
 	"forum/log"
 	"forum/model"
 	"forum/pkg/constvar"
 	"forum/pkg/errno"
+
+	"github.com/Muxi-X/forum-be/client"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
@@ -58,7 +59,7 @@ func (a *Api) CreateOrRemove(c *gin.Context) {
 		},
 	}
 
-	_, err = service.PostClient.CreateOrRemoveLike(context.TODO(), likeReq)
+	_, err = client.PostClient.CreateOrRemoveLike(context.TODO(), likeReq)
 	if err != nil {
 		SendError(c, err, nil, "", GetLine())
 		return

@@ -3,6 +3,7 @@ package service
 import (
 	pbu "forum-user/proto"
 	"forum/pkg/handler"
+
 	"github.com/go-micro/plugins/v4/registry/etcd"
 	_ "github.com/go-micro/plugins/v4/registry/kubernetes"
 	opentracingWrapper "github.com/go-micro/plugins/v4/wrapper/trace/opentracing"

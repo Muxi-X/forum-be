@@ -3,16 +3,17 @@ package comment
 import (
 	"context"
 	. "forum-gateway/handler"
-	"forum-gateway/service"
 	"forum-gateway/util"
 	pb "forum-post/proto"
 	"forum/log"
 	"forum/model"
 	"forum/pkg/constvar"
 	"forum/pkg/errno"
+	"strconv"
+
+	"github.com/Muxi-X/forum-be/client"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
-	"strconv"
 )
 
 // Delete ... 删除评论
@@ -52,7 +53,7 @@ func (a *Api) Delete(c *gin.Context) {
 		UserId:   userId,
 	}
 
-	_, err = service.PostClient.DeleteItem(context.TODO(), deleteReq)
+	_, err = client.PostClient.DeleteItem(context.TODO(), deleteReq)
 	if err != nil {
 		SendError(c, err, nil, "", GetLine())
 		return

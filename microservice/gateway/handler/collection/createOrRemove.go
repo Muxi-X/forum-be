@@ -4,16 +4,17 @@ import (
 	"context"
 	pbf "forum-feed/proto"
 	. "forum-gateway/handler"
-	"forum-gateway/service"
 	"forum-gateway/util"
 	pb "forum-post/proto"
 	"forum/log"
 	"forum/model"
 	"forum/pkg/constvar"
 	"forum/pkg/errno"
+	"strconv"
+
+	"github.com/Muxi-X/forum-be/client"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
-	"strconv"
 )
 
 // CreateOrRemove ... 收藏/取消收藏帖子
@@ -57,7 +58,7 @@ func (a *Api) CreateOrRemove(c *gin.Context) {
 		Id:     uint32(postId),
 	}
 
-	resp, err := service.PostClient.CreateOrRemoveCollection(context.TODO(), &createReq)
+	resp, err := client.PostClient.CreateOrRemoveCollection(context.TODO(), &createReq)
 	if err != nil {
 		SendError(c, err, nil, "", GetLine())
 		return
@@ -75,7 +76,7 @@ func (a *Api) CreateOrRemove(c *gin.Context) {
 		TargetUserId: resp.UserId,
 		Content:      "",
 	}
-	_, err = service.FeedClient.Push(context.TODO(), pushReq)
+	_, err = client.FeedClient.Push(context.TODO(), pushReq)
 
 	SendResponse(c, err, nil)
 }
