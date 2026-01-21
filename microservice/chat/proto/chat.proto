@@ -8,6 +8,7 @@ service ChatService {
     rpc Create(CreateRequest) returns (Response) {}
     rpc GetList(GetListRequest) returns (GetListResponse) {}
     rpc ListHistory(ListHistoryRequest) returns (ListHistoryResponse) {}
+    rpc UserList(UserListRequest) returns (UserListResponse) {}
 }
 
 message ListHistoryRequest {
@@ -47,4 +48,12 @@ message Message {
 
 message ListHistoryResponse {
     repeated Message histories = 1;
+}
+
+message UserListRequest {
+    uint32 user_id = 1;
+}
+
+message UserListResponse {
+    repeated uint32 user_ids = 1;
 }

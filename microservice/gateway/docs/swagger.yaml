@@ -632,6 +632,22 @@ paths:
       summary: 获取该用户的聊天记录
       tags:
       - chat
+  /chat/userList:
+    get:
+      parameters:
+      - description: token 用户令牌
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: '示例: {\"code\":0,\"message\":ok,\"data\":[123,456,789]}'
+      summary: 获取该用户的聊天列表
+      tags:
+      - chat
   /chat/ws:
     get:
       description: |-

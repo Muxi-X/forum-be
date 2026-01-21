@@ -31,6 +31,7 @@ type ChatService interface {
 	Create(ctx context.Context, in *CreateRequest, opts ...client.CallOption) (*Response, error)
 	GetList(ctx context.Context, in *GetListRequest, opts ...client.CallOption) (*GetListResponse, error)
 	ListHistory(ctx context.Context, in *ListHistoryRequest, opts ...client.CallOption) (*ListHistoryResponse, error)
+	UserList(ctx context.Context, in *UserListRequest, opts ...client.CallOption) (*UserListResponse, error)
 }
 
 type chatService struct {
@@ -75,12 +76,23 @@ func (c *chatService) ListHistory(ctx context.Context, in *ListHistoryRequest, o
 	return out, nil
 }
 
+func (c *chatService) UserList(ctx context.Context, in *UserListRequest, opts ...client.CallOption) (*UserListResponse, error) {
+	req := c.c.NewRequest(c.name, "ChatService.UserList", in)
+	out := new(UserListResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // Server API for ChatService service
 
 type ChatServiceHandler interface {
 	Create(context.Context, *CreateRequest, *Response) error
 	GetList(context.Context, *GetListRequest, *GetListResponse) error
 	ListHistory(context.Context, *ListHistoryRequest, *ListHistoryResponse) error
+	UserList(context.Context, *UserListRequest, *UserListResponse) error
 }
 
 func RegisterChatServiceHandler(s server.Server, hdlr ChatServiceHandler, opts ...server.HandlerOption) error {
@@ -88,6 +100,7 @@ func RegisterChatServiceHandler(s server.Server, hdlr ChatServiceHandler, opts .
 		Create(ctx context.Context, in *CreateRequest, out *Response) error
 		GetList(ctx context.Context, in *GetListRequest, out *GetListResponse) error
 		ListHistory(ctx context.Context, in *ListHistoryRequest, out *ListHistoryResponse) error
+		UserList(ctx context.Context, in *UserListRequest, out *UserListResponse) error
 	}
 	type ChatService struct {
 		chatService
@@ -110,4 +123,8 @@ func (h *chatServiceHandler) GetList(ctx context.Context, in *GetListRequest, ou
 
 func (h *chatServiceHandler) ListHistory(ctx context.Context, in *ListHistoryRequest, out *ListHistoryResponse) error {
 	return h.ChatServiceHandler.ListHistory(ctx, in, out)
+}
+
+func (h *chatServiceHandler) UserList(ctx context.Context, in *UserListRequest, out *UserListResponse) error {
+	return h.ChatServiceHandler.UserList(ctx, in, out)
 }

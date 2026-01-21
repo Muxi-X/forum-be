@@ -3,7 +3,6 @@ package main
 import (
 	"errors"
 	"fmt"
-	"forum-gateway/service"
 	"net/http"
 	"time"
 
@@ -13,6 +12,7 @@ import (
 	"forum/config"
 	"forum/log"
 
+	"forum/client"
 	_ "github.com/go-micro/plugins/v4/registry/kubernetes"
 	"github.com/joho/godotenv"
 
@@ -66,10 +66,10 @@ func main() {
 
 	// logger sync
 	defer log.SyncLogger()
-	service.UserInit()
-	service.ChatInit()
-	service.PostInit()
-	service.FeedInit()
+	client.UserInit()
+	client.ChatInit()
+	client.PostInit()
+	client.FeedInit()
 	dao.Init()
 	// Set gin mode.
 	gin.SetMode(viper.GetString("runmode"))

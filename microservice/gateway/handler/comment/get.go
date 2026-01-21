@@ -11,7 +11,7 @@ import (
 	"forum/pkg/errno"
 	"strconv"
 
-	"github.com/Muxi-X/forum-be/client"
+	"forum/client"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )

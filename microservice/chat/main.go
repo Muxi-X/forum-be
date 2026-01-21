@@ -48,7 +48,7 @@ func main() {
 		etcd.Auth(viper.GetString("etcd.username"), viper.GetString("etcd.password")),
 	)
 	srv := micro.NewService(
-		micro.Name("forum/"+identity.GetIdentity()+"/"+viper.GetString("local_name")),
+		micro.Name(identity.Prefix()+viper.GetString("local_name")),
 		micro.WrapHandler(
 			opentracingWrapper.NewHandlerWrapper(opentracing.GlobalTracer()),
 		),

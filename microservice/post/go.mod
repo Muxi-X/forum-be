@@ -4,6 +4,10 @@ replace forum => ../../
 
 replace forum-user => ../user
 
+replace forum-chat => ../chat
+
+replace forum-feed => ../feed
+
 go 1.23.0
 
 toolchain go1.23.3
@@ -32,7 +36,6 @@ require (
 	github.com/aliyun/alibaba-cloud-sdk-go v1.61.976 // indirect
 	github.com/bitly/go-simplejson v0.5.0 // indirect
 	github.com/bmatcuk/doublestar/v4 v4.6.1 // indirect
-	github.com/bmizerany/assert v0.0.0-20160611221934-b7ed37b82869 // indirect
 	github.com/buger/jsonparser v1.1.1 // indirect
 	github.com/casbin/casbin/v2 v2.103.0 // indirect
 	github.com/casbin/gorm-adapter/v3 v3.7.2 // indirect

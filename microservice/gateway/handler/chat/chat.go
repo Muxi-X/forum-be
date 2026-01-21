@@ -11,7 +11,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/Muxi-X/forum-be/client"
+	"forum/client"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 	"go.uber.org/zap"

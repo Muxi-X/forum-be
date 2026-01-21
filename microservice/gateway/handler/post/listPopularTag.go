@@ -7,7 +7,8 @@ import (
 	pb "forum-post/proto"
 	"forum/log"
 
-	"github.com/Muxi-X/forum-be/client"
+	"forum/client"
+
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )

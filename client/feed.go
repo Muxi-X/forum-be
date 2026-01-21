@@ -1,9 +1,10 @@
-package service
+package client
 
 import (
 	pbf "forum-feed/proto"
 	"forum/pkg/handler"
 
+	"forum/pkg/identity"
 	"github.com/go-micro/plugins/v4/registry/etcd"
 	"github.com/spf13/viper"
 	"go-micro.dev/v4/registry"
@@ -32,5 +33,5 @@ func FeedInit() {
 
 	service.Init()
 
-	FeedClient = pbf.NewFeedService("forum.service.feed", service.Client())
+	FeedClient = pbf.NewFeedService(identity.Prefix()+"forum.service.feed", service.Client())
 }

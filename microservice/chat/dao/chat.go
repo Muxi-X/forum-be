@@ -180,3 +180,19 @@ func (d *Dao) CreateHistory(userId uint32, list []string) error {
 	}
 	return nil
 }
+
+func (d *Dao) GetUserList(userId uint32) ([]uint32, error) {
+	var receiver []uint32
+	err := d.DB.Table("messages").Where("sender_id = ?", userId).Distinct("receiver_id").Pluck("receiver_id", &receiver).Error
+	if err != nil {
+		return nil, err
+	}
+
+	var sender []uint32
+	err = d.DB.Table("messages").Where("receiver_id = ?", userId).Distinct("sender_id").Pluck("sender_id", &sender).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return append(receiver, sender...), nil
+}

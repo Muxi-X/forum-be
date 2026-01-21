@@ -26,6 +26,7 @@ type Interface interface {
 	Rewrite(uint32, []string) error
 	ListHistory(uint32, uint32, uint32, uint32, bool) ([]*pb.Message, error)
 	CreateHistory(uint32, []string) error
+	GetUserList(uint32) ([]uint32, error)
 }
 
 // Init init dao

@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-func GetIdentity() string {
+func getIdentity() string {
 
 	// 1. 用户名
 	user := os.Getenv("USERNAME")
@@ -32,4 +32,8 @@ func sanitize(s string) string {
 	s = strings.ReplaceAll(s, ".", "_")
 	s = strings.ReplaceAll(s, ":", "_")
 	return s
+}
+
+func Prefix() string {
+	return "forum/" + getIdentity() + "/"
 }

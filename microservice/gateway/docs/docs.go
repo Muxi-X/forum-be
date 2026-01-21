@@ -136,6 +136,31 @@ const docTemplate = `{
                 }
             }
         },
+        "/chat/userList": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "chat"
+                ],
+                "summary": "获取该用户的聊天列表",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token 用户令牌",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "示例: {\\\"code\\\":0,\\\"message\\\":ok,\\\"data\\\":[123,456,789]}"
+                    }
+                }
+            }
+        },
         "/chat/ws": {
             "get": {
                 "description": "通过 WebSocket 实现客户端与服务器之间的实时通信。\n使用 ` + "`" + `ws://` + "`" + ` 或 ` + "`" + `wss://` + "`" + ` 协议访问此接口，连接成功后可进行双向通信。\n客户端连接后，请使用 JSON 格式发送消息，结构如下：\n\n` + "`" + `` + "`" + `` + "`" + `json\n{\n\"target_user_id\": 123,\n\"content\": \"你好\",\n\"type_name\": \"text\",\n\"time\": \"2025-07-20 12:00:00\"\n}\n` + "`" + `` + "`" + `` + "`" + `",

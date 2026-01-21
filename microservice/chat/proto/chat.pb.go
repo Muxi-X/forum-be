@@ -425,6 +425,94 @@ func (x *ListHistoryResponse) GetHistories() []*Message {
 	return nil
 }
 
+type UserListRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        uint32                 `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UserListRequest) Reset() {
+	*x = UserListRequest{}
+	mi := &file_chat_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UserListRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UserListRequest) ProtoMessage() {}
+
+func (x *UserListRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_chat_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UserListRequest.ProtoReflect.Descriptor instead.
+func (*UserListRequest) Descriptor() ([]byte, []int) {
+	return file_chat_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *UserListRequest) GetUserId() uint32 {
+	if x != nil {
+		return x.UserId
+	}
+	return 0
+}
+
+type UserListResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserIds       []uint32               `protobuf:"varint,1,rep,packed,name=user_ids,json=userIds,proto3" json:"user_ids,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UserListResponse) Reset() {
+	*x = UserListResponse{}
+	mi := &file_chat_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UserListResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UserListResponse) ProtoMessage() {}
+
+func (x *UserListResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_chat_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UserListResponse.ProtoReflect.Descriptor instead.
+func (*UserListResponse) Descriptor() ([]byte, []int) {
+	return file_chat_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *UserListResponse) GetUserIds() []uint32 {
+	if x != nil {
+		return x.UserIds
+	}
+	return nil
+}
+
 var File_chat_proto protoreflect.FileDescriptor
 
 const file_chat_proto_rawDesc = "" +
@@ -460,11 +548,16 @@ const file_chat_proto_rawDesc = "" +
 	"\vreceiver_id\x18\x05 \x01(\rR\n" +
 	"receiverId\"B\n" +
 	"\x13ListHistoryResponse\x12+\n" +
-	"\thistories\x18\x01 \x03(\v2\r.chat.MessageR\thistories2\xbe\x01\n" +
+	"\thistories\x18\x01 \x03(\v2\r.chat.MessageR\thistories\"*\n" +
+	"\x0fUserListRequest\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\rR\x06userId\"-\n" +
+	"\x10UserListResponse\x12\x19\n" +
+	"\buser_ids\x18\x01 \x03(\rR\auserIds2\xfb\x01\n" +
 	"\vChatService\x12/\n" +
 	"\x06Create\x12\x13.chat.CreateRequest\x1a\x0e.chat.Response\"\x00\x128\n" +
 	"\aGetList\x12\x14.chat.GetListRequest\x1a\x15.chat.GetListResponse\"\x00\x12D\n" +
-	"\vListHistory\x12\x18.chat.ListHistoryRequest\x1a\x19.chat.ListHistoryResponse\"\x00B\tZ\a./protob\x06proto3"
+	"\vListHistory\x12\x18.chat.ListHistoryRequest\x1a\x19.chat.ListHistoryResponse\"\x00\x12;\n" +
+	"\bUserList\x12\x15.chat.UserListRequest\x1a\x16.chat.UserListResponse\"\x00B\tZ\a./protob\x06proto3"
 
 var (
 	file_chat_proto_rawDescOnce sync.Once
@@ -478,7 +571,7 @@ func file_chat_proto_rawDescGZIP() []byte {
 	return file_chat_proto_rawDescData
 }
 
-var file_chat_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
+var file_chat_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
 var file_chat_proto_goTypes = []any{
 	(*ListHistoryRequest)(nil),  // 0: chat.ListHistoryRequest
 	(*CreateRequest)(nil),       // 1: chat.CreateRequest
@@ -487,17 +580,21 @@ var file_chat_proto_goTypes = []any{
 	(*GetListResponse)(nil),     // 4: chat.GetListResponse
 	(*Message)(nil),             // 5: chat.Message
 	(*ListHistoryResponse)(nil), // 6: chat.ListHistoryResponse
+	(*UserListRequest)(nil),     // 7: chat.UserListRequest
+	(*UserListResponse)(nil),    // 8: chat.UserListResponse
 }
 var file_chat_proto_depIdxs = []int32{
 	5, // 0: chat.ListHistoryResponse.histories:type_name -> chat.Message
 	1, // 1: chat.ChatService.Create:input_type -> chat.CreateRequest
 	3, // 2: chat.ChatService.GetList:input_type -> chat.GetListRequest
 	0, // 3: chat.ChatService.ListHistory:input_type -> chat.ListHistoryRequest
-	2, // 4: chat.ChatService.Create:output_type -> chat.Response
-	4, // 5: chat.ChatService.GetList:output_type -> chat.GetListResponse
-	6, // 6: chat.ChatService.ListHistory:output_type -> chat.ListHistoryResponse
-	4, // [4:7] is the sub-list for method output_type
-	1, // [1:4] is the sub-list for method input_type
+	7, // 4: chat.ChatService.UserList:input_type -> chat.UserListRequest
+	2, // 5: chat.ChatService.Create:output_type -> chat.Response
+	4, // 6: chat.ChatService.GetList:output_type -> chat.GetListResponse
+	6, // 7: chat.ChatService.ListHistory:output_type -> chat.ListHistoryResponse
+	8, // 8: chat.ChatService.UserList:output_type -> chat.UserListResponse
+	5, // [5:9] is the sub-list for method output_type
+	1, // [1:5] is the sub-list for method input_type
 	1, // [1:1] is the sub-list for extension type_name
 	1, // [1:1] is the sub-list for extension extendee
 	0, // [0:1] is the sub-list for field type_name
@@ -514,7 +611,7 @@ func file_chat_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_chat_proto_rawDesc), len(file_chat_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   7,
+			NumMessages:   9,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

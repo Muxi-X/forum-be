@@ -3,6 +3,6 @@ package identity
 import "testing"
 
 func TestGetIdentity(t *testing.T) {
-	identity := GetIdentity()
+	identity := getIdentity()
 	t.Log(identity)
 }
