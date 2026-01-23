@@ -13,6 +13,7 @@ import (
 	"forum/log"
 
 	"forum/client"
+
 	_ "github.com/go-micro/plugins/v4/registry/kubernetes"
 	"github.com/joho/godotenv"
 
@@ -27,7 +28,7 @@ var (
 )
 
 func init() {
-	// 预加载.env文件,用于本地开发
+	// 预加载.env文件,用于本地开发.
 	_ = godotenv.Load()
 }
 

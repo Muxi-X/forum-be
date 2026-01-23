@@ -63,5 +63,5 @@ jobs:
           docker rm -f \$SERVICE || true
           docker pull \$IMAGE || true
           docker rmi -f \$IMAGE || true
-          IMAGE=\$IMAGE docker-compose up -d \$SERVICE
+          IMAGE=\$IMAGE docker compose up -d \$SERVICE
           EOF
