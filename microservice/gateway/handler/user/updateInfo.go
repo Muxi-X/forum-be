@@ -3,11 +3,12 @@ package user
 import (
 	"context"
 	. "forum-gateway/handler"
-	"forum-gateway/service"
 	"forum-gateway/util"
 	pb "forum-user/proto"
 	"forum/log"
 	"forum/pkg/errno"
+
+	"forum/client"
 
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
@@ -45,7 +46,7 @@ func UpdateInfo(c *gin.Context) {
 		},
 	}
 
-	_, err := service.UserClient.UpdateInfo(context.TODO(), updateInfoReq)
+	_, err := client.UserClient.UpdateInfo(context.TODO(), updateInfoReq)
 	if err != nil {
 		SendError(c, err, nil, "", GetLine())
 		return

@@ -5,13 +5,13 @@ import (
 	"encoding/json"
 	pb "forum-chat/proto"
 	. "forum-gateway/handler"
-	"forum-gateway/service"
 	"forum-gateway/util"
 	"forum/log"
 	"forum/pkg/errno"
 	"net/http"
 	"time"
 
+	"forum/client"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 	"go.uber.org/zap"
@@ -106,7 +106,7 @@ func (c *Client) Read() {
 			break
 		}
 		//创建聊天记录
-		if _, err := service.ChatClient.Create(context.Background(), &req); err != nil {
+		if _, err := client.ChatClient.Create(context.Background(), &req); err != nil {
 			log.Error(err.Error())
 			c.Socket.WriteMessage(websocket.TextMessage, []byte(err.Error()))
 			break
@@ -133,7 +133,7 @@ func (c *Client) Write() {
 			cancel()
 		}()
 		// 死循环获取,直到客户端断开连接
-		resp, err := service.ChatClient.GetList(ctx, getListRequest)
+		resp, err := client.ChatClient.GetList(ctx, getListRequest)
 		if err != nil {
 			// TODO:ctx报错
 			log.Error(err.Error())

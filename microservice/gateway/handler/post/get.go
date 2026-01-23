@@ -3,16 +3,18 @@ package post
 import (
 	"context"
 	. "forum-gateway/handler"
-	"forum-gateway/service"
 	"forum-gateway/util"
 	pb "forum-post/proto"
 	"forum/log"
 	"forum/model"
 	"forum/pkg/constvar"
 	"forum/pkg/errno"
+	"strconv"
+
+	"forum/client"
+
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
-	"strconv"
 )
 
 // Get ... 获取帖子
@@ -51,7 +53,7 @@ func (a *Api) Get(c *gin.Context) {
 		Id:     uint32(id),
 	}
 
-	getResp, err := service.PostClient.GetPost(context.TODO(), getReq)
+	getResp, err := client.PostClient.GetPost(context.TODO(), getReq)
 	if err != nil {
 		SendError(c, err, nil, "", GetLine())
 		return

@@ -4,11 +4,12 @@ import (
 	"context"
 	"errors"
 	. "forum-gateway/handler"
-	"forum-gateway/service"
 	"forum-gateway/util"
 	pb "forum-user/proto"
 	"forum/log"
 	"forum/pkg/errno"
+
+	"forum/client"
 
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
@@ -38,7 +39,7 @@ func CreateMessage(c *gin.Context) {
 		Message: req.Message,
 	}
 
-	_, err := service.UserClient.CreateMessage(context.TODO(), listReq)
+	_, err := client.UserClient.CreateMessage(context.TODO(), listReq)
 	if err != nil {
 		SendError(c, err, nil, "", GetLine())
 		return
@@ -79,7 +80,7 @@ func CreatePrivateMessage(c *gin.Context) {
 		CommentId: req.CommentId,
 	}
 
-	_, err := service.UserClient.CreatePrivateMessage(context.TODO(), listReq)
+	_, err := client.UserClient.CreatePrivateMessage(context.TODO(), listReq)
 	if err != nil {
 		SendError(c, err, nil, "", GetLine())
 		return

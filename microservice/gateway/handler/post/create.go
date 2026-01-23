@@ -3,13 +3,15 @@ package post
 import (
 	"context"
 	. "forum-gateway/handler"
-	"forum-gateway/service"
 	"forum-gateway/util"
 	pb "forum-post/proto"
 	"forum/log"
 	"forum/model"
 	"forum/pkg/constvar"
 	"forum/pkg/errno"
+
+	"forum/client"
+
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
@@ -72,7 +74,7 @@ func (a *Api) Create(c *gin.Context) {
 		Summary:         req.Summary,
 	}
 
-	resp, err := service.PostClient.CreatePost(context.TODO(), &createReq)
+	resp, err := client.PostClient.CreatePost(context.TODO(), &createReq)
 	if err != nil {
 		SendError(c, err, nil, "", GetLine())
 		return

@@ -3,13 +3,15 @@ package report
 import (
 	"context"
 	. "forum-gateway/handler"
-	"forum-gateway/service"
 	"forum-gateway/util"
 	pb "forum-post/proto"
 	"forum/log"
 	"forum/model"
 	"forum/pkg/constvar"
 	"forum/pkg/errno"
+
+	"forum/client"
+
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
@@ -63,7 +65,7 @@ func (a *Api) Create(c *gin.Context) {
 		Cause:    req.Cause,
 	}
 
-	_, err = service.PostClient.CreateReport(context.TODO(), &createReq)
+	_, err = client.PostClient.CreateReport(context.TODO(), &createReq)
 	if err != nil {
 		SendError(c, err, nil, "", GetLine())
 		return

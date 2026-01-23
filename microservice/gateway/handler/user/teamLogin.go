@@ -3,11 +3,12 @@ package user
 import (
 	"context"
 	. "forum-gateway/handler"
-	"forum-gateway/service"
 	"forum-gateway/util"
 	pb "forum-user/proto"
 	"forum/log"
 	"forum/pkg/errno"
+
+	"forum/client"
 
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
@@ -37,7 +38,7 @@ func TeamLogin(c *gin.Context) {
 		OauthCode: req.OauthCode,
 	}
 
-	loginResp, err := service.UserClient.TeamLogin(context.TODO(), loginReq)
+	loginResp, err := client.UserClient.TeamLogin(context.TODO(), loginReq)
 	if err != nil {
 		SendError(c, err, nil, "", GetLine())
 		return

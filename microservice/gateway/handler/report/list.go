@@ -3,14 +3,16 @@ package report
 import (
 	"context"
 	. "forum-gateway/handler"
-	"forum-gateway/service"
 	"forum-gateway/util"
 	pb "forum-post/proto"
 	"forum/log"
 	"forum/pkg/errno"
+	"strconv"
+
+	"forum/client"
+
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
-	"strconv"
 )
 
 // List ... list举报
@@ -52,7 +54,7 @@ func (a *Api) List(c *gin.Context) {
 		Pagination: limit != 0 || page != 0,
 	}
 
-	listResp, err := service.PostClient.ListReport(context.TODO(), listReq)
+	listResp, err := client.PostClient.ListReport(context.TODO(), listReq)
 	if err != nil {
 		SendError(c, err, listResp, "", GetLine())
 		return

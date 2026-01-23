@@ -7,12 +7,15 @@ import (
 	"forum/config"
 	logger "forum/log"
 	"forum/pkg/handler"
+	"forum/pkg/identity"
 	"forum/pkg/tracer"
+	"log"
+
 	"github.com/go-micro/plugins/v4/registry/etcd"
+	"github.com/joho/godotenv"
 	"github.com/opentracing/opentracing-go"
 	micro "go-micro.dev/v4"
 	"go-micro.dev/v4/registry"
-	"log"
 
 	_ "github.com/go-micro/plugins/v4/registry/kubernetes"
 
@@ -22,6 +25,9 @@ import (
 
 func init() {
 	service.UserInit()
+	// 预加载.env文件,用于本地开发
+	_ = godotenv.Load()
+
 }
 
 func main() {
@@ -45,7 +51,7 @@ func main() {
 	)
 
 	srv := micro.NewService(
-		micro.Name(viper.GetString("local_name")),
+		micro.Name(identity.Prefix()+viper.GetString("local_name")),
 		micro.WrapHandler(
 			opentracingWrapper.NewHandlerWrapper(opentracing.GlobalTracer()),
 		),

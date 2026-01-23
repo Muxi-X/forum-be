@@ -3,7 +3,6 @@ package post
 import (
 	"context"
 	. "forum-gateway/handler"
-	"forum-gateway/service"
 	"forum-gateway/util"
 	pb "forum-post/proto"
 	"forum/log"
@@ -11,6 +10,8 @@ import (
 	"forum/pkg/constvar"
 	"forum/pkg/errno"
 	"strconv"
+
+	"forum/client"
 
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
@@ -107,7 +108,7 @@ func (a *Api) ListMainPost(c *gin.Context) {
 		Tag:           tag,
 	}
 
-	postResp, err := service.PostClient.ListMainPost(context.TODO(), listReq)
+	postResp, err := client.PostClient.ListMainPost(context.TODO(), listReq)
 	if err != nil {
 		SendError(c, err, nil, "", GetLine())
 		return

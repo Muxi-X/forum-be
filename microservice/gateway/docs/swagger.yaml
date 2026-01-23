@@ -128,6 +128,15 @@ definitions:
       type_name:
         type: string
     type: object
+  chat.UserStatus:
+    properties:
+      avatar:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+    type: object
   comment.Comment:
     properties:
       be_replied_content:
@@ -630,6 +639,27 @@ paths:
               $ref: '#/definitions/chat.Message'
             type: array
       summary: 获取该用户的聊天记录
+      tags:
+      - chat
+  /chat/userList:
+    get:
+      description: 获取该用户的聊天列表，包括每个聊天对象的名字和图片
+      parameters:
+      - description: token 用户令牌
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功返回用户列表
+          schema:
+            items:
+              $ref: '#/definitions/chat.UserStatus'
+            type: array
+      summary: 获取该用户的聊天列表
       tags:
       - chat
   /chat/ws:

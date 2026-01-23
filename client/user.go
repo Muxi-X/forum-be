@@ -1,8 +1,11 @@
-package service
+package client
 
 import (
 	pbu "forum-user/proto"
 	"forum/pkg/handler"
+
+	"forum/pkg/identity"
+
 	"github.com/go-micro/plugins/v4/registry/etcd"
 	_ "github.com/go-micro/plugins/v4/registry/kubernetes"
 	opentracingWrapper "github.com/go-micro/plugins/v4/wrapper/trace/opentracing"
@@ -29,5 +32,5 @@ func UserInit() {
 
 	service.Init()
 
-	UserClient = pbu.NewUserService("forum.service.user", service.Client())
+	UserClient = pbu.NewUserService(identity.Prefix()+"forum.service.user", service.Client())
 }

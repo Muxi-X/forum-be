@@ -36,7 +36,7 @@ func (d *Dao) GetList(id uint32, expiration time.Duration, wait bool) ([]string,
 	defer func() {
 		fmt.Println(time.Now().Sub(t))
 	}()
-	//使用用户的id创建一个key
+	// 使用用户的id创建一个key
 	key := GetKey(id)
 	// 如果数列里面为空的话则阻塞等待
 	if d.Redis.LLen(key).Val() == 0 {
@@ -179,4 +179,39 @@ func (d *Dao) CreateHistory(userId uint32, list []string) error {
 		}
 	}
 	return nil
+}
+
+func (d *Dao) GetUserList(userId uint32, limit, page int) ([]uint32, error) {
+	var userList []uint32
+
+	// order by id 让最新聊天的用户排在最前面
+	err := d.DB.Table("messages").
+		Select("CASE WHEN sender_id = ? THEN receiver_id ELSE sender_id END AS other_id", userId).
+		Where("sender_id = ? OR receiver_id = ?", userId, userId).
+		Group("other_id").
+		Order("MAX(time) DESC").
+		Offset(page * limit).
+		Limit(limit).
+		Scan(&userList).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return userList, nil
+}
+
+func (d *Dao) GetUserById(userIds []uint32) ([]*pb.UserStatus, error) {
+	var usersStatus []*pb.UserStatus
+	for _, id := range userIds {
+		var userStatus pb.UserStatus
+		err := d.DB.Table("users").Where("id = ?", id).Find(&userStatus).Error
+		if err != nil {
+			return nil, err
+		}
+
+		usersStatus = append(usersStatus, &userStatus)
+	}
+
+	return usersStatus, nil
 }

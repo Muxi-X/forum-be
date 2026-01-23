@@ -71,6 +71,7 @@ func Load(g *gin.Engine, mw ...gin.HandlerFunc) *gin.Engine {
 	{
 		chatRouter.GET("/history/:id", chat.ListHistory)
 		chatRouter.GET("/ws", chat.WsHandler)
+		chatRouter.GET("/userList", chat.UserList)
 	}
 
 	postRouter := g.Group("api/v1/post")

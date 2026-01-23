@@ -3,13 +3,15 @@ package post
 import (
 	"context"
 	. "forum-gateway/handler"
-	"forum-gateway/service"
 	"forum-gateway/util"
 	pb "forum-post/proto"
 	"forum/log"
 	"forum/model"
 	"forum/pkg/constvar"
 	"forum/pkg/errno"
+
+	"forum/client"
+
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
@@ -61,7 +63,7 @@ func (a *Api) UpdateInfo(c *gin.Context) {
 		Summary:  req.Summary,
 	}
 
-	_, err = service.PostClient.UpdatePostInfo(context.TODO(), &updateReq)
+	_, err = client.PostClient.UpdatePostInfo(context.TODO(), &updateReq)
 	if err != nil {
 		SendError(c, err, nil, "", GetLine())
 		return

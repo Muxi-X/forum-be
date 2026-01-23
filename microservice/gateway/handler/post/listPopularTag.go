@@ -3,10 +3,12 @@ package post
 import (
 	"context"
 	. "forum-gateway/handler"
-	"forum-gateway/service"
 	"forum-gateway/util"
 	pb "forum-post/proto"
 	"forum/log"
+
+	"forum/client"
+
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
@@ -30,7 +32,7 @@ func (a *Api) ListPopularTag(c *gin.Context) {
 		Category: category,
 	}
 
-	resp, err := service.PostClient.ListPopularTag(context.TODO(), req)
+	resp, err := client.PostClient.ListPopularTag(context.TODO(), req)
 	if err != nil {
 		SendError(c, err, nil, "", GetLine())
 		return

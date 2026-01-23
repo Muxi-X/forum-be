@@ -2,11 +2,14 @@ package main
 
 import (
 	"flag"
+	"forum/pkg/identity"
+	"log"
+
 	"github.com/go-micro/plugins/v4/registry/etcd"
+	"github.com/joho/godotenv"
 	"github.com/opentracing/opentracing-go"
 	micro "go-micro.dev/v4"
 	"go-micro.dev/v4/registry"
-	"log"
 
 	"forum-feed/dao"
 	pb "forum-feed/proto"
@@ -22,6 +25,11 @@ import (
 	"github.com/spf13/viper"
 	cli "github.com/urfave/cli/v2"
 )
+
+func init() {
+	// 预加载.env文件,用于本地开发
+	_ = godotenv.Load()
+}
 
 // 使用--sub运行subscribe服务
 // 否则默认运行feed服务
@@ -77,7 +85,7 @@ func main() {
 	)
 	// feed-service
 	srv := micro.NewService(
-		micro.Name(viper.GetString("local_name")),
+		micro.Name(identity.Prefix()+viper.GetString("local_name")),
 		micro.WrapHandler(
 			opentracingWrapper.NewHandlerWrapper(opentracing.GlobalTracer()),
 		),

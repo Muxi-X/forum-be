@@ -3,12 +3,14 @@ package report
 import (
 	"context"
 	. "forum-gateway/handler"
-	"forum-gateway/service"
 	"forum-gateway/util"
 	pb "forum-post/proto"
 	"forum/log"
 	"forum/pkg/constvar"
 	"forum/pkg/errno"
+
+	"forum/client"
+
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
@@ -41,7 +43,7 @@ func (a *Api) Handle(c *gin.Context) {
 		Result: req.Result,
 	}
 
-	_, err := service.PostClient.HandleReport(context.TODO(), &handleReq)
+	_, err := client.PostClient.HandleReport(context.TODO(), &handleReq)
 	if err != nil {
 		SendError(c, err, nil, "", GetLine())
 		return

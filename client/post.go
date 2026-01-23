@@ -1,8 +1,10 @@
-package service
+package client
 
 import (
 	pbp "forum-post/proto"
 	"forum/pkg/handler"
+
+	"forum/pkg/identity"
 	"github.com/go-micro/plugins/v4/registry/etcd"
 	_ "github.com/go-micro/plugins/v4/registry/kubernetes"
 	opentracingWrapper "github.com/go-micro/plugins/v4/wrapper/trace/opentracing"
@@ -30,5 +32,5 @@ func PostInit() {
 
 	service.Init()
 
-	PostClient = pbp.NewPostService("forum.service.post", service.Client())
+	PostClient = pbp.NewPostService(identity.Prefix()+"forum.service.post", service.Client())
 }

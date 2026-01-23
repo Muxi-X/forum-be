@@ -4,7 +4,6 @@ import (
 	"context"
 	pb "forum-feed/proto"
 	. "forum-gateway/handler"
-	"forum-gateway/service"
 	"forum-gateway/util"
 	"forum/log"
 	"forum/model"
@@ -12,6 +11,7 @@ import (
 	"forum/pkg/errno"
 	"strconv"
 
+	"forum/client"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
@@ -79,7 +79,7 @@ func (a *Api) List(c *gin.Context) {
 		TargetUserId: uint32(targetUserId),
 	}
 
-	listResp, err := service.FeedClient.List(context.TODO(), listReq)
+	listResp, err := client.FeedClient.List(context.TODO(), listReq)
 	if err != nil {
 		SendError(c, err, nil, "", GetLine())
 		return

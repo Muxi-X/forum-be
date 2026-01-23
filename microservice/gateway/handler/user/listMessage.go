@@ -3,10 +3,11 @@ package user
 import (
 	"context"
 	. "forum-gateway/handler"
-	"forum-gateway/service"
 	"forum-gateway/util"
 	pb "forum-user/proto"
 	"forum/log"
+
+	"forum/client"
 
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
@@ -29,7 +30,7 @@ func ListMessage(c *gin.Context) {
 		UserId: userId,
 	}
 
-	listResp, err := service.UserClient.ListMessage(context.TODO(), listReq)
+	listResp, err := client.UserClient.ListMessage(context.TODO(), listReq)
 	if err != nil {
 		SendError(c, err, nil, "", GetLine())
 		return
@@ -55,7 +56,7 @@ func ListPrivateMessage(c *gin.Context) {
 		UserId: userId,
 	}
 
-	listResp, err := service.UserClient.ListPrivateMessage(context.TODO(), listReq)
+	listResp, err := client.UserClient.ListPrivateMessage(context.TODO(), listReq)
 	if err != nil {
 		SendError(c, err, nil, "", GetLine())
 		return

@@ -4,6 +4,10 @@ replace forum => ../../
 
 replace forum-user => ../user
 
+replace forum-chat => ../chat
+
+replace forum-feed => ../feed
+
 go 1.23.0
 
 toolchain go1.23.3
@@ -12,9 +16,10 @@ require (
 	forum v0.0.0-00010101000000-000000000000
 	forum-user v0.0.0-00010101000000-000000000000
 	github.com/go-micro/plugins/v4/registry/etcd v1.2.0
-	github.com/go-micro/plugins/v4/registry/kubernetes v1.1.0
-	github.com/go-micro/plugins/v4/wrapper/trace/opentracing v1.1.0
+	github.com/go-micro/plugins/v4/registry/kubernetes v1.1.2
+	github.com/go-micro/plugins/v4/wrapper/trace/opentracing v1.2.0
 	github.com/go-redis/redis v6.15.9+incompatible
+	github.com/joho/godotenv v1.5.1
 	github.com/opentracing/opentracing-go v1.2.0
 	github.com/spf13/viper v1.12.0
 	go-micro.dev/v4 v4.11.0
@@ -31,7 +36,6 @@ require (
 	github.com/aliyun/alibaba-cloud-sdk-go v1.61.976 // indirect
 	github.com/bitly/go-simplejson v0.5.0 // indirect
 	github.com/bmatcuk/doublestar/v4 v4.6.1 // indirect
-	github.com/bmizerany/assert v0.0.0-20160611221934-b7ed37b82869 // indirect
 	github.com/buger/jsonparser v1.1.1 // indirect
 	github.com/casbin/casbin/v2 v2.103.0 // indirect
 	github.com/casbin/gorm-adapter/v3 v3.7.2 // indirect
@@ -70,7 +74,7 @@ require (
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/gorilla/handlers v1.5.1 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
-	github.com/imdario/mergo v0.3.12 // indirect
+	github.com/imdario/mergo v0.3.13 // indirect
 	github.com/jackc/chunkreader/v2 v2.0.1 // indirect
 	github.com/jackc/pgconn v1.13.0 // indirect
 	github.com/jackc/pgio v1.0.0 // indirect
@@ -89,7 +93,7 @@ require (
 	github.com/magiconair/properties v1.8.6 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/microsoft/go-mssqldb v1.8.0 // indirect
-	github.com/miekg/dns v1.1.43 // indirect
+	github.com/miekg/dns v1.1.50 // indirect
 	github.com/mitchellh/hashstructure v1.1.0 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
@@ -126,10 +130,12 @@ require (
 	go.uber.org/multierr v1.6.0 // indirect
 	golang.org/x/crypto v0.37.0 // indirect
 	golang.org/x/exp v0.0.0-20250408133849-7e4ce0ab07d0 // indirect
+	golang.org/x/mod v0.24.0 // indirect
 	golang.org/x/net v0.39.0 // indirect
 	golang.org/x/sync v0.13.0 // indirect
 	golang.org/x/sys v0.32.0 // indirect
 	golang.org/x/text v0.24.0 // indirect
+	golang.org/x/tools v0.32.0 // indirect
 	google.golang.org/genproto v0.0.0-20230306155012-7f2fa6fef1f4 // indirect
 	google.golang.org/grpc v1.54.1 // indirect
 	gopkg.in/ini.v1 v1.66.4 // indirect

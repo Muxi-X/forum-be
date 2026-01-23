@@ -5,11 +5,12 @@ import (
 	. "forum-gateway/handler"
 	"strconv"
 
-	"forum-gateway/service"
 	"forum-gateway/util"
 	pb "forum-user/proto"
 	"forum/log"
 	"forum/pkg/errno"
+
+	"forum/client"
 
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
@@ -48,7 +49,7 @@ func GetUserProfile(id uint32) (*pb.UserProfile, error) {
 
 	getProfileReq := &pb.GetRequest{Id: id}
 
-	getProfileResp, err := service.UserClient.GetProfile(context.TODO(), getProfileReq)
+	getProfileResp, err := client.UserClient.GetProfile(context.TODO(), getProfileReq)
 
 	return getProfileResp, err
 }

@@ -4,11 +4,12 @@ import (
 	"context"
 	pb "forum-chat/proto"
 	. "forum-gateway/handler"
-	"forum-gateway/service"
 	"forum-gateway/util"
 	"forum/log"
 	"forum/pkg/errno"
 	"strconv"
+
+	"forum/client"
 
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
@@ -55,7 +56,7 @@ func ListHistory(c *gin.Context) {
 		Wait:   false,
 	}
 
-	_, err = service.ChatClient.GetList(context.Background(), getListRequest)
+	_, err = client.ChatClient.GetList(context.Background(), getListRequest)
 	if err != nil {
 		SendError(c, errno.ErrQuery, nil, err.Error(), GetLine())
 		return
@@ -69,7 +70,7 @@ func ListHistory(c *gin.Context) {
 		OtherUserId: uint32(otherUserId),
 	}
 
-	resp, err := service.ChatClient.ListHistory(context.TODO(), &req)
+	resp, err := client.ChatClient.ListHistory(context.TODO(), &req)
 	if err != nil {
 		SendError(c, err, nil, "", GetLine())
 		return
