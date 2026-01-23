@@ -3,32 +3,22 @@ package service
 import (
 	"context"
 	pb "forum-chat/proto"
-	"forum/pkg/errno"
+
+	"github.com/samber/lo"
 )
 
 // UserList ... 获取用户列表
 func (s *ChatService) UserList(ctx context.Context, req *pb.UserListRequest, resp *pb.UserListResponse) error {
-	usersId, err := s.Dao.GetUserList(req.UserId)
+	userList, err := s.Dao.GetUserList(req.UserId, int(req.Limit), int(req.Page))
 	if err != nil {
-		return errno.ServerErr(errno.ErrDatabase, err.Error())
+		return err
 	}
+	userList = lo.Uniq(userList)
 
-	resp.UserIds = removeDistinct(usersId)
+	resp.UserLists, err = s.Dao.GetUserById(userList)
+	if err != nil {
+		return err
+	}
 
 	return nil
-}
-
-func removeDistinct(usersId []uint32) []uint32 {
-	newIds := make([]uint32, 0)
-	idMap := make(map[uint32]bool)
-
-	for _, id := range usersId {
-		if idMap[id] {
-			continue
-		}
-		newIds = append(newIds, id)
-		idMap[id] = true
-	}
-
-	return newIds
 }

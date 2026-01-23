@@ -138,6 +138,7 @@ const docTemplate = `{
         },
         "/chat/userList": {
             "get": {
+                "description": "获取该用户的聊天列表，包括每个聊天对象的名字和图片",
                 "produces": [
                     "application/json"
                 ],
@@ -156,7 +157,13 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "示例: {\\\"code\\\":0,\\\"message\\\":ok,\\\"data\\\":[123,456,789]}"
+                        "description": "成功返回用户列表",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/chat.UserStatus"
+                            }
+                        }
                     }
                 }
             }
@@ -1560,6 +1567,20 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "type_name": {
+                    "type": "string"
+                }
+            }
+        },
+        "chat.UserStatus": {
+            "type": "object",
+            "properties": {
+                "avatar": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
                     "type": "string"
                 }
             }
