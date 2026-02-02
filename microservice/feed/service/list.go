@@ -6,6 +6,7 @@ import (
 	pb "forum-feed/proto"
 	"forum-user/pkg/role"
 	pbu "forum-user/proto"
+	"forum/client"
 	logger "forum/log"
 	"forum/pkg/constvar"
 	"forum/pkg/errno"
@@ -17,7 +18,7 @@ func (s *FeedService) List(_ context.Context, req *pb.ListRequest, res *pb.ListR
 
 	var filter = &dao.FeedModel{}
 
-	getResp, err := UserClient.GetProfile(context.TODO(), &pbu.GetRequest{Id: req.UserId})
+	getResp, err := client.UserClient.GetProfile(context.TODO(), &pbu.GetRequest{Id: req.UserId})
 	if err != nil {
 		return errno.ServerErr(errno.ErrRPC, err.Error())
 	}

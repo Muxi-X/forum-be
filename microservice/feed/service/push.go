@@ -11,13 +11,15 @@ import (
 	"forum-feed/dao"
 	pb "forum-feed/proto"
 	logger "forum/log"
+
+	"forum/client"
 )
 
 // Push ... 异步新增feed
 func (s *FeedService) Push(_ context.Context, req *pb.PushRequest, _ *pb.Response) error {
 	logger.Info("FeedService Push")
 
-	getResp, err := UserClient.GetProfile(context.TODO(), &pbu.GetRequest{Id: req.UserId})
+	getResp, err := client.UserClient.GetProfile(context.TODO(), &pbu.GetRequest{Id: req.UserId})
 	if err != nil {
 		return errno.ServerErr(errno.ErrRPC, err.Error())
 	}

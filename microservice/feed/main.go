@@ -35,11 +35,6 @@ func init() {
 // 否则默认运行feed服务
 var subFg = flag.Bool("sub", false, "use subscribe service mode")
 
-// InitRpcClient ... 记录 bug: go-micro 框架的命令行参数和 go 标准库的 flag 冲突了
-func initRpcClient() {
-	service.UserInit()
-}
-
 // 包含两个服务：feed服务和subscribe服务
 // subscribe服务 --> 异步将feed数据写入数据库
 func main() {
@@ -51,7 +46,7 @@ func main() {
 	if !*subFg {
 		// feed-service
 		err = config.Init("./conf/config.yaml", "FORUM_FEED")
-		initRpcClient()
+		//initRpcClient()
 	} else {
 		// sub-service
 		err = config.Init("./conf/config_sub.yaml", "FORUM_SUB")

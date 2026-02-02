@@ -3,8 +3,9 @@ package dao
 import (
 	pb "forum-post/proto"
 	"forum/pkg/constvar"
-	"gorm.io/gorm"
 	"strconv"
+
+	"gorm.io/gorm"
 )
 
 type PostModel struct {
@@ -116,7 +117,7 @@ func (d *Dao) ListMainPost(filter *PostModel, typeName string, offset, limit, la
 			return nil, err
 		}
 
-		query.Where("posts.id IN ?", postIds)
+		query = query.Where("posts.id IN ?", postIds)
 	}
 
 	if searchContent != "" {
