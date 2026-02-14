@@ -6,9 +6,10 @@ import (
 	"forum/model"
 	"forum/pkg/constvar"
 	"forum/pkg/errno"
+	"time"
+
 	"github.com/go-redis/redis"
 	"gorm.io/gorm"
-	"time"
 )
 
 var (
@@ -31,6 +32,8 @@ type Interface interface {
 	IsUserCollectionPost(uint32, uint32) (bool, error)
 	ListPostInfoByPostIds([]uint32, *PostModel, uint32, uint32, uint32, bool) ([]*pb.PostPartInfo, error)
 	DeletePost(uint32, ...*gorm.DB) error
+	ChangeQualityPost(uint32, bool) error
+	CountPostByTime(string, string) (int64, error)
 
 	CreateComment(*CommentModel) (uint32, error)
 	GetCommentInfo(uint32) (*CommentInfo, error)
@@ -68,6 +71,8 @@ type Interface interface {
 	ValidReport(string, uint32) error
 	InValidReport(uint32, string, uint32) error
 	IsUserHadReportTarget(uint32, string, uint32) (bool, error)
+
+	UpdateLastRead(uint32, string, string) error
 }
 
 // Init init dao

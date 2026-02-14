@@ -28,15 +28,17 @@ func (s *UserService) CreatePrivateMessage(_ context.Context, req *pb.CreatePriv
 
 	uid := uuid.New().String()
 	message, _ := json.Marshal(map[string]string{
-		"id":          uid,
-		"send_userid": strconv.Itoa(int(req.SendId)),
-		"content":     req.Content,
-		"post_id":     strconv.Itoa(int(req.PostId)),
-		"comment_id":  strconv.Itoa(int(req.CommentId)),
-		"type":        req.Type,
+		"id":              uid,
+		"send_userid":     strconv.Itoa(int(req.SendUserid)),
+		"content":         req.Content,
+		"post_id":         strconv.Itoa(int(req.PostId)),
+		"comment_id":      strconv.Itoa(int(req.CommentId)),
+		"type":            req.Type,
+		"post_title":      req.PostTitle,
+		"comment_content": req.CommentContent,
 	})
 
-	if err := s.Dao.CreateMessage(req.ReceiveId, string(message)); err != nil {
+	if err := s.Dao.CreateMessage(req.ReceiveUserid, string(message)); err != nil {
 		return errno.ServerErr(errno.ErrRedis, err.Error())
 	}
 

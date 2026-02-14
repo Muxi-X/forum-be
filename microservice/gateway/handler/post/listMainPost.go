@@ -28,7 +28,7 @@ import (
 // @Param page query int false "page"
 // @Param last_id query int false "last_id"
 // @Param category query string false "category"
-// @Param filter query string false "filter"
+// @Param filter query string false "filter可以是hot,quality或空，表示获取热门、精华或全部帖子"
 // @Param search_content query string false "search_content"
 // @Param tag query string false "tag"
 // @Param domain path string true "normal -> 团队外; muxi -> 团队内"
@@ -112,6 +112,20 @@ func (a *Api) ListMainPost(c *gin.Context) {
 	if err != nil {
 		SendError(c, err, nil, "", GetLine())
 		return
+	}
+
+	// 当page等于0意味已经读取到了对应板块最新的帖子，更新用户的last_read_time
+	if page == 0 && filter == "" {
+		lastReadReq := &pb.UpdateLastReadRequest{
+			UserId:   userId,
+			Category: category,
+		}
+
+		_, err = client.PostClient.UpdateLastReadTime(context.TODO(), lastReadReq)
+		if err != nil {
+			SendError(c, err, nil, "", GetLine())
+			return
+		}
 	}
 
 	SendMicroServiceResponse(c, nil, postResp, ListMainPostResponse{})

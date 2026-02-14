@@ -24,6 +24,7 @@ import (
 // @Produce application/json
 // @Param Authorization header string true "token 用户令牌"
 // @Param post_id path int true "post_id"
+// @Param quality query string false "quality=1表示将帖子从精华板块移除，quality=0或不传表示直接删除帖子"
 // @Success 200 {object} handler.Response
 // @Router /post/{post_id} [delete]
 func (a *Api) Delete(c *gin.Context) {
@@ -48,10 +49,27 @@ func (a *Api) Delete(c *gin.Context) {
 		return
 	}
 
+	quality := c.DefaultQuery("quality", "0")
+
 	deleteReq := &pb.DeleteItemRequest{
 		Id:       uint32(id),
 		TypeName: constvar.Post,
 		UserId:   userId,
+	}
+
+	if quality == "1" {
+		ok, err := model.HasRole(userId, constvar.NormalAdminRole)
+		if err != nil {
+			SendError(c, errno.ErrCasbin, nil, err.Error(), GetLine())
+			return
+		}
+
+		if !ok {
+			SendError(c, errno.ErrPermissionDenied, nil, "权限不足", GetLine())
+			return
+		}
+
+		deleteReq.TypeName = constvar.QualityPost
 	}
 
 	_, err = client.PostClient.DeleteItem(context.TODO(), deleteReq)

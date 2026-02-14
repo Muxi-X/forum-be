@@ -678,7 +678,7 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "description": "filter",
+                        "description": "filter可以是hot,quality或空，表示获取热门、精华或全部帖子",
                         "name": "filter",
                         "in": "query"
                     },
@@ -840,6 +840,70 @@ const docTemplate = `{
                 }
             }
         },
+        "/post/set_quality/{post_id}": {
+            "patch": {
+                "description": "需要管理员权限才能设置帖子为精华帖",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "post"
+                ],
+                "summary": "设置帖子为精华帖 api",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token 用户令牌",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/post/unread_num": {
+            "get": {
+                "description": "注意要先调用这个接口获取后再调用/list/:domain接口！！！",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "post"
+                ],
+                "summary": "获取每个板块未读帖子数 api",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token 用户令牌",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/post.UnReadNumResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/post/{post_id}": {
             "get": {
                 "consumes": [
@@ -902,6 +966,12 @@ const docTemplate = `{
                         "name": "post_id",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "quality=1表示将帖子从精华板块移除，quality=0或不传表示直接删除帖子",
+                        "name": "quality",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -1260,6 +1330,31 @@ const docTemplate = `{
                         "required": true,
                         "schema": {
                             "$ref": "#/definitions/user.CreatePrivateMessageRequest"
+                        }
+                    },
+                    {
+                        "description": "type can only be (like/comment/collection/reply_comment)",
+                        "name": "Type",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "comment_id 只有当type为reply_comment时需要传这个参数",
+                        "name": "CommentId",
+                        "in": "body",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "description": "comment_content 指被回复的评论内容",
+                        "name": "CommentContent",
+                        "in": "body",
+                        "schema": {
+                            "type": "string"
                         }
                     }
                 ],
@@ -2006,6 +2101,28 @@ const docTemplate = `{
                 }
             }
         },
+        "post.UnReadNum": {
+            "type": "object",
+            "properties": {
+                "category": {
+                    "type": "string"
+                },
+                "num": {
+                    "type": "integer"
+                }
+            }
+        },
+        "post.UnReadNumResponse": {
+            "type": "object",
+            "properties": {
+                "un_read_num": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/post.UnReadNum"
+                    }
+                }
+            }
+        },
         "post.UpdateInfoRequest": {
             "type": "object",
             "required": [
@@ -2174,10 +2291,14 @@ const docTemplate = `{
             "type": "object",
             "required": [
                 "post_id",
+                "post_title",
                 "receive_userid",
                 "type"
             ],
             "properties": {
+                "comment_content": {
+                    "type": "string"
+                },
                 "comment_id": {
                     "type": "integer"
                 },
@@ -2186,6 +2307,9 @@ const docTemplate = `{
                 },
                 "post_id": {
                     "type": "integer"
+                },
+                "post_title": {
+                    "type": "string"
                 },
                 "receive_userid": {
                     "type": "integer"

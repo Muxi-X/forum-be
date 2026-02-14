@@ -31,6 +31,8 @@ require (
 require (
 	dario.cat/mergo v1.0.0 // indirect
 	filippo.io/edwards25519 v1.1.0 // indirect
+	forum-chat v0.0.0-00010101000000-000000000000 // indirect
+	forum-feed v0.0.0-00010101000000-000000000000 // indirect
 	github.com/Microsoft/go-winio v0.6.2 // indirect
 	github.com/ProtonMail/go-crypto v1.1.6 // indirect
 	github.com/aliyun/alibaba-cloud-sdk-go v1.61.976 // indirect
