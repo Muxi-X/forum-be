@@ -33,7 +33,7 @@ type Interface interface {
 	ListPostInfoByPostIds([]uint32, *PostModel, uint32, uint32, uint32, bool) ([]*pb.PostPartInfo, error)
 	DeletePost(uint32, ...*gorm.DB) error
 	ChangeQualityPost(uint32, bool) error
-	CountPostByTime(string, string) (int64, error)
+	CountPostByTime(string, string) (int, error)
 
 	CreateComment(*CommentModel) (uint32, error)
 	GetCommentInfo(uint32) (*CommentInfo, error)

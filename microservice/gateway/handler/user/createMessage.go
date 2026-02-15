@@ -75,13 +75,13 @@ func CreatePrivateMessage(c *gin.Context) {
 
 	userId := c.MustGet("userId").(uint32)
 	listReq := &pb.CreatePrivateMessageRequest{
-		ReceiveUserid:  req.ReceiveUserid,
-		SendUserid:     userId,
+		ReceiveUserId:  req.ReceiveUserid,
+		SendUserId:     userId,
 		Content:        req.Content,
 		Type:           req.Type,
 		PostId:         req.PostId,
 		CommentId:      req.CommentId,
-		PostTitle:      req.PostTiTle,
+		PostTitle:      req.PostTitle,
 		CommentContent: req.CommentContent,
 	}
 

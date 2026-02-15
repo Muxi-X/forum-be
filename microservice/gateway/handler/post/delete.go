@@ -49,7 +49,7 @@ func (a *Api) Delete(c *gin.Context) {
 		return
 	}
 
-	quality := c.DefaultQuery("quality", "0")
+	quality := c.DefaultQuery("quality", constvar.DeletePost)
 
 	deleteReq := &pb.DeleteItemRequest{
 		Id:       uint32(id),
@@ -57,7 +57,7 @@ func (a *Api) Delete(c *gin.Context) {
 		UserId:   userId,
 	}
 
-	if quality == "1" {
+	if quality == constvar.RemoveQuality {
 		ok, err := model.HasRole(userId, constvar.NormalAdminRole)
 		if err != nil {
 			SendError(c, errno.ErrCasbin, nil, err.Error(), GetLine())

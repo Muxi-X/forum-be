@@ -100,6 +100,6 @@ type CreatePrivateMessageRequest struct {
 	Content        string `json:"content"`
 	PostId         uint32 `json:"post_id" binding:"required"`
 	CommentId      uint32 `json:"comment_id"`
-	PostTiTle      string `json:"post_title" binding:"required"`
+	PostTitle      string `json:"post_title" binding:"required"`
 	CommentContent string `json:"comment_content"`
 }

@@ -1407,6 +1407,14 @@ paths:
         name: Authorization
         required: true
         type: string
+      - description: limit
+        in: query
+        name: limit
+        type: string
+      - description: page
+        in: query
+        name: page
+        type: string
       produces:
       - application/json
       responses:
@@ -1509,6 +1517,14 @@ paths:
         in: header
         name: Authorization
         required: true
+        type: string
+      - description: limit
+        in: query
+        name: limit
+        type: string
+      - description: page
+        in: query
+        name: page
         type: string
       produces:
       - application/json

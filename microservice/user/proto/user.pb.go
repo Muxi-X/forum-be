@@ -75,8 +75,8 @@ func (x *CreateMessageRequest) GetMessage() string {
 
 type CreatePrivateMessageRequest struct {
 	state          protoimpl.MessageState `protogen:"open.v1"`
-	SendUserid     uint32                 `protobuf:"varint,1,opt,name=send_userid,json=sendUserid,proto3" json:"send_userid,omitempty"`
-	ReceiveUserid  uint32                 `protobuf:"varint,2,opt,name=receive_userid,json=receiveUserid,proto3" json:"receive_userid,omitempty"`
+	SendUserId     uint32                 `protobuf:"varint,1,opt,name=send_user_id,json=sendUserId,proto3" json:"send_user_id,omitempty"`
+	ReceiveUserId  uint32                 `protobuf:"varint,2,opt,name=receive_user_id,json=receiveUserId,proto3" json:"receive_user_id,omitempty"`
 	PostId         uint32                 `protobuf:"varint,3,opt,name=post_id,json=postId,proto3" json:"post_id,omitempty"`
 	CommentId      uint32                 `protobuf:"varint,4,opt,name=comment_id,json=commentId,proto3" json:"comment_id,omitempty"`
 	Type           string                 `protobuf:"bytes,5,opt,name=type,proto3" json:"type,omitempty"`
@@ -117,16 +117,16 @@ func (*CreatePrivateMessageRequest) Descriptor() ([]byte, []int) {
 	return file_user_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *CreatePrivateMessageRequest) GetSendUserid() uint32 {
+func (x *CreatePrivateMessageRequest) GetSendUserId() uint32 {
 	if x != nil {
-		return x.SendUserid
+		return x.SendUserId
 	}
 	return 0
 }
 
-func (x *CreatePrivateMessageRequest) GetReceiveUserid() uint32 {
+func (x *CreatePrivateMessageRequest) GetReceiveUserId() uint32 {
 	if x != nil {
-		return x.ReceiveUserid
+		return x.ReceiveUserId
 	}
 	return 0
 }
@@ -228,6 +228,8 @@ func (x *DeletePrivateMessageRequest) GetId() string {
 type ListMessageRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	UserId        uint32                 `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	Limit         uint32                 `protobuf:"varint,2,opt,name=limit,proto3" json:"limit,omitempty"`
+	Offset        uint32                 `protobuf:"varint,3,opt,name=offset,proto3" json:"offset,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -269,10 +271,24 @@ func (x *ListMessageRequest) GetUserId() uint32 {
 	return 0
 }
 
+func (x *ListMessageRequest) GetLimit() uint32 {
+	if x != nil {
+		return x.Limit
+	}
+	return 0
+}
+
+func (x *ListMessageRequest) GetOffset() uint32 {
+	if x != nil {
+		return x.Offset
+	}
+	return 0
+}
+
 type Message struct {
 	state          protoimpl.MessageState `protogen:"open.v1"`
 	Id             string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	SendUserid     string                 `protobuf:"bytes,2,opt,name=send_userid,json=sendUserid,proto3" json:"send_userid,omitempty"`
+	SendUserId     string                 `protobuf:"bytes,2,opt,name=send_user_id,json=sendUserId,proto3" json:"send_user_id,omitempty"`
 	PostId         string                 `protobuf:"bytes,3,opt,name=post_id,json=postId,proto3" json:"post_id,omitempty"`
 	CommentId      string                 `protobuf:"bytes,4,opt,name=comment_id,json=commentId,proto3" json:"comment_id,omitempty"`
 	Type           string                 `protobuf:"bytes,5,opt,name=type,proto3" json:"type,omitempty"`
@@ -322,9 +338,9 @@ func (x *Message) GetId() string {
 	return ""
 }
 
-func (x *Message) GetSendUserid() string {
+func (x *Message) GetSendUserId() string {
 	if x != nil {
-		return x.SendUserid
+		return x.SendUserId
 	}
 	return ""
 }
@@ -1341,11 +1357,11 @@ const file_user_proto_rawDesc = "" +
 	"user.proto\x12\x04user\"I\n" +
 	"\x14CreateMessageRequest\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\rR\x06userId\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessage\"\x93\x02\n" +
-	"\x1bCreatePrivateMessageRequest\x12\x1f\n" +
-	"\vsend_userid\x18\x01 \x01(\rR\n" +
-	"sendUserid\x12%\n" +
-	"\x0ereceive_userid\x18\x02 \x01(\rR\rreceiveUserid\x12\x17\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\"\x95\x02\n" +
+	"\x1bCreatePrivateMessageRequest\x12 \n" +
+	"\fsend_user_id\x18\x01 \x01(\rR\n" +
+	"sendUserId\x12&\n" +
+	"\x0freceive_user_id\x18\x02 \x01(\rR\rreceiveUserId\x12\x17\n" +
 	"\apost_id\x18\x03 \x01(\rR\x06postId\x12\x1d\n" +
 	"\n" +
 	"comment_id\x18\x04 \x01(\rR\tcommentId\x12\x12\n" +
@@ -1356,13 +1372,15 @@ const file_user_proto_rawDesc = "" +
 	"\x0fcomment_content\x18\b \x01(\tR\x0ecommentContent\"F\n" +
 	"\x1bDeletePrivateMessageRequest\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\rR\x06userId\x12\x0e\n" +
-	"\x02id\x18\x02 \x01(\tR\x02id\"-\n" +
+	"\x02id\x18\x02 \x01(\tR\x02id\"[\n" +
 	"\x12ListMessageRequest\x12\x17\n" +
-	"\auser_id\x18\x01 \x01(\rR\x06userId\"\xa1\x02\n" +
+	"\auser_id\x18\x01 \x01(\rR\x06userId\x12\x14\n" +
+	"\x05limit\x18\x02 \x01(\rR\x05limit\x12\x16\n" +
+	"\x06offset\x18\x03 \x01(\rR\x06offset\"\xa2\x02\n" +
 	"\aMessage\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1f\n" +
-	"\vsend_userid\x18\x02 \x01(\tR\n" +
-	"sendUserid\x12\x17\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12 \n" +
+	"\fsend_user_id\x18\x02 \x01(\tR\n" +
+	"sendUserId\x12\x17\n" +
 	"\apost_id\x18\x03 \x01(\tR\x06postId\x12\x1d\n" +
 	"\n" +
 	"comment_id\x18\x04 \x01(\tR\tcommentId\x12\x12\n" +

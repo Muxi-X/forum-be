@@ -335,8 +335,9 @@ func (d Dao) UpdateLastRead(userId uint32, category, time string) error {
 	return d.DB.Table("last_clicks").Where("user_id = ? AND category = ?", userId, category).Update("last_click_at", time).Error
 }
 
-func (d Dao) CountPostByTime(time, category string) (int64, error) {
-	var count int64
-	err := d.DB.Table("posts").Where("create_time >= ? AND re = 0 AND is_report = 0 AND category = ?", time, category).Count(&count).Error
-	return count, err
+func (d Dao) CountPostByTime(time, category string) (int, error) {
+	var list []int
+	// 最多只查询到99条，避免数据过多
+	err := d.DB.Table("posts").Select("1").Where("create_time >= ? AND re = 0 AND is_report = 0 AND category = ?", time, category).Limit(99).Find(&list).Error
+	return len(list), err
 }

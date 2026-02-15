@@ -26,8 +26,8 @@ message CreateMessageRequest {
 }
 
 message CreatePrivateMessageRequest {
-  uint32 send_userid = 1;
-  uint32 receive_userid = 2;
+  uint32 send_user_id = 1;
+  uint32 receive_user_id = 2;
   uint32 post_id =3;
   uint32 comment_id =4;
   string type = 5;
@@ -43,11 +43,13 @@ message DeletePrivateMessageRequest {
 
 message ListMessageRequest {
   uint32 user_id = 1;
+  uint32 limit = 2;
+  uint32 offset = 3;
 }
 
 message Message {
   string id = 1;
-  string send_userid = 2;
+  string send_user_id = 2;
   string post_id = 3;
   string comment_id = 4;
   string type = 5;

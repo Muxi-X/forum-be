@@ -60,4 +60,8 @@ const (
 	Emotion   = "感情 · 成长 · 回顾"
 	Campus    = "校园生活 · 日常经验"
 	Trade     = "闲置 · 出物 · 互助"
+
+	// delete type
+	DeletePost    = "0"
+	RemoveQuality = "1"
 )

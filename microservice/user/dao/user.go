@@ -4,8 +4,9 @@ import (
 	"errors"
 	"forum/model"
 	"forum/pkg/constvar"
-	"gorm.io/gorm"
 	"strconv"
+
+	"gorm.io/gorm"
 )
 
 type RegisterInfo struct {
@@ -24,6 +25,20 @@ func (d *Dao) GetUser(id uint32) (*UserModel, error) {
 		return nil, nil
 	}
 	return user, err
+}
+
+func (d *Dao) BatchGetUser(ids []uint32) (map[uint32]*UserModel, error) {
+	var users []*UserModel
+	if err := d.DB.Where("id IN (?) AND re = 0", ids).Find(&users).Error; err != nil {
+		return nil, err
+	}
+
+	userMap := make(map[uint32]*UserModel, len(users))
+	for _, user := range users {
+		userMap[user.Id] = user
+	}
+
+	return userMap, nil
 }
 
 // GetUserByIds get user by id array
