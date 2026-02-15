@@ -24,10 +24,8 @@ import (
 )
 
 func init() {
-	service.UserInit()
 	// 预加载.env文件,用于本地开发.
 	_ = godotenv.Load()
-
 }
 
 func main() {

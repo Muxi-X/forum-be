@@ -12,7 +12,7 @@ service UserService {
   rpc List(ListRequest) returns (ListResponse) {}
 
   rpc ListMessage(ListMessageRequest)returns (ListMessageResponse) {}
-  rpc ListPrivateMessage(ListMessageRequest)returns (ListMessageResponse) {}
+  rpc ListPrivateMessage(ListMessageRequest)returns (ListPrivateMessageResponse) {}
   rpc CreateMessage(CreateMessageRequest)returns (Response) {}
   rpc CreatePrivateMessage(CreatePrivateMessageRequest)returns (Response) {}
   rpc DeletePrivateMessage(DeletePrivateMessageRequest)returns (Response) {}
@@ -26,12 +26,14 @@ message CreateMessageRequest {
 }
 
 message CreatePrivateMessageRequest {
-  uint32 send_id = 1;
-  uint32 receive_id = 2;
+  uint32 send_user_id = 1;
+  uint32 receive_user_id = 2;
   uint32 post_id =3;
   uint32 comment_id =4;
   string type = 5;
   string content = 6;
+  string post_title = 7;
+  string comment_content = 8;  // 回复评论时，显示被回复的评论
 }
 
 message DeletePrivateMessageRequest {
@@ -41,6 +43,25 @@ message DeletePrivateMessageRequest {
 
 message ListMessageRequest {
   uint32 user_id = 1;
+  uint32 limit = 2;
+  uint32 offset = 3;
+}
+
+message Message {
+  string id = 1;
+  string send_user_id = 2;
+  string post_id = 3;
+  string comment_id = 4;
+  string type = 5;
+  string content = 6;
+  string post_title = 7;
+  string comment_content = 8;  // 回复评论时，显示被回复的评论内容
+  string avatar = 9;
+  string sender_name = 10;
+}
+
+message ListPrivateMessageResponse {
+  repeated Message messages = 1;
 }
 
 message ListMessageResponse {

@@ -21,8 +21,9 @@ const (
 	SuperAdminRole  = "SuperAdmin"
 
 	// item.TypeName
-	Post    = "post"
-	Comment = "comment"
+	Post        = "post"
+	QualityPost = "quality-post"
+	Comment     = "comment"
 
 	Collection        = "collection"
 	CollectionAndLike = "collection-like"
@@ -51,4 +52,16 @@ const (
 	BanNumber     = 5
 	ValidReport   = "valid"
 	InvalidReport = "invalid"
+
+	// post category
+	DailyLife = "即时 · 日常 · 树洞"
+	Study     = "学习 · 决策 · 经验"
+	Project   = "比赛 · 项目 · 实践"
+	Emotion   = "感情 · 成长 · 回顾"
+	Campus    = "校园生活 · 日常经验"
+	Trade     = "闲置 · 出物 · 互助"
+
+	// delete type
+	DeletePost    = "0"
+	RemoveQuality = "1"
 )

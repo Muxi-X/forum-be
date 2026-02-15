@@ -419,6 +419,20 @@ definitions:
       time:
         type: string
     type: object
+  post.UnReadNum:
+    properties:
+      category:
+        type: string
+      num:
+        type: integer
+    type: object
+  post.UnReadNumResponse:
+    properties:
+      un_read_num:
+        items:
+          $ref: '#/definitions/post.UnReadNum'
+        type: array
+    type: object
   post.UpdateInfoRequest:
     properties:
       category:
@@ -532,12 +546,16 @@ definitions:
     type: object
   user.CreatePrivateMessageRequest:
     properties:
+      comment_content:
+        type: string
       comment_id:
         type: integer
       content:
         type: string
       post_id:
         type: integer
+      post_title:
+        type: string
       receive_userid:
         type: integer
       type:
@@ -545,6 +563,7 @@ definitions:
         type: string
     required:
     - post_id
+    - post_title
     - receive_userid
     - type
     type: object
@@ -993,6 +1012,10 @@ paths:
         name: post_id
         required: true
         type: integer
+      - description: quality=1表示将帖子从精华板块移除，quality=0或不传表示直接删除帖子
+        in: query
+        name: quality
+        type: string
       produces:
       - application/json
       responses:
@@ -1054,7 +1077,7 @@ paths:
         in: query
         name: category
         type: string
-      - description: filter
+      - description: filter可以是hot,quality或空，表示获取热门、精华或全部帖子
         in: query
         name: filter
         type: string
@@ -1163,6 +1186,48 @@ paths:
           schema:
             $ref: '#/definitions/post.QiNiuToken'
       summary: 获取七牛云token
+      tags:
+      - post
+  /post/set_quality/{post_id}:
+    patch:
+      consumes:
+      - application/json
+      description: 需要管理员权限才能设置帖子为精华帖
+      parameters:
+      - description: token 用户令牌
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Response'
+      summary: 设置帖子为精华帖 api
+      tags:
+      - post
+  /post/unread_num:
+    get:
+      consumes:
+      - application/json
+      description: 注意要先调用这个接口获取后再调用/list/:domain接口！！！
+      parameters:
+      - description: token 用户令牌
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/post.UnReadNumResponse'
+      summary: 获取每个板块未读帖子数 api
       tags:
       - post
   /report:
@@ -1342,6 +1407,14 @@ paths:
         name: Authorization
         required: true
         type: string
+      - description: limit
+        in: query
+        name: limit
+        type: string
+      - description: page
+        in: query
+        name: page
+        type: string
       produces:
       - application/json
       responses:
@@ -1409,6 +1482,22 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/user.CreatePrivateMessageRequest'
+      - description: type can only be (like/comment/collection/reply_comment)
+        in: body
+        name: Type
+        required: true
+        schema:
+          type: string
+      - description: comment_id 只有当type为reply_comment时需要传这个参数
+        in: body
+        name: CommentId
+        schema:
+          type: integer
+      - description: comment_content 指被回复的评论内容
+        in: body
+        name: CommentContent
+        schema:
+          type: string
       produces:
       - application/json
       responses:
@@ -1428,6 +1517,14 @@ paths:
         in: header
         name: Authorization
         required: true
+        type: string
+      - description: limit
+        in: query
+        name: limit
+        type: string
+      - description: page
+        in: query
+        name: page
         type: string
       produces:
       - application/json

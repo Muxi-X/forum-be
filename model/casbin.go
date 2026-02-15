@@ -4,6 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"forum/pkg/constvar"
+	"strconv"
+
 	"github.com/casbin/casbin/v2"
 	"github.com/casbin/casbin/v2/model"
 	gormadapter "github.com/casbin/gorm-adapter/v3"
@@ -12,7 +14,6 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/spf13/viper"
 	"go.uber.org/zap"
-	"strconv"
 )
 
 type Casbin struct {
@@ -215,4 +216,8 @@ func DeleteResourceRole(typeName string, id uint32, role string) error {
 	}
 
 	return nil
+}
+
+func HasRole(userId uint32, role string) (bool, error) {
+	return CB.Self.HasRoleForUser("user:"+strconv.Itoa(int(userId)), role)
 }

@@ -116,12 +116,21 @@ type PostPartInfo struct {
 	Tags          []string `json:"tags"`
 }
 
+type UnReadNum struct {
+	Num      uint32 `json:"num"`
+	Category string `json:"category"`
+}
+
 type PostPartInfoResponse struct {
 	Posts []*PostPartInfo `json:"posts"`
 }
 
 type ListMainPostResponse struct {
 	Posts []*Post `json:"posts"`
+}
+
+type UnReadNumResponse struct {
+	UnReadNum []*UnReadNum `json:"un_read_num"`
 }
 
 // 这里用了 generics and reflect, 更一般的写法应该是用interface

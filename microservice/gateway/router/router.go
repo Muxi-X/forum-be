@@ -86,6 +86,8 @@ func Load(g *gin.Engine, mw ...gin.HandlerFunc) *gin.Engine {
 		postRouter.PUT("", postApi.UpdateInfo)
 		postRouter.GET("/popular_tag", postApi.ListPopularTag)
 		postRouter.GET("/qiniu_token", postApi.GetQiNiuToken)
+		postRouter.GET("/unread_num", postApi.GetUnReadPostNum)
+		postRouter.PATCH("/set_quality/:post_id", postApi.SetQualityPost)
 	}
 
 	commentRouter := g.Group("api/v1/comment")

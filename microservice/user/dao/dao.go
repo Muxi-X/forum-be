@@ -20,6 +20,7 @@ type Dao struct {
 // Interface dao
 type Interface interface {
 	GetUser(id uint32) (*UserModel, error)
+	BatchGetUser(ids []uint32) (map[uint32]*UserModel, error)
 	GetUserByIds(ids []uint32) ([]*UserModel, error)
 	GetUserByEmail(email string) (*UserModel, error)
 	UpdatePassword(userID uint32, newPassword string) error

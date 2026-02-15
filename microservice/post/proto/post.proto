@@ -10,6 +10,9 @@ service PostService {
     rpc ListMainPost(ListMainPostRequest) returns (ListPostResponse) {}
     rpc ListUserCreatedPost(ListPostPartInfoRequest) returns (ListPostPartInfoResponse) {}
     rpc UpdatePostInfo(UpdatePostInfoRequest) returns (Response) {}
+    rpc SetQualityPost(Request) returns (Response) {}
+    rpc GetUnReadPostNum(Request) returns (UnReadPostNumResponse) {}
+    rpc UpdateLastReadTime(UpdateLastReadRequest) returns (Response) {}
 
     rpc GetComment(Request) returns (CommentInfo) {}
     rpc CreateComment(CreateCommentRequest) returns (CreateCommentResponse) {}
@@ -242,4 +245,18 @@ message PostPartInfo {
 
 message DeleteCollectionRequest {
     uint32 id = 1;
+}
+
+message UnReadPostNum {
+    uint32 num = 1;
+    string category = 2;
+}
+
+message UnReadPostNumResponse {
+    repeated UnReadPostNum un_read_num = 1;
+}
+
+message UpdateLastReadRequest {
+    uint32 user_id = 1;
+    string category = 2;
 }

@@ -55,6 +55,9 @@ func CreateMessage(c *gin.Context) {
 // @Produce application/json
 // @Param Authorization header string true "token 用户令牌"
 // @Param object body CreatePrivateMessageRequest true "create_private_message_request"
+// @Param Type body string true "type can only be (like/comment/collection/reply_comment)"
+// @Param CommentId body int false "comment_id 只有当type为reply_comment时需要传这个参数"
+// @Param CommentContent body string false "comment_content 指被回复的评论内容"
 // @Success 200 {object} handler.Response
 // @Router /user/private_message [post]
 func CreatePrivateMessage(c *gin.Context) {
@@ -72,12 +75,14 @@ func CreatePrivateMessage(c *gin.Context) {
 
 	userId := c.MustGet("userId").(uint32)
 	listReq := &pb.CreatePrivateMessageRequest{
-		ReceiveId: req.ReceiveUserid,
-		SendId:    userId,
-		Content:   req.Content,
-		Type:      req.Type,
-		PostId:    req.PostId,
-		CommentId: req.CommentId,
+		ReceiveUserId:  req.ReceiveUserid,
+		SendUserId:     userId,
+		Content:        req.Content,
+		Type:           req.Type,
+		PostId:         req.PostId,
+		CommentId:      req.CommentId,
+		PostTitle:      req.PostTitle,
+		CommentContent: req.CommentContent,
 	}
 
 	_, err := client.UserClient.CreatePrivateMessage(context.TODO(), listReq)

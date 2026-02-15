@@ -95,9 +95,11 @@ type CreateMessageRequest struct {
 }
 
 type CreatePrivateMessageRequest struct {
-	ReceiveUserid uint32 `json:"receive_userid" binding:"required"`
-	Type          string `json:"type" binding:"required"` // comment/like/collection/reply_comment
-	Content       string `json:"content"`
-	PostId        uint32 `json:"post_id" binding:"required"`
-	CommentId     uint32 `json:"comment_id"`
+	ReceiveUserid  uint32 `json:"receive_userid" binding:"required"`
+	Type           string `json:"type" binding:"required"` // comment/like/collection/reply_comment
+	Content        string `json:"content"`
+	PostId         uint32 `json:"post_id" binding:"required"`
+	CommentId      uint32 `json:"comment_id"`
+	PostTitle      string `json:"post_title" binding:"required"`
+	CommentContent string `json:"comment_content"`
 }

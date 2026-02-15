@@ -3,8 +3,9 @@ package dao
 import (
 	pb "forum-post/proto"
 	"forum/pkg/constvar"
-	"gorm.io/gorm"
 	"strconv"
+
+	"gorm.io/gorm"
 )
 
 type PostModel struct {
@@ -23,6 +24,7 @@ type PostModel struct {
 	Summary         string
 	Score           uint32
 	IsReport        bool
+	Quality         bool
 }
 
 func (PostModel) TableName() string {
@@ -116,7 +118,7 @@ func (d *Dao) ListMainPost(filter *PostModel, typeName string, offset, limit, la
 			return nil, err
 		}
 
-		query.Where("posts.id IN ?", postIds)
+		query = query.Where("posts.id IN ?", postIds)
 	}
 
 	if searchContent != "" {
@@ -127,6 +129,8 @@ func (d *Dao) ListMainPost(filter *PostModel, typeName string, offset, limit, la
 
 	if typeName == "hot" {
 		query = query.Order("posts.score DESC")
+	} else if typeName == "quality" {
+		query = query.Where("quality = ?", true).Order("posts.id DESC")
 	} else {
 		query = query.Order("posts.id DESC")
 	}
@@ -311,4 +315,29 @@ func (d Dao) syncItemLike() error {
 	}
 
 	return nil
+}
+
+func (d Dao) ChangeQualityPost(postId uint32, quality bool) error {
+	return dao.DB.Table("posts").Where("id = ?", postId).Update("quality", quality).Error
+}
+
+type LastClickModel struct {
+	UserId      uint32
+	Category    string
+	LastClickAt string
+}
+
+func (c *LastClickModel) GetOrCreateLastRead() error {
+	return dao.DB.Table("last_clicks").FirstOrCreate(c, LastClickModel{UserId: c.UserId, Category: c.Category}).Error
+}
+
+func (d Dao) UpdateLastRead(userId uint32, category, time string) error {
+	return d.DB.Table("last_clicks").Where("user_id = ? AND category = ?", userId, category).Update("last_click_at", time).Error
+}
+
+func (d Dao) CountPostByTime(time, category string) (int, error) {
+	var list []int
+	// 最多只查询到99条，避免数据过多
+	err := d.DB.Table("posts").Select("1").Where("create_time >= ? AND re = 0 AND is_report = 0 AND category = ?", time, category).Limit(99).Find(&list).Error
+	return len(list), err
 }
