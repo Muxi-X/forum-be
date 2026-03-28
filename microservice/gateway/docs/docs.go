@@ -984,6 +984,46 @@ const docTemplate = `{
                 }
             }
         },
+        "/ranking-list": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "rankingList"
+                ],
+                "summary": "创建帖子 api",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token 用户令牌",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "create_ranking_list_request",
+                        "name": "object",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/rankingList.CreateRankingListRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/rankingList.IdResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/report": {
             "put": {
                 "consumes": [
@@ -2181,6 +2221,48 @@ const docTemplate = `{
                 },
                 "title": {
                     "type": "string"
+                }
+            }
+        },
+        "rankingList.CreateRankingListRequest": {
+            "type": "object",
+            "required": [
+                "category",
+                "cover_img",
+                "description",
+                "domain",
+                "name",
+                "tags"
+            ],
+            "properties": {
+                "category": {
+                    "type": "string"
+                },
+                "cover_img": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "domain": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "tags": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "rankingList.IdResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
                 }
             }
         },

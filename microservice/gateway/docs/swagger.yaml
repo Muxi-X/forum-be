@@ -459,6 +459,35 @@ definitions:
     - tags
     - title
     type: object
+  rankingList.CreateRankingListRequest:
+    properties:
+      category:
+        type: string
+      cover_img:
+        type: string
+      description:
+        type: string
+      domain:
+        type: string
+      name:
+        type: string
+      tags:
+        items:
+          type: string
+        type: array
+    required:
+    - category
+    - cover_img
+    - description
+    - domain
+    - name
+    - tags
+    type: object
+  rankingList.IdResponse:
+    properties:
+      id:
+        type: integer
+    type: object
   report.CreateRequest:
     properties:
       category:
@@ -1230,6 +1259,32 @@ paths:
       summary: 获取每个板块未读帖子数 api
       tags:
       - post
+  /ranking-list:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: token 用户令牌
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: create_ranking_list_request
+        in: body
+        name: object
+        required: true
+        schema:
+          $ref: '#/definitions/rankingList.CreateRankingListRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/rankingList.IdResponse'
+      summary: 创建帖子 api
+      tags:
+      - rankingList
   /report:
     post:
       consumes:

@@ -10,6 +10,7 @@ import (
 	"forum-gateway/handler/feed"
 	"forum-gateway/handler/like"
 	"forum-gateway/handler/post"
+	"forum-gateway/handler/rankingList"
 	"forum-gateway/handler/report"
 	"forum-gateway/handler/sd"
 	"forum-gateway/handler/user"
@@ -89,6 +90,13 @@ func Load(g *gin.Engine, mw ...gin.HandlerFunc) *gin.Engine {
 		postRouter.GET("/qiniu_token", postApi.GetQiNiuToken)
 		postRouter.GET("/unread_num", postApi.GetUnReadPostNum)
 		postRouter.PATCH("/set_quality/:post_id", postApi.SetQualityPost)
+	}
+
+	rankingListRouter := g.Group("api/v1/ranking-list")
+	rankingListApi := rankingList.New(dao.GetDao())
+	rankingListRouter.Use(normalRequired)
+	{
+		rankingListRouter.POST("", rankingListApi.CreateRankingList)
 	}
 
 	commentRouter := g.Group("api/v1/comment")
