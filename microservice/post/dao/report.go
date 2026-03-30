@@ -48,7 +48,8 @@ func (d Dao) ValidReport(typeName string, targetId uint32) error {
 		}
 	}()
 
-	if err := tx.Table("reports").Where("type_name = ? AND id = ?", typeName, targetId).Delete(&ReportModel{}).Error; err != nil {
+	// 只要有一条有效举报就会删post,comment，故其余举报不再需要，一并删除
+	if err := tx.Table("reports").Where("type_name = ? AND target_id = ?", typeName, targetId).Delete(&ReportModel{}).Error; err != nil {
 		tx.Rollback()
 		return err
 	}
@@ -56,9 +57,9 @@ func (d Dao) ValidReport(typeName string, targetId uint32) error {
 	var err error
 
 	if typeName == constvar.Post {
-		err = d.DeletePost(targetId)
+		err = d.DeletePost(targetId, tx)
 	} else if typeName == constvar.Comment {
-		err = d.DeleteComment(targetId)
+		err = d.DeleteComment(targetId, tx)
 	} else {
 		err = errors.New("wrong TypeName")
 	}
@@ -82,7 +83,6 @@ func (d Dao) InValidReport(id uint32, typeName string, targetId uint32) error {
 	}
 
 	if count == constvar.BanNumber-1 { // cancel auto ban
-
 		var item BeReporter
 
 		if typeName == constvar.Post {
@@ -90,10 +90,14 @@ func (d Dao) InValidReport(id uint32, typeName string, targetId uint32) error {
 		} else if typeName == constvar.Comment {
 			item, err = d.GetComment(targetId)
 		} else {
-			return errors.New("wrong TypeName")
+			err = errors.New("wrong TypeName")
 		}
 
-		return item.BeReported()
+		if err != nil {
+			return err
+		}
+
+		return item.CancelReported()
 	}
 
 	return nil
@@ -139,7 +143,7 @@ func (d *Dao) ListReport(offset, limit, lastId uint32, pagination bool) ([]*pb.R
 
 func (d *Dao) GetReportNumByTypeNameAndId(typeName string, id uint32) (uint32, error) {
 	var count int64
-	err := d.DB.Model(&ReportModel{}).Where("type_name = ? AND id = ?", typeName, id).Count(&count).Error
+	err := d.DB.Model(&ReportModel{}).Where("type_name = ? AND target_id = ?", typeName, id).Count(&count).Error
 	return uint32(count), err
 }
 
@@ -154,4 +158,5 @@ func (d *Dao) IsUserHadReportTarget(userId uint32, typeName string, id uint32) (
 
 type BeReporter interface {
 	BeReported() error
+	CancelReported() error
 }

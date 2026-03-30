@@ -8,8 +8,9 @@ import (
 	"forum/pkg/constvar"
 	"forum/pkg/errno"
 	"forum/util"
-	"gorm.io/gorm"
 	"strconv"
+
+	"gorm.io/gorm"
 )
 
 func (s *PostService) CreateReport(_ context.Context, req *pb.CreateReportRequest, _ *pb.Response) error {
@@ -34,6 +35,7 @@ func (s *PostService) CreateReport(_ context.Context, req *pb.CreateReportReques
 		return errno.ServerErr(errno.ErrDatabase, err.Error())
 	}
 
+	// 避免一个人重复举报
 	isReported, err := s.Dao.IsUserHadReportTarget(req.UserId, req.TypeName, req.Id)
 	if err != nil {
 		return errno.ServerErr(errno.ErrDatabase, err.Error())
@@ -46,7 +48,6 @@ func (s *PostService) CreateReport(_ context.Context, req *pb.CreateReportReques
 	report := &dao.ReportModel{
 		UserId:     req.UserId,
 		CreateTime: util.GetCurrentTime(),
-		Id:         req.Id,
 		TypeName:   req.TypeName,
 		Cause:      req.Cause,
 		Category:   req.Category,

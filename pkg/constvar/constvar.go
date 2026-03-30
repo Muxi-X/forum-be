@@ -1,7 +1,7 @@
 package constvar
 
 const (
-	DefaultLimit = 50
+	DefaultLimit = 5
 
 	// 角色权限
 	Normal     = 1 // 普通用户

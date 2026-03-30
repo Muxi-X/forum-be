@@ -40,7 +40,7 @@ type Interface interface {
 	GetComment(uint32) (*CommentModel, error)
 	ListCommentByPostId(uint32) ([]*CommentInfo, error)
 	GetCommentNumByPostId(uint32) (uint32, error)
-	DeleteComment(uint32) error
+	DeleteComment(uint32, ...*gorm.DB) error
 
 	AddLike(uint32, Item) error
 	RemoveLike(uint32, Item) error
@@ -51,7 +51,7 @@ type Interface interface {
 	CreatePost2Tag(Post2TagModel) error
 	GetTagById(uint32) (*TagModel, error)
 	GetTagByContent(string) (*TagModel, error)
-	ListTagsByPostId(uint32) ([]string, error)
+	ListTagsByPostId(uint32) ([]string, []uint32, error)
 
 	AddTagToSortedSet(uint32, string) error
 	ListPopularTags(string) ([]string, error)
@@ -129,67 +129,58 @@ func (d Dao) DeletePost(id uint32, tx ...*gorm.DB) error {
 		return err
 	}
 
-	ch := make(chan struct{})
+	_, tagIds, err := d.ListTagsByPostId(id)
+	if err != nil {
+		return err
+	}
 
-	go func() {
-		tags, err := d.ListTagsByPostId(id)
-		ch <- struct{}{}
-		if err != nil {
-			log.Error(err.Error())
-			return
-		}
-
-		for _, tag := range tags {
-			tagId, err := d.getTagIdByContent(tag)
-			if err != nil {
-				log.Error(err.Error())
-				return
-			}
-
-			isExist, err := d.isExistPostWithTagId(tagId)
-			if err != nil {
-				log.Error(err.Error())
-				return
-			}
-
-			if !isExist {
-				// TODO 添加redis事务保证数据一致性
-				if err := d.Redis.ZRem("tags:", tagId).Err(); err != nil {
-					log.Error(err.Error())
-					return
-				}
-
-				isExist, err := d.isExistPostWithTagIdAndCategory(tagId, post.Category)
-				if err != nil {
-					log.Error(err.Error())
-					return
-				}
-
-				if !isExist {
-					if err := d.Redis.ZRem("tags:"+post.Category, tagId).Err(); err != nil {
-						log.Error(err.Error())
-						return
-					}
-				}
-			}
-
-		}
-	}()
-
-	<-ch // 上面获取成功后再删除
 	if err := d.deletePost2TagByPostId(id); err != nil {
 		return err
 	}
 
+	go func() {
+		for _, tagId := range tagIds {
+			isExist, err := d.isExistPostWithTagId(int(tagId))
+			if err != nil {
+				log.Error(err.Error())
+				continue
+			}
+
+			if !isExist {
+				pipe := d.Redis.Pipeline()
+				pipe.ZRem("tags:", tagId)
+
+				isExist, err := d.isExistPostWithTagIdAndCategory(int(tagId), post.Category)
+				if err != nil {
+					log.Error(err.Error())
+					continue
+				}
+
+				if !isExist {
+					pipe.ZRem("tags:"+post.Category, tagId)
+				}
+
+				if _, err := pipe.Exec(); err != nil {
+					log.Error(err.Error())
+				}
+			}
+		}
+	}()
+
 	return d.Redis.ZRem("posts:", id).Err()
 }
 
-func (d Dao) DeleteComment(id uint32) error {
+func (d Dao) DeleteComment(id uint32, tx ...*gorm.DB) error {
+	db := d.DB
+	if len(tx) == 1 {
+		db = tx[0]
+	}
+
 	comment := &CommentModel{}
 	if err := comment.Get(id); err != nil {
 		return err
 	}
-	if err := comment.Delete(); err != nil {
+	if err := comment.Delete(db); err != nil {
 		return err
 	}
 

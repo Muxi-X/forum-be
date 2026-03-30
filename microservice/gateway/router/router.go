@@ -45,10 +45,11 @@ func Load(g *gin.Engine, mw ...gin.HandlerFunc) *gin.Engine {
 	// superAdminRequired := middleware.AuthMiddleware(constvar.AuthLevelSuperAdmin)
 
 	// auth 模块
-	authRouter := g.Group("api/v1/auth/login")
+	authRouter := g.Group("api/v1/auth")
 	{
-		authRouter.POST("/student", user.StudentLogin)
-		authRouter.POST("/team", user.TeamLogin)
+		authRouter.POST("/login/student", user.StudentLogin)
+		authRouter.POST("/login/team", user.TeamLogin)
+		authRouter.POST("/set_role/:id", adminRequired, user.SetRole)
 	}
 
 	// user 模块

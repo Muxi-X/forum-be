@@ -8,6 +8,8 @@ replace forum-post => ../post
 
 replace forum-feed => ../feed
 
+replace forum-ocr => ../ocr
+
 go 1.23.0
 
 require (

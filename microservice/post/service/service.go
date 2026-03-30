@@ -104,7 +104,7 @@ func (s PostService) getPostInfo(postId uint32, userId uint32) (bool, bool, uint
 		logger.Error(errno.ErrRedis.Error(), logger.String(err.Error()))
 	}
 
-	tags, err := s.Dao.ListTagsByPostId(postId)
+	tags, _, err := s.Dao.ListTagsByPostId(postId)
 	if err != nil {
 		logger.Error(errno.ErrDatabase.Error(), logger.String(err.Error()))
 	}

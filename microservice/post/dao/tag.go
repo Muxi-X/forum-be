@@ -3,11 +3,12 @@ package dao
 import (
 	logger "forum/log"
 	"forum/pkg/errno"
+	"strconv"
+	"time"
+
 	"github.com/go-redis/redis"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
-	"strconv"
-	"time"
 )
 
 type TagModel struct {
@@ -136,23 +137,23 @@ func (Dao) CreatePost2Tag(item Post2TagModel) error {
 	return item.Create()
 }
 
-func (d *Dao) ListTagsByPostId(postId uint32) ([]string, error) {
-	var list []*Post2TagModel
-	err := d.DB.Table("post2tags").Where("post_id = ?", postId).Find(&list).Error
+func (d *Dao) ListTagsByPostId(postId uint32) ([]string, []uint32, error) {
+	var tagIds []uint32
+	err := d.DB.Table("post2tags").Where("post_id = ?", postId).Pluck("tag_id", &tagIds).Error
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	contents := make([]string, len(list))
-	for i, item := range list {
-		tag, err := d.GetTagById(item.TagId)
+	contents := make([]string, len(tagIds))
+	for i, item := range tagIds {
+		tag, err := d.GetTagById(item)
 		if err != nil {
-			return nil, err
+			return nil, nil, err
 		}
 		contents[i] = tag.Content
 	}
 
-	return contents, nil
+	return contents, tagIds, nil
 }
 
 func (d *Dao) AddTagToSortedSet(tagId uint32, category string) error {

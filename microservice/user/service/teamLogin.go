@@ -65,13 +65,18 @@ func (s *UserService) TeamLogin(_ context.Context, req *pb.TeamLoginRequest, res
 			return errno.ServerErr(errno.ErrDatabase, err.Error())
 		}
 
-		if err := s.Dao.AddPublicPolicy(user.Role, user.Id); err != nil {
+		if err := s.Dao.AddPublicPolicy(constvar.MuxiRole, user.Id); err != nil {
 			return errno.ServerErr(errno.ErrCasbin, err.Error())
 		}
 
 		if err := model.AddRole("user", user.Id, constvar.MuxiRole); err != nil {
 			return errno.ServerErr(errno.ErrCasbin, err.Error())
 		}
+	}
+
+	user.Role, err = resolveRoleByUserID(user.Id)
+	if err != nil {
+		return err
 	}
 
 	role := uint32(constvar.Normal)

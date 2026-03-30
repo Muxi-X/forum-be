@@ -28,21 +28,31 @@ func (c *CommentModel) Create() error {
 }
 
 // Save ...
-func (c *CommentModel) Save() error {
-	return dao.DB.Save(c).Error
+func (c *CommentModel) Save(tx ...*gorm.DB) error {
+	db := dao.DB
+	if len(tx) == 1 {
+		db = tx[0]
+	}
+
+	return db.Save(c).Error
 }
 
 func (c *CommentModel) Get(id uint32) error {
 	return dao.DB.Model(c).Where("id = ? AND re = 0", id).First(c).Error
 }
 
-func (c *CommentModel) Delete() error {
+func (c *CommentModel) Delete(tx *gorm.DB) error {
 	c.Re = true
-	return c.Save()
+	return c.Save(tx)
 }
 
 func (c *CommentModel) BeReported() error {
 	c.IsReport = true
+	return c.Save()
+}
+
+func (c *CommentModel) CancelReported() error {
+	c.IsReport = false
 	return c.Save()
 }
 

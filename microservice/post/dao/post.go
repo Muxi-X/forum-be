@@ -74,6 +74,11 @@ func (p *PostModel) BeReported() error {
 	return p.Save()
 }
 
+func (p *PostModel) CancelReported() error {
+	p.IsReport = false
+	return p.Save()
+}
+
 type PostInfo struct {
 	Id              uint32
 	Content         string
@@ -248,7 +253,7 @@ func (d Dao) ListPostInfoByPostIds(postIds []uint32, filter *PostModel, offset, 
 			return nil, err
 		}
 
-		post.Tags, err = d.ListTagsByPostId(post.Id)
+		post.Tags, _, err = d.ListTagsByPostId(post.Id)
 		if err != nil {
 			return nil, err
 		}

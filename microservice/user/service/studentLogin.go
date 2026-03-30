@@ -106,6 +106,11 @@ func (s *UserService) issueStudentToken(studentID string, password string) (stri
 		}
 	}
 
+	user.Role, err = resolveRoleByUserID(user.Id)
+	if err != nil {
+		return "", err
+	}
+
 	// 根据权限生成 token
 	role := uint32(constvar.Normal)
 	if user.Role == constvar.NormalAdminRole || user.Role == constvar.MuxiAdminRole {

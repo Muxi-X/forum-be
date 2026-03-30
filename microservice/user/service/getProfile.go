@@ -24,7 +24,10 @@ func (s *UserService) GetProfile(_ context.Context, req *pb.GetRequest, resp *pb
 	resp.Name = user.Name
 	resp.Avatar = user.Avatar
 	resp.Email = user.Email
-	resp.Role = user.Role
+	resp.Role, err = resolveRoleByUserID(user.Id)
+	if err != nil {
+		return err
+	}
 	resp.Signature = user.Signature
 	resp.IsPublicCollectionAndLike = user.IsPublicCollectionAndLike
 	resp.IsPublicFeed = user.IsPublicFeed

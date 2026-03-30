@@ -46,10 +46,12 @@ func GetProfile(c *gin.Context) {
 }
 
 func GetUserProfile(ctx context.Context, id uint32) (*pb.UserProfile, error) {
-
 	getProfileReq := &pb.GetRequest{Id: id}
 
 	getProfileResp, err := client.UserClient.GetProfile(ctx, getProfileReq)
+	if err != nil {
+		return nil, err
+	}
 
-	return getProfileResp, err
+	return getProfileResp, nil
 }

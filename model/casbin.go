@@ -221,3 +221,29 @@ func DeleteResourceRole(typeName string, id uint32, role string) error {
 func HasRole(userId uint32, role string) (bool, error) {
 	return CB.Self.HasRoleForUser("user:"+strconv.Itoa(int(userId)), role)
 }
+
+func GetRole(userId uint32) ([]string, error) {
+	return CB.Self.GetRolesForUser("user:" + strconv.Itoa(int(userId)))
+}
+
+// SelectRole 选取用户拥有的最高权限的角色
+func SelectRole(roles []string) string {
+	priority := map[string]int{
+		constvar.NormalRole:      1,
+		constvar.MuxiRole:        2,
+		constvar.NormalAdminRole: 3,
+		constvar.MuxiAdminRole:   4,
+		constvar.SuperAdminRole:  5,
+	}
+
+	maxP := -1
+	r := ""
+	for _, role := range roles {
+		if p, ok := priority[role]; ok && p > maxP {
+			maxP = p
+			r = role
+		}
+	}
+
+	return r
+}
