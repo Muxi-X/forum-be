@@ -13,15 +13,24 @@ import (
 
 // todo 可以进一步优化 - 消息队列
 
-func (s *PostService) CreateRankingList(_ context.Context, req *pb.CreateRankingListRequest, resp *pb.CreateRankingListResponse) error {
-	logger.Info("PostService CreateRankingList")
+func (s *PostService) CreateSipScore(_ context.Context, req *pb.CreateSipScoreRequest, resp *pb.CreateSipScoreResponse) error {
+	logger.Info("PostService CreateSipScore")
 
+	// 参数检验
 	domain := req.GetDomain()
 	if domain != constvar.NormalDomain && domain != constvar.MuxiDomain {
 		return errno.ServerErr(errno.ErrBadRequest, "domain not legal")
 	}
 
-	data := &dao.RankingListModel{
+	tags := req.GetTags()
+	uniqueTags := unique.UniqueStrings(tags)
+	for _, content := range uniqueTags {
+		if content == "" {
+			return errno.ServerErr(errno.ErrBadRequest, "tag content cannot be empty")
+		}
+	}
+
+	data := &dao.SipScoreModel{
 		Name:        req.GetName(),
 		Description: req.GetDescription(),
 		CoverImg:    req.GetCoverImg(),
@@ -30,26 +39,18 @@ func (s *PostService) CreateRankingList(_ context.Context, req *pb.CreateRanking
 		Category:    req.GetCategory(),
 	}
 
-	rankingListID, err := s.Dao.CreateRankingList(data)
+	sipScoreID, err := s.Dao.CreateSipScore(data)
 	if err != nil {
 		return errno.ServerErr(errno.ErrDatabase, err.Error())
 	}
 
 	// 创建者具有写权限
-	if err = model.AddPolicy(req.CreatorId, constvar.RankingList, rankingListID, constvar.Write); err != nil {
+	if err = model.AddPolicy(req.CreatorId, constvar.SipScore, sipScoreID, constvar.Write); err != nil {
 		return errno.ServerErr(errno.ErrCasbin, err.Error())
 	}
 
-	if err = model.AddResourceRole(constvar.RankingList, rankingListID, domain); err != nil {
+	if err = model.AddResourceRole(constvar.SipScore, sipScoreID, domain); err != nil {
 		return errno.ServerErr(errno.ErrCasbin, err.Error())
-	}
-
-	rankingTags := req.GetTags()
-	uniqueTags := unique.UniqueStrings(rankingTags)
-	for _, content := range uniqueTags {
-		if content == "" {
-			return errno.ServerErr(errno.ErrBadRequest, "tag content cannot be empty")
-		}
 	}
 
 	// 获取 tagID
@@ -59,15 +60,15 @@ func (s *PostService) CreateRankingList(_ context.Context, req *pb.CreateRanking
 	}
 
 	// 顺序一样，直接构建
-	rankingListTags := make([]*dao.RankingListTagModel, 0, len(uniqueTags))
+	sipScoreTags := make([]*dao.SipScoreTagModel, 0, len(uniqueTags))
 	for _, tag := range tagsModel {
-		rankingListTags = append(rankingListTags, &dao.RankingListTagModel{
-			TagID:         tag.Id,
-			RankingListID: rankingListID,
+		sipScoreTags = append(sipScoreTags, &dao.SipScoreTagModel{
+			TagID:      tag.Id,
+			SipScoreID: sipScoreID,
 		})
 	}
 
-	err = s.Dao.BatchCreateRankingListTags(rankingListTags)
+	err = s.Dao.BatchCreateSipScoreTags(sipScoreTags)
 	if err != nil {
 		return errno.ServerErr(errno.ErrDatabase, err.Error())
 	}
@@ -85,6 +86,6 @@ func (s *PostService) CreateRankingList(_ context.Context, req *pb.CreateRanking
 		}
 	}(tagIDs, category)
 
-	resp.Id = rankingListID
+	resp.Id = sipScoreID
 	return nil
 }

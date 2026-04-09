@@ -24,7 +24,7 @@ const (
 	Post        = "post"
 	QualityPost = "quality-post"
 	Comment     = "comment"
-	RankingList = "ranking-list"
+	SipScore    = "sip-score"
 
 	Collection        = "collection"
 	CollectionAndLike = "collection-like"

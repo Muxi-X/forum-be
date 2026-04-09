@@ -36,7 +36,7 @@ type PostService interface {
 	SetQualityPost(ctx context.Context, in *Request, opts ...client.CallOption) (*Response, error)
 	GetUnReadPostNum(ctx context.Context, in *Request, opts ...client.CallOption) (*UnReadPostNumResponse, error)
 	UpdateLastReadTime(ctx context.Context, in *UpdateLastReadRequest, opts ...client.CallOption) (*Response, error)
-	CreateRankingList(ctx context.Context, in *CreateRankingListRequest, opts ...client.CallOption) (*CreateRankingListResponse, error)
+	CreateSipScore(ctx context.Context, in *CreateSipScoreRequest, opts ...client.CallOption) (*CreateSipScoreResponse, error)
 	GetComment(ctx context.Context, in *Request, opts ...client.CallOption) (*CommentInfo, error)
 	CreateComment(ctx context.Context, in *CreateCommentRequest, opts ...client.CallOption) (*CreateCommentResponse, error)
 	DeleteItem(ctx context.Context, in *DeleteItemRequest, opts ...client.CallOption) (*Response, error)
@@ -142,9 +142,9 @@ func (c *postService) UpdateLastReadTime(ctx context.Context, in *UpdateLastRead
 	return out, nil
 }
 
-func (c *postService) CreateRankingList(ctx context.Context, in *CreateRankingListRequest, opts ...client.CallOption) (*CreateRankingListResponse, error) {
-	req := c.c.NewRequest(c.name, "PostService.CreateRankingList", in)
-	out := new(CreateRankingListResponse)
+func (c *postService) CreateSipScore(ctx context.Context, in *CreateSipScoreRequest, opts ...client.CallOption) (*CreateSipScoreResponse, error) {
+	req := c.c.NewRequest(c.name, "PostService.CreateSipScore", in)
+	out := new(CreateSipScoreResponse)
 	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
 		return nil, err
@@ -273,7 +273,7 @@ type PostServiceHandler interface {
 	SetQualityPost(context.Context, *Request, *Response) error
 	GetUnReadPostNum(context.Context, *Request, *UnReadPostNumResponse) error
 	UpdateLastReadTime(context.Context, *UpdateLastReadRequest, *Response) error
-	CreateRankingList(context.Context, *CreateRankingListRequest, *CreateRankingListResponse) error
+	CreateSipScore(context.Context, *CreateSipScoreRequest, *CreateSipScoreResponse) error
 	GetComment(context.Context, *Request, *CommentInfo) error
 	CreateComment(context.Context, *CreateCommentRequest, *CreateCommentResponse) error
 	DeleteItem(context.Context, *DeleteItemRequest, *Response) error
@@ -297,7 +297,7 @@ func RegisterPostServiceHandler(s server.Server, hdlr PostServiceHandler, opts .
 		SetQualityPost(ctx context.Context, in *Request, out *Response) error
 		GetUnReadPostNum(ctx context.Context, in *Request, out *UnReadPostNumResponse) error
 		UpdateLastReadTime(ctx context.Context, in *UpdateLastReadRequest, out *Response) error
-		CreateRankingList(ctx context.Context, in *CreateRankingListRequest, out *CreateRankingListResponse) error
+		CreateSipScore(ctx context.Context, in *CreateSipScoreRequest, out *CreateSipScoreResponse) error
 		GetComment(ctx context.Context, in *Request, out *CommentInfo) error
 		CreateComment(ctx context.Context, in *CreateCommentRequest, out *CreateCommentResponse) error
 		DeleteItem(ctx context.Context, in *DeleteItemRequest, out *Response) error
@@ -353,8 +353,8 @@ func (h *postServiceHandler) UpdateLastReadTime(ctx context.Context, in *UpdateL
 	return h.PostServiceHandler.UpdateLastReadTime(ctx, in, out)
 }
 
-func (h *postServiceHandler) CreateRankingList(ctx context.Context, in *CreateRankingListRequest, out *CreateRankingListResponse) error {
-	return h.PostServiceHandler.CreateRankingList(ctx, in, out)
+func (h *postServiceHandler) CreateSipScore(ctx context.Context, in *CreateSipScoreRequest, out *CreateSipScoreResponse) error {
+	return h.PostServiceHandler.CreateSipScore(ctx, in, out)
 }
 
 func (h *postServiceHandler) GetComment(ctx context.Context, in *Request, out *CommentInfo) error {

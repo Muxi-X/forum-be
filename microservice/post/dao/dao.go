@@ -35,9 +35,9 @@ type Interface interface {
 	ChangeQualityPost(uint32, bool) error
 	CountPostByTime(string, string) (int, error)
 
-	CreateRankingList(rankingList *RankingListModel) (uint32, error)
+	CreateSipScore(sipScore *SipScoreModel) (uint32, error)
 	BatchGetOrCreateTags(tags []string) ([]*TagModel, error)
-	BatchCreateRankingListTags(items []*RankingListTagModel) error
+	BatchCreateSipScoreTags(items []*SipScoreTagModel) error
 	BatchAddTagsToSortedSet(tagIDs []uint32, category string) error
 
 	CreateComment(*CommentModel) (uint32, error)

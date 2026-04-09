@@ -132,13 +132,14 @@ func (c *Casbin) Init() {
 	recourseRules := [][]string{
 		{constvar.Post + ":" + constvar.MuxiDomain, constvar.MuxiDomain},
 		{constvar.Post + ":" + constvar.NormalDomain, constvar.NormalDomain},
+		{constvar.SipScore + ":" + constvar.MuxiDomain, constvar.MuxiDomain},
+		{constvar.SipScore + ":" + constvar.NormalDomain, constvar.NormalDomain},
 	}
 
 	_, err = CB.Self.AddNamedGroupingPolicies("g2", recourseRules)
 	if err != nil {
 		panic(err)
 	}
-
 }
 
 func Enforce(userId uint32, typeName string, data interface{}, act string) (bool, error) {

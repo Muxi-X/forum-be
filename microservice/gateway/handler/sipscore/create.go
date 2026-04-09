@@ -1,6 +1,7 @@
-package rankingList
+package sipscore
 
 import (
+	"fmt"
 	. "forum-gateway/handler"
 	"forum-gateway/util"
 	pb "forum-post/proto"
@@ -14,19 +15,19 @@ import (
 	"go.uber.org/zap"
 )
 
-// CreateRankingList ... 创建帖子
-// @Summary 创建帖子 api
-// @Tags rankingList
+// CreateSipScore ... 创建榜单
+// @Summary 创建榜单 api
+// @Tags sipscore
 // @Accept application/json
 // @Produce application/json
 // @Param Authorization header string true "token 用户令牌"
-// @Param object body CreateRankingListRequest true "create_ranking_list_request"
+// @Param object body CreateSipScoreRequest true "create_sip_score_request"
 // @Success 200 {object} IdResponse
-// @Router /ranking-list [post]
-func (a *Api) CreateRankingList(c *gin.Context) {
-	log.Info("Post CreateRankingList function called.", zap.String("X-Request-Id", util.GetReqID(c)))
+// @Router /sip-score [post]
+func (a *Api) CreateSipScore(c *gin.Context) {
+	log.Info("Post CreateSipScore function called.", zap.String("X-Request-Id", util.GetReqID(c)))
 
-	var req CreateRankingListRequest
+	var req CreateSipScoreRequest
 	if err := c.BindJSON(&req); err != nil {
 		SendError(c, errno.ErrBind, nil, err.Error(), GetLine())
 		return
@@ -38,8 +39,10 @@ func (a *Api) CreateRankingList(c *gin.Context) {
 	}
 
 	userID := c.MustGet("userId").(uint32)
-
-	ok, err := model.Enforce(userID, constvar.RankingList, req.Domain, constvar.Read)
+	if err := model.AddRole("user", userID, constvar.NormalRole); err != nil {
+		fmt.Println("err", err.Error())
+	}
+	ok, err := model.Enforce(userID, constvar.SipScore, req.Domain, constvar.Read)
 	if err != nil {
 		SendError(c, errno.ErrCasbin, nil, err.Error(), GetLine())
 		return
@@ -55,7 +58,7 @@ func (a *Api) CreateRankingList(c *gin.Context) {
 		return
 	}
 
-	createReq := pb.CreateRankingListRequest{
+	createReq := pb.CreateSipScoreRequest{
 		CreatorId:   userID,
 		Name:        req.Name,
 		Description: req.Description,
@@ -65,7 +68,7 @@ func (a *Api) CreateRankingList(c *gin.Context) {
 		Category:    req.Category,
 	}
 
-	resp, err := client.PostClient.CreateRankingList(c.Request.Context(), &createReq)
+	resp, err := client.PostClient.CreateSipScore(c.Request.Context(), &createReq)
 	if err != nil {
 		SendError(c, err, nil, "", GetLine())
 		return

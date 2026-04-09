@@ -1,4 +1,4 @@
-package rankingList
+package sipscore
 
 import "forum-gateway/dao"
 
@@ -13,14 +13,14 @@ func New(i dao.Interface) *Api {
 }
 
 // ====================
-// RankingList Domain
+// SipScore Domain
 // ====================
 
 // ---- model ----
 
 // ---- request ----
 
-type CreateRankingListRequest struct {
+type CreateSipScoreRequest struct {
 	Name        string   `json:"name" binding:"required"`
 	Description string   `json:"description" binding:"required"`
 	CoverImg    string   `json:"cover_img" binding:"required"`

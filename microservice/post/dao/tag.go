@@ -10,6 +10,7 @@ import (
 	"github.com/go-redis/redis"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 const (
@@ -430,25 +431,25 @@ func (d Dao) isExistPostWithTagIdAndCategory(tagId int, category string) (bool, 
 	return count != 0, nil
 }
 
-type RankingListTagModel struct {
-	ID            uint32
-	RankingListID uint32
-	TagID         uint32
+type SipScoreTagModel struct {
+	ID         uint32 `gorm:"primaryKey"`
+	SipScoreID uint32 `gorm:"uniqueIndex:idx_rank_tag;index"`
+	TagID      uint32 `gorm:"uniqueIndex:idx_rank_tag;index"`
 }
 
-func (RankingListTagModel) TableName() string {
-	return "ranking_list_tags"
+func (SipScoreTagModel) TableName() string {
+	return "sip_score_tags"
 }
 
 // Create ...
-func (r *RankingListTagModel) Create() error {
-	return dao.DB.Create(r).Error
+func (s *SipScoreTagModel) Create() error {
+	return dao.DB.Create(s).Error
 }
 
-func (d *Dao) CreateRankingListTag(item *RankingListTagModel) error {
+func (d *Dao) CreateSipScoreTag(item *SipScoreTagModel) error {
 	return item.Create()
 }
 
-func (d *Dao) BatchCreateRankingListTags(items []*RankingListTagModel) error {
+func (d *Dao) BatchCreateSipScoreTags(items []*SipScoreTagModel) error {
 	return d.DB.Create(&items).Error
 }

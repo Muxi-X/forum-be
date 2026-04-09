@@ -20,6 +20,7 @@ require (
 	github.com/go-redis/redis v6.15.9+incompatible
 	github.com/joho/godotenv v1.5.1
 	github.com/opentracing/opentracing-go v1.2.0
+	github.com/samber/lo v1.52.0
 	github.com/spf13/viper v1.12.0
 	go-micro.dev/v4 v4.11.0
 	go.uber.org/zap v1.21.0
@@ -103,7 +104,6 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
-	github.com/samber/lo v1.52.0 // indirect
 	github.com/segmentio/kafka-go v0.4.38 // indirect
 	github.com/sergi/go-diff v1.3.2-0.20230802210424-5b0b94c5c0d3 // indirect
 	github.com/skeema/knownhosts v1.3.1 // indirect

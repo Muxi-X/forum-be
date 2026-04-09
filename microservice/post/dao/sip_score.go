@@ -9,9 +9,9 @@ import (
 // 茶评 榜单 对象
 
 // todo 创建索引
-// 1. tag - content 二级索引
+// todo 1. tag - content 二级索引
 
-type RankingListModel struct {
+type SipScoreModel struct {
 	ID        uint32    `gorm:"primarykey;index:idx_rank,priority:3;index:idx_latest,priority:2;index:idx_creator,priority:2"`
 	CreatedAt time.Time `gorm:"index:idx_latest,priority:1"`
 	UpdatedAt time.Time
@@ -38,47 +38,49 @@ type RankingListModel struct {
 	ParticipantCount uint32 `gorm:"type:int unsigned;default:0;index:idx_rank,priority:2"`
 }
 
-func (RankingListModel) TableName() string {
-	return "ranking_lists"
+func (SipScoreModel) TableName() string {
+	return "sip_scores"
 }
 
 // Create ...
-func (r *RankingListModel) Create() error {
-	return dao.DB.Create(r).Error
+func (s *SipScoreModel) Create() error {
+	return dao.DB.Create(s).Error
 }
 
 // Save ...
-func (r *RankingListModel) Save(tx ...*gorm.DB) error {
+func (s *SipScoreModel) Save(tx ...*gorm.DB) error {
 	db := dao.DB
 	if len(tx) == 1 {
 		db = tx[0]
 	}
 
-	return db.Save(r).Error
+	return db.Save(s).Error
 }
 
-func (r *RankingListModel) Update() error {
-	return dao.DB.Model(r).Where("id = ?", r.ID).Updates(map[string]interface{}{
-		"name":        r.Name,
-		"description": r.Description,
-		"cover_img":   r.CoverImg,
+func (s *SipScoreModel) Update() error {
+	return dao.DB.Model(s).Where("id = ?", s.ID).Updates(map[string]interface{}{
+		"name":        s.Name,
+		"description": s.Description,
+		"cover_img":   s.CoverImg,
+		"domain":      s.Domain,
+		"category":    s.Category,
 	}).Error
 }
 
-func (r *RankingListModel) Delete(tx *gorm.DB) error {
-	return tx.Delete(r).Error
+func (s *SipScoreModel) Delete(tx *gorm.DB) error {
+	return tx.Delete(s).Error
 }
 
-func (r *RankingListModel) Get(id uint32) error {
-	return dao.DB.First(r, id).Error
+func (s *SipScoreModel) Get(id uint32) error {
+	return dao.DB.First(s, id).Error
 }
 
-func (r *RankingListModel) BeReported() error {
-	r.IsReport = true
-	return r.Save()
+func (s *SipScoreModel) BeReported() error {
+	s.IsReport = true
+	return s.Save()
 }
 
-type RankingListInfo struct {
+type SipScoreInfo struct {
 	ID        uint32
 	CreatedAt string
 	UpdatedAt string
@@ -93,7 +95,7 @@ type RankingListInfo struct {
 	ParticipantCount uint32
 }
 
-func (d *Dao) CreateRankingList(rankingList *RankingListModel) (uint32, error) {
-	err := rankingList.Create()
-	return rankingList.ID, err
+func (d *Dao) CreateSipScore(sipScore *SipScoreModel) (uint32, error) {
+	err := sipScore.Create()
+	return sipScore.ID, err
 }

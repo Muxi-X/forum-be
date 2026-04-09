@@ -83,6 +83,38 @@ const docTemplate = `{
                 }
             }
         },
+        "/auth/set_role/{id}": {
+            "post": {
+                "description": "前端无需接此接口，casbin只会在启动时读取一遍数据库，因此改权限不能直接修改数据库，故写一个接口",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "设置权限",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token 用户令牌",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/Response"
+                        }
+                    }
+                }
+            }
+        },
         "/chat/history/{id}": {
             "get": {
                 "consumes": [
@@ -984,46 +1016,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/ranking-list": {
-            "post": {
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "rankingList"
-                ],
-                "summary": "创建帖子 api",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "token 用户令牌",
-                        "name": "Authorization",
-                        "in": "header",
-                        "required": true
-                    },
-                    {
-                        "description": "create_ranking_list_request",
-                        "name": "object",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/rankingList.CreateRankingListRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/rankingList.IdResponse"
-                        }
-                    }
-                }
-            }
-        },
         "/report": {
             "put": {
                 "consumes": [
@@ -1146,6 +1138,46 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/report.ListResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/sip-score": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "sipscore"
+                ],
+                "summary": "创建榜单 api",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token 用户令牌",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "create_sip_score_request",
+                        "name": "object",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/sipscore.CreateSipScoreRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/sipscore.IdResponse"
                         }
                     }
                 }
@@ -1610,12 +1642,23 @@ const docTemplate = `{
         },
         "StudentLoginRequest": {
             "type": "object",
-            "required": [
-                "password",
-                "student_id"
-            ],
             "properties": {
+                "action": {
+                    "type": "string"
+                },
+                "captcha": {
+                    "type": "string"
+                },
                 "password": {
+                    "type": "string"
+                },
+                "second_auth_code": {
+                    "type": "string"
+                },
+                "second_auth_method": {
+                    "type": "string"
+                },
+                "session_id": {
                     "type": "string"
                 },
                 "student_id": {
@@ -1626,6 +1669,33 @@ const docTemplate = `{
         "StudentLoginResponse": {
             "type": "object",
             "properties": {
+                "available_second_auth_methods": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "captcha_image_base64": {
+                    "type": "string"
+                },
+                "current_second_auth_method": {
+                    "type": "string"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "second_auth_email_target": {
+                    "type": "string"
+                },
+                "second_auth_sms_target": {
+                    "type": "string"
+                },
+                "session_id": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
                 "token": {
                     "type": "string"
                 }
@@ -2224,48 +2294,6 @@ const docTemplate = `{
                 }
             }
         },
-        "rankingList.CreateRankingListRequest": {
-            "type": "object",
-            "required": [
-                "category",
-                "cover_img",
-                "description",
-                "domain",
-                "name",
-                "tags"
-            ],
-            "properties": {
-                "category": {
-                    "type": "string"
-                },
-                "cover_img": {
-                    "type": "string"
-                },
-                "description": {
-                    "type": "string"
-                },
-                "domain": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "tags": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                }
-            }
-        },
-        "rankingList.IdResponse": {
-            "type": "object",
-            "properties": {
-                "id": {
-                    "type": "integer"
-                }
-            }
-        },
         "report.CreateRequest": {
             "type": "object",
             "required": [
@@ -2359,6 +2387,48 @@ const docTemplate = `{
                 },
                 "user_name": {
                     "type": "string"
+                }
+            }
+        },
+        "sipscore.CreateSipScoreRequest": {
+            "type": "object",
+            "required": [
+                "category",
+                "cover_img",
+                "description",
+                "domain",
+                "name",
+                "tags"
+            ],
+            "properties": {
+                "category": {
+                    "type": "string"
+                },
+                "cover_img": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "domain": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "tags": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "sipscore.IdResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
                 }
             }
         },

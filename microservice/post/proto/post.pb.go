@@ -1400,7 +1400,7 @@ func (x *CreatePostRequest) GetTags() []string {
 	return nil
 }
 
-type CreateRankingListRequest struct {
+type CreateSipScoreRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	CreatorId     uint32                 `protobuf:"varint,1,opt,name=creator_id,json=creatorId,proto3" json:"creator_id,omitempty"`
 	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
@@ -1413,20 +1413,20 @@ type CreateRankingListRequest struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *CreateRankingListRequest) Reset() {
-	*x = CreateRankingListRequest{}
+func (x *CreateSipScoreRequest) Reset() {
+	*x = CreateSipScoreRequest{}
 	mi := &file_proto_post_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *CreateRankingListRequest) String() string {
+func (x *CreateSipScoreRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*CreateRankingListRequest) ProtoMessage() {}
+func (*CreateSipScoreRequest) ProtoMessage() {}
 
-func (x *CreateRankingListRequest) ProtoReflect() protoreflect.Message {
+func (x *CreateSipScoreRequest) ProtoReflect() protoreflect.Message {
 	mi := &file_proto_post_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -1438,54 +1438,54 @@ func (x *CreateRankingListRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use CreateRankingListRequest.ProtoReflect.Descriptor instead.
-func (*CreateRankingListRequest) Descriptor() ([]byte, []int) {
+// Deprecated: Use CreateSipScoreRequest.ProtoReflect.Descriptor instead.
+func (*CreateSipScoreRequest) Descriptor() ([]byte, []int) {
 	return file_proto_post_proto_rawDescGZIP(), []int{16}
 }
 
-func (x *CreateRankingListRequest) GetCreatorId() uint32 {
+func (x *CreateSipScoreRequest) GetCreatorId() uint32 {
 	if x != nil {
 		return x.CreatorId
 	}
 	return 0
 }
 
-func (x *CreateRankingListRequest) GetName() string {
+func (x *CreateSipScoreRequest) GetName() string {
 	if x != nil {
 		return x.Name
 	}
 	return ""
 }
 
-func (x *CreateRankingListRequest) GetDescription() string {
+func (x *CreateSipScoreRequest) GetDescription() string {
 	if x != nil {
 		return x.Description
 	}
 	return ""
 }
 
-func (x *CreateRankingListRequest) GetCoverImg() string {
+func (x *CreateSipScoreRequest) GetCoverImg() string {
 	if x != nil {
 		return x.CoverImg
 	}
 	return ""
 }
 
-func (x *CreateRankingListRequest) GetTags() []string {
+func (x *CreateSipScoreRequest) GetTags() []string {
 	if x != nil {
 		return x.Tags
 	}
 	return nil
 }
 
-func (x *CreateRankingListRequest) GetDomain() string {
+func (x *CreateSipScoreRequest) GetDomain() string {
 	if x != nil {
 		return x.Domain
 	}
 	return ""
 }
 
-func (x *CreateRankingListRequest) GetCategory() string {
+func (x *CreateSipScoreRequest) GetCategory() string {
 	if x != nil {
 		return x.Category
 	}
@@ -2268,27 +2268,27 @@ func (x *UnReadPostNumResponse) GetUnReadNum() []*UnReadPostNum {
 	return nil
 }
 
-type CreateRankingListResponse struct {
+type CreateSipScoreResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            uint32                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *CreateRankingListResponse) Reset() {
-	*x = CreateRankingListResponse{}
+func (x *CreateSipScoreResponse) Reset() {
+	*x = CreateSipScoreResponse{}
 	mi := &file_proto_post_proto_msgTypes[29]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *CreateRankingListResponse) String() string {
+func (x *CreateSipScoreResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*CreateRankingListResponse) ProtoMessage() {}
+func (*CreateSipScoreResponse) ProtoMessage() {}
 
-func (x *CreateRankingListResponse) ProtoReflect() protoreflect.Message {
+func (x *CreateSipScoreResponse) ProtoReflect() protoreflect.Message {
 	mi := &file_proto_post_proto_msgTypes[29]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -2300,12 +2300,12 @@ func (x *CreateRankingListResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use CreateRankingListResponse.ProtoReflect.Descriptor instead.
-func (*CreateRankingListResponse) Descriptor() ([]byte, []int) {
+// Deprecated: Use CreateSipScoreResponse.ProtoReflect.Descriptor instead.
+func (*CreateSipScoreResponse) Descriptor() ([]byte, []int) {
 	return file_proto_post_proto_rawDescGZIP(), []int{29}
 }
 
-func (x *CreateRankingListResponse) GetId() uint32 {
+func (x *CreateSipScoreResponse) GetId() uint32 {
 	if x != nil {
 		return x.Id
 	}
@@ -2481,8 +2481,8 @@ const file_proto_post_proto_rawDesc = "" +
 	"\fcontent_type\x18\x06 \x01(\tR\vcontentType\x12)\n" +
 	"\x10compiled_content\x18\a \x01(\tR\x0fcompiledContent\x12\x18\n" +
 	"\asummary\x18\b \x01(\tR\asummary\x12\x12\n" +
-	"\x04tags\x18\t \x03(\tR\x04tags\"\xd4\x01\n" +
-	"\x18CreateRankingListRequest\x12\x1d\n" +
+	"\x04tags\x18\t \x03(\tR\x04tags\"\xd1\x01\n" +
+	"\x15CreateSipScoreRequest\x12\x1d\n" +
 	"\n" +
 	"creator_id\x18\x01 \x01(\rR\tcreatorId\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12 \n" +
@@ -2553,11 +2553,11 @@ const file_proto_post_proto_rawDesc = "" +
 	"\x18ListPostPartInfoResponse\x12(\n" +
 	"\x05posts\x18\x01 \x03(\v2\x12.post.PostPartInfoR\x05posts\"L\n" +
 	"\x15UnReadPostNumResponse\x123\n" +
-	"\vun_read_num\x18\x01 \x03(\v2\x13.post.UnReadPostNumR\tunReadNum\"+\n" +
-	"\x19CreateRankingListResponse\x12\x0e\n" +
+	"\vun_read_num\x18\x01 \x03(\v2\x13.post.UnReadPostNumR\tunReadNum\"(\n" +
+	"\x16CreateSipScoreResponse\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\rR\x02id\"\n" +
 	"\n" +
-	"\bResponse2\xd1\n" +
+	"\bResponse2\xc8\n" +
 	"\n" +
 	"\vPostService\x12A\n" +
 	"\n" +
@@ -2569,8 +2569,8 @@ const file_proto_post_proto_rawDesc = "" +
 	"\x0eUpdatePostInfo\x12\x1b.post.UpdatePostInfoRequest\x1a\x0e.post.Response\"\x00\x121\n" +
 	"\x0eSetQualityPost\x12\r.post.Request\x1a\x0e.post.Response\"\x00\x12@\n" +
 	"\x10GetUnReadPostNum\x12\r.post.Request\x1a\x1b.post.UnReadPostNumResponse\"\x00\x12C\n" +
-	"\x12UpdateLastReadTime\x12\x1b.post.UpdateLastReadRequest\x1a\x0e.post.Response\"\x00\x12V\n" +
-	"\x11CreateRankingList\x12\x1e.post.CreateRankingListRequest\x1a\x1f.post.CreateRankingListResponse\"\x00\x120\n" +
+	"\x12UpdateLastReadTime\x12\x1b.post.UpdateLastReadRequest\x1a\x0e.post.Response\"\x00\x12M\n" +
+	"\x0eCreateSipScore\x12\x1b.post.CreateSipScoreRequest\x1a\x1c.post.CreateSipScoreResponse\"\x00\x120\n" +
 	"\n" +
 	"GetComment\x12\r.post.Request\x1a\x11.post.CommentInfo\"\x00\x12J\n" +
 	"\rCreateComment\x12\x1a.post.CreateCommentRequest\x1a\x1b.post.CreateCommentResponse\"\x00\x127\n" +
@@ -2617,7 +2617,7 @@ var file_proto_post_proto_goTypes = []any{
 	(*DeleteItemRequest)(nil),                // 13: post.DeleteItemRequest
 	(*UpdatePostInfoRequest)(nil),            // 14: post.UpdatePostInfoRequest
 	(*CreatePostRequest)(nil),                // 15: post.CreatePostRequest
-	(*CreateRankingListRequest)(nil),         // 16: post.CreateRankingListRequest
+	(*CreateSipScoreRequest)(nil),            // 16: post.CreateSipScoreRequest
 	(*ListPostPartInfoRequest)(nil),          // 17: post.ListPostPartInfoRequest
 	(*CreateCommentRequest)(nil),             // 18: post.CreateCommentRequest
 	(*ListMainPostRequest)(nil),              // 19: post.ListMainPostRequest
@@ -2630,7 +2630,7 @@ var file_proto_post_proto_goTypes = []any{
 	(*ListPostResponse)(nil),                 // 26: post.ListPostResponse
 	(*ListPostPartInfoResponse)(nil),         // 27: post.ListPostPartInfoResponse
 	(*UnReadPostNumResponse)(nil),            // 28: post.UnReadPostNumResponse
-	(*CreateRankingListResponse)(nil),        // 29: post.CreateRankingListResponse
+	(*CreateSipScoreResponse)(nil),           // 29: post.CreateSipScoreResponse
 	(*Response)(nil),                         // 30: post.Response
 }
 var file_proto_post_proto_depIdxs = []int32{
@@ -2648,7 +2648,7 @@ var file_proto_post_proto_depIdxs = []int32{
 	12, // 11: post.PostService.SetQualityPost:input_type -> post.Request
 	12, // 12: post.PostService.GetUnReadPostNum:input_type -> post.Request
 	21, // 13: post.PostService.UpdateLastReadTime:input_type -> post.UpdateLastReadRequest
-	16, // 14: post.PostService.CreateRankingList:input_type -> post.CreateRankingListRequest
+	16, // 14: post.PostService.CreateSipScore:input_type -> post.CreateSipScoreRequest
 	12, // 15: post.PostService.GetComment:input_type -> post.Request
 	18, // 16: post.PostService.CreateComment:input_type -> post.CreateCommentRequest
 	13, // 17: post.PostService.DeleteItem:input_type -> post.DeleteItemRequest
@@ -2668,7 +2668,7 @@ var file_proto_post_proto_depIdxs = []int32{
 	30, // 31: post.PostService.SetQualityPost:output_type -> post.Response
 	28, // 32: post.PostService.GetUnReadPostNum:output_type -> post.UnReadPostNumResponse
 	30, // 33: post.PostService.UpdateLastReadTime:output_type -> post.Response
-	29, // 34: post.PostService.CreateRankingList:output_type -> post.CreateRankingListResponse
+	29, // 34: post.PostService.CreateSipScore:output_type -> post.CreateSipScoreResponse
 	2,  // 35: post.PostService.GetComment:output_type -> post.CommentInfo
 	25, // 36: post.PostService.CreateComment:output_type -> post.CreateCommentResponse
 	30, // 37: post.PostService.DeleteItem:output_type -> post.Response

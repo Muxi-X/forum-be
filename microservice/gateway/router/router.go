@@ -10,9 +10,9 @@ import (
 	"forum-gateway/handler/feed"
 	"forum-gateway/handler/like"
 	"forum-gateway/handler/post"
-	"forum-gateway/handler/rankingList"
 	"forum-gateway/handler/report"
 	"forum-gateway/handler/sd"
+	"forum-gateway/handler/sipscore"
 	"forum-gateway/handler/user"
 	"forum-gateway/router/middleware"
 	"forum/pkg/constvar"
@@ -92,11 +92,11 @@ func Load(g *gin.Engine, mw ...gin.HandlerFunc) *gin.Engine {
 		postRouter.PATCH("/set_quality/:post_id", postApi.SetQualityPost)
 	}
 
-	rankingListRouter := g.Group("api/v1/ranking-list")
-	rankingListApi := rankingList.New(dao.GetDao())
-	rankingListRouter.Use(normalRequired)
+	sipScoreRouter := g.Group("api/v1/sip-score")
+	sipScoreApi := sipscore.New(dao.GetDao())
+	sipScoreRouter.Use(normalRequired)
 	{
-		rankingListRouter.POST("", rankingListApi.CreateRankingList)
+		sipScoreRouter.POST("", sipScoreApi.CreateSipScore)
 	}
 
 	commentRouter := g.Group("api/v1/comment")
