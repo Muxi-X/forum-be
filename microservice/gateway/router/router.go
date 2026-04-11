@@ -97,6 +97,7 @@ func Load(g *gin.Engine, mw ...gin.HandlerFunc) *gin.Engine {
 	sipScoreRouter.Use(normalRequired)
 	{
 		sipScoreRouter.POST("", sipScoreApi.CreateSipScore)
+		sipScoreRouter.PUT("", sipScoreApi.UpdateSipScore)
 	}
 
 	commentRouter := g.Group("api/v1/comment")

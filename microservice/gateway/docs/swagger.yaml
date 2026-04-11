@@ -578,6 +578,27 @@ definitions:
       id:
         type: integer
     type: object
+  sipscore.UpdateSipScoreRequest:
+    properties:
+      category:
+        type: string
+      cover_img:
+        type: string
+      description:
+        type: string
+      domain:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      tags:
+        items:
+          type: string
+        type: array
+    required:
+    - id
+    type: object
   user:
     properties:
       avatar:
@@ -1412,6 +1433,31 @@ paths:
           schema:
             $ref: '#/definitions/sipscore.IdResponse'
       summary: 创建榜单 api
+      tags:
+      - sipscore
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: token 用户令牌
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: update_sip_score_request
+        in: body
+        name: object
+        required: true
+        schema:
+          $ref: '#/definitions/sipscore.UpdateSipScoreRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Response'
+      summary: 修改榜单信息 api
       tags:
       - sipscore
   /user:

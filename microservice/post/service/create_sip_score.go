@@ -30,13 +30,15 @@ func (s *PostService) CreateSipScore(_ context.Context, req *pb.CreateSipScoreRe
 		}
 	}
 
+	creatorID := req.GetCreatorId()
 	data := &dao.SipScoreModel{
-		Name:        req.GetName(),
-		Description: req.GetDescription(),
-		CoverImg:    req.GetCoverImg(),
-		CreatorID:   req.GetCreatorId(),
-		Domain:      domain,
-		Category:    req.GetCategory(),
+		Name:           req.GetName(),
+		Description:    req.GetDescription(),
+		CoverImg:       req.GetCoverImg(),
+		CreatorID:      creatorID,
+		Domain:         domain,
+		Category:       req.GetCategory(),
+		LastModifiedBy: creatorID,
 	}
 
 	sipScoreID, err := s.Dao.CreateSipScore(data)
@@ -61,7 +63,10 @@ func (s *PostService) CreateSipScore(_ context.Context, req *pb.CreateSipScoreRe
 
 	// 顺序一样，直接构建
 	sipScoreTags := make([]*dao.SipScoreTagModel, 0, len(uniqueTags))
+	tagIDs := make([]uint32, 0, len(tagsModel))
 	for _, tag := range tagsModel {
+		tagIDs = append(tagIDs, tag.Id)
+
 		sipScoreTags = append(sipScoreTags, &dao.SipScoreTagModel{
 			TagID:      tag.Id,
 			SipScoreID: sipScoreID,
@@ -71,11 +76,6 @@ func (s *PostService) CreateSipScore(_ context.Context, req *pb.CreateSipScoreRe
 	err = s.Dao.BatchCreateSipScoreTags(sipScoreTags)
 	if err != nil {
 		return errno.ServerErr(errno.ErrDatabase, err.Error())
-	}
-
-	tagIDs := make([]uint32, 0, len(tagsModel))
-	for _, tag := range tagsModel {
-		tagIDs = append(tagIDs, tag.Id)
 	}
 
 	category := req.GetCategory()

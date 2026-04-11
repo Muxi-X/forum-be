@@ -24,6 +24,8 @@ type Dao struct {
 
 // Interface dao
 type Interface interface {
+	Transaction(fc func(tx *gorm.DB) error) error
+
 	CreatePost(*PostModel) (uint32, error)
 	ListUserCreatedPost(uint32) ([]uint32, error)
 	ListMainPost(*PostModel, string, uint32, uint32, uint32, bool, string, uint32) ([]*PostInfo, error)
@@ -37,8 +39,13 @@ type Interface interface {
 
 	CreateSipScore(sipScore *SipScoreModel) (uint32, error)
 	BatchGetOrCreateTags(tags []string) ([]*TagModel, error)
-	BatchCreateSipScoreTags(items []*SipScoreTagModel) error
+	BatchCreateSipScoreTags(items []*SipScoreTagModel, tx ...*gorm.DB) error
 	BatchAddTagsToSortedSet(tagIDs []uint32, category string) error
+	BatchRemoveTagsFromSortedSet(tagIDs []uint32, category string) error
+	UpdateSipScore(id uint32, update map[string]interface{}, tx ...*gorm.DB) error
+	ListTagIDsBySipScoreId(sipScoreId uint32, tx ...*gorm.DB) ([]uint32, error)
+	DeleteSipScoreTagsBySipScoreId(sipScoreId uint32, tx ...*gorm.DB) error
+	GetSipScore(id uint32, tx ...*gorm.DB) (*SipScoreModel, error)
 
 	CreateComment(*CommentModel) (uint32, error)
 	GetCommentInfo(uint32) (*CommentInfo, error)
@@ -120,7 +127,7 @@ func GetDao() *Dao {
 	return dao
 }
 
-func (d Dao) DeletePost(id uint32, tx ...*gorm.DB) error {
+func (d *Dao) DeletePost(id uint32, tx ...*gorm.DB) error {
 	db := d.DB
 	if len(tx) == 1 {
 		db = tx[0]
@@ -175,7 +182,7 @@ func (d Dao) DeletePost(id uint32, tx ...*gorm.DB) error {
 	return d.Redis.ZRem("posts:", id).Err()
 }
 
-func (d Dao) DeleteComment(id uint32, tx ...*gorm.DB) error {
+func (d *Dao) DeleteComment(id uint32, tx ...*gorm.DB) error {
 	db := d.DB
 	if len(tx) == 1 {
 		db = tx[0]
@@ -190,4 +197,15 @@ func (d Dao) DeleteComment(id uint32, tx ...*gorm.DB) error {
 	}
 
 	return d.ChangePostScore(comment.PostId, -constvar.CommentScore)
+}
+
+func (d *Dao) Transaction(fc func(tx *gorm.DB) error) error {
+	return d.DB.Transaction(fc)
+}
+
+func (d *Dao) getDB(tx ...*gorm.DB) *gorm.DB {
+	if len(tx) > 0 && tx[0] != nil {
+		return tx[0]
+	}
+	return d.DB
 }

@@ -131,11 +131,7 @@ func (d *Dao) addTag(id uint32, content string) error {
 
 // BatchGetOrCreateTags
 // NOTE:
-// 1. redis miss -> mysql query -> mysql miss -> mysql insert -> mysql query(防止 toctou) -> redis set
-// 可以进一步优化为：
-// 2. redis miss -> mysql insert -> mysql query -> redis set
-// 但是第二种方案在后期——如果tag基本mysql中都有的话依然，会有两次db操作，而第一种方案在tag基本mysql中都有的情况下就只有一次db操作了
-// 交给后人优化了
+// 流程示意： redis miss -> mysql query -> mysql insert ignore -> mysql query -> redis set
 func (d *Dao) BatchGetOrCreateTags(tags []string) ([]*TagModel, error) {
 	if len(tags) == 0 {
 		return nil, nil
@@ -386,6 +382,19 @@ func (d *Dao) BatchAddTagsToSortedSet(tagIDs []uint32, category string) error {
 	return err
 }
 
+func (d *Dao) BatchRemoveTagsFromSortedSet(tagIDs []uint32, category string) error {
+	pipe := d.Redis.TxPipeline()
+
+	for _, tagID := range tagIDs {
+		member := strconv.Itoa(int(tagID))
+		pipe.ZIncrBy("tags:", -1, member)
+		pipe.ZIncrBy("tags:"+category, -1, member)
+	}
+
+	_, err := pipe.Exec()
+	return err
+}
+
 func (d *Dao) ListPopularTags(category string) ([]string, error) {
 	// 降序
 	ids, err := d.Redis.ZRevRange("tags:"+category, 0, 9).Result()
@@ -450,6 +459,21 @@ func (d *Dao) CreateSipScoreTag(item *SipScoreTagModel) error {
 	return item.Create()
 }
 
-func (d *Dao) BatchCreateSipScoreTags(items []*SipScoreTagModel) error {
-	return d.DB.Create(&items).Error
+func (d *Dao) BatchCreateSipScoreTags(items []*SipScoreTagModel, tx ...*gorm.DB) error {
+	db := d.getDB(tx...)
+	return db.Create(&items).Error
+}
+
+func (d *Dao) ListTagIDsBySipScoreId(sipScoreId uint32, tx ...*gorm.DB) ([]uint32, error) {
+	db := d.getDB(tx...)
+
+	var ids []uint32
+	err := db.Model(&SipScoreTagModel{}).Where("sip_score_id = ?", sipScoreId).Pluck("tag_id", &ids).Error
+	return ids, err
+}
+
+// DeleteSipScoreTagsBySipScoreId 硬删除
+func (d *Dao) DeleteSipScoreTagsBySipScoreId(sipScoreId uint32, tx ...*gorm.DB) error {
+	db := d.getDB(tx...)
+	return db.Where("sip_score_id = ?", sipScoreId).Unscoped().Delete(&SipScoreTagModel{}).Error
 }

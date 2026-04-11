@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 option go_package = "./proto";
-
+import "google/protobuf/field_mask.proto";
 package post;
 
 service PostService {
@@ -15,6 +15,7 @@ service PostService {
     rpc UpdateLastReadTime(UpdateLastReadRequest) returns (Response) {}
 
     rpc CreateSipScore(CreateSipScoreRequest) returns (CreateSipScoreResponse) {}
+    rpc UpdateSipScoreInfo(UpdateSipScoreInfoRequest) returns (Response) {}
 
     rpc GetComment(Request) returns (CommentInfo) {}
     rpc CreateComment(CreateCommentRequest) returns (CreateCommentResponse) {}
@@ -363,6 +364,19 @@ message CreateSipScoreRequest {
     repeated string tags = 5;
     string domain = 6;
     string category = 7;
+}
+
+message UpdateSipScoreInfoRequest {
+    uint32 id = 1;
+    string name = 2;
+    string description = 3;
+    string cover_img = 4;
+    repeated string tags = 5;
+    string domain = 6;
+    string category = 7;
+    uint32 last_modified_by = 8;
+
+    google.protobuf.FieldMask update_mask = 10;
 }
 
 // ---- response ----

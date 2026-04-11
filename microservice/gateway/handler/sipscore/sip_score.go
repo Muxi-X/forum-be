@@ -29,6 +29,16 @@ type CreateSipScoreRequest struct {
 	Tags        []string `json:"tags" binding:"required"`
 }
 
+type UpdateSipScoreRequest struct {
+	Id          uint32   `json:"id" binding:"required"`
+	Name        string   `json:"name"`
+	Description *string  `json:"description"`
+	CoverImg    string   `json:"cover_img"`
+	Domain      string   `json:"domain"`
+	Category    string   `json:"category"`
+	Tags        []string `json:"tags"`
+}
+
 // =====================
 // Other Common Response
 // =====================
@@ -36,3 +46,5 @@ type CreateSipScoreRequest struct {
 type IdResponse struct {
 	Id uint32 `json:"id"`
 }
+
+type EmptyResponse struct{}

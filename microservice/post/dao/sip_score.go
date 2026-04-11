@@ -10,25 +10,25 @@ import (
 
 // todo 创建索引
 // todo 1. tag - content 二级索引
+// todo 2. LastModifiedBy 二级索引
 
 type SipScoreModel struct {
-	ID        uint32    `gorm:"primarykey;index:idx_rank,priority:3;index:idx_latest,priority:2;index:idx_creator,priority:2"`
-	CreatedAt time.Time `gorm:"index:idx_latest,priority:1"`
-	UpdatedAt time.Time
-	DeletedAt gorm.DeletedAt `gorm:"index"`
+	ID             uint32    `gorm:"primarykey;index:idx_rank,priority:3;index:idx_latest,priority:2;index:idx_creator,priority:2"`
+	CreatedAt      time.Time `gorm:"index:idx_latest,priority:1"`
+	UpdatedAt      time.Time
+	DeletedAt      gorm.DeletedAt `gorm:"index"`
+	LastModifiedBy uint32
+	CreatorID      uint32 `gorm:"index:idx_creator,priority:1"`
 
 	// 用户可编辑的字段
 	Name        string `gorm:"type:varchar(100);not null;index:,class:FULLTEXT,option:WITH PARSER ngram"`
 	Description string `gorm:"type:varchar(500)"`
 	CoverImg    string `gorm:"type:varchar(255)"`
-
-	CreatorID uint32 `gorm:"index:idx_creator,priority:1"`
+	Domain      string `gorm:"type:varchar(20);not null;index"`
+	Category    string `gorm:"type:varchar(20);not null;index"`
 
 	// 是否被举报过多而被 ban 了
 	IsReport bool `gorm:"index"`
-
-	Domain   string `gorm:"type:varchar(20);not null;index"`
-	Category string `gorm:"type:varchar(20);not null;index"`
 
 	// 榜单内的茶评数量 todo 暂时不用，没发现相关的需求
 	ItemCount uint32 `gorm:"type:int unsigned;default:0"`
@@ -55,16 +55,6 @@ func (s *SipScoreModel) Save(tx ...*gorm.DB) error {
 	}
 
 	return db.Save(s).Error
-}
-
-func (s *SipScoreModel) Update() error {
-	return dao.DB.Model(s).Where("id = ?", s.ID).Updates(map[string]interface{}{
-		"name":        s.Name,
-		"description": s.Description,
-		"cover_img":   s.CoverImg,
-		"domain":      s.Domain,
-		"category":    s.Category,
-	}).Error
 }
 
 func (s *SipScoreModel) Delete(tx *gorm.DB) error {
@@ -98,4 +88,20 @@ type SipScoreInfo struct {
 func (d *Dao) CreateSipScore(sipScore *SipScoreModel) (uint32, error) {
 	err := sipScore.Create()
 	return sipScore.ID, err
+}
+
+func (d *Dao) UpdateSipScore(id uint32, update map[string]interface{}, tx ...*gorm.DB) error {
+	db := d.getDB(tx...)
+	result := db.Model(&SipScoreModel{}).Where("id = ?", id).Updates(update)
+	if result.RowsAffected == 0 {
+		return gorm.ErrRecordNotFound
+	}
+	return result.Error
+}
+
+func (d *Dao) GetSipScore(id uint32, tx ...*gorm.DB) (*SipScoreModel, error) {
+	db := d.getDB(tx...)
+	var sipScore SipScoreModel
+	err := db.First(&sipScore, id).Error
+	return &sipScore, err
 }
