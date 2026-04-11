@@ -1221,6 +1221,46 @@ const docTemplate = `{
                 }
             }
         },
+        "/sip-score/entries": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "sipscore"
+                ],
+                "summary": "创建榜单条目 api",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token 用户令牌",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "create_sip_score_entry_request",
+                        "name": "object",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/sipscore.CreateSipScoreEntryRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/sipscore.IdsResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/user": {
             "put": {
                 "consumes": [
@@ -2428,6 +2468,24 @@ const docTemplate = `{
                 }
             }
         },
+        "sipscore.CreateSipScoreEntryRequest": {
+            "type": "object",
+            "required": [
+                "entries",
+                "sip_score_id"
+            ],
+            "properties": {
+                "entries": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/sipscore.SipScoreEntryCreateInfo"
+                    }
+                },
+                "sip_score_id": {
+                    "type": "integer"
+                }
+            }
+        },
         "sipscore.CreateSipScoreRequest": {
             "type": "object",
             "required": [
@@ -2467,6 +2525,35 @@ const docTemplate = `{
             "properties": {
                 "id": {
                     "type": "integer"
+                }
+            }
+        },
+        "sipscore.IdsResponse": {
+            "type": "object",
+            "properties": {
+                "ids": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                }
+            }
+        },
+        "sipscore.SipScoreEntryCreateInfo": {
+            "type": "object",
+            "required": [
+                "cover_img",
+                "name"
+            ],
+            "properties": {
+                "cover_img": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
                 }
             }
         },

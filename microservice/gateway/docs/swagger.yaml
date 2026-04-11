@@ -549,6 +549,18 @@ definitions:
       user_name:
         type: string
     type: object
+  sipscore.CreateSipScoreEntryRequest:
+    properties:
+      entries:
+        items:
+          $ref: '#/definitions/sipscore.SipScoreEntryCreateInfo'
+        type: array
+      sip_score_id:
+        type: integer
+    required:
+    - entries
+    - sip_score_id
+    type: object
   sipscore.CreateSipScoreRequest:
     properties:
       category:
@@ -577,6 +589,25 @@ definitions:
     properties:
       id:
         type: integer
+    type: object
+  sipscore.IdsResponse:
+    properties:
+      ids:
+        items:
+          type: integer
+        type: array
+    type: object
+  sipscore.SipScoreEntryCreateInfo:
+    properties:
+      cover_img:
+        type: string
+      description:
+        type: string
+      name:
+        type: string
+    required:
+    - cover_img
+    - name
     type: object
   sipscore.UpdateSipScoreRequest:
     properties:
@@ -1458,6 +1489,32 @@ paths:
           schema:
             $ref: '#/definitions/Response'
       summary: 修改榜单信息 api
+      tags:
+      - sipscore
+  /sip-score/entries:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: token 用户令牌
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: create_sip_score_entry_request
+        in: body
+        name: object
+        required: true
+        schema:
+          $ref: '#/definitions/sipscore.CreateSipScoreEntryRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/sipscore.IdsResponse'
+      summary: 创建榜单条目 api
       tags:
       - sipscore
   /user:

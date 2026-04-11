@@ -39,12 +39,35 @@ type UpdateSipScoreRequest struct {
 	Tags        []string `json:"tags"`
 }
 
+// ====================
+// SipScoreEntry Domain
+// ====================
+
+// ---- model ----
+
+type SipScoreEntryCreateInfo struct {
+	Name        string `json:"name" binding:"required"`
+	Description string `json:"description"`
+	CoverImg    string `json:"cover_img" binding:"required"`
+}
+
+// ---- request ----
+
+type CreateSipScoreEntryRequest struct {
+	SipScoreID uint32                     `json:"sip_score_id" binding:"required"`
+	Entries    []*SipScoreEntryCreateInfo `json:"entries" binding:"required,dive"`
+}
+
 // =====================
 // Other Common Response
 // =====================
 
 type IdResponse struct {
-	Id uint32 `json:"id"`
+	ID uint32 `json:"id"`
+}
+
+type IdsResponse struct {
+	IDs []uint32 `json:"ids"`
 }
 
 type EmptyResponse struct{}

@@ -1,7 +1,6 @@
 package sipscore
 
 import (
-	"fmt"
 	. "forum-gateway/handler"
 	"forum-gateway/util"
 	pb "forum-post/proto"
@@ -39,9 +38,6 @@ func (a *Api) CreateSipScore(c *gin.Context) {
 	}
 
 	userID := c.MustGet("userId").(uint32)
-	if err := model.AddRole("user", userID, constvar.NormalRole); err != nil {
-		fmt.Println("err", err.Error())
-	}
 	ok, err := model.Enforce(userID, constvar.SipScore, req.Domain, constvar.Read)
 	if err != nil {
 		SendError(c, errno.ErrCasbin, nil, err.Error(), GetLine())
@@ -53,7 +49,7 @@ func (a *Api) CreateSipScore(c *gin.Context) {
 		return
 	}
 
-	if ok := a.Dao.AllowN(userID, 30); !ok {
+	if ok = a.Dao.AllowN(userID, 30); !ok {
 		SendError(c, errno.ErrExceededTrafficLimit, nil, "Please try again later", GetLine())
 		return
 	}
@@ -74,5 +70,5 @@ func (a *Api) CreateSipScore(c *gin.Context) {
 		return
 	}
 
-	SendResponse(c, nil, &IdResponse{Id: resp.Id})
+	SendResponse(c, nil, &IdResponse{ID: resp.Id})
 }

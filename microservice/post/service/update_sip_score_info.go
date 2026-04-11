@@ -27,6 +27,7 @@ import (
 // 5. BatchGetOrCreateTags 获取新 tagID（可能包含 redis + DB 多次操作）
 // 6. 批量创建新的 SipScoreTag 关联 -> 1 次 DB
 // 7. 事务提交后，异步更新 Redis ZSet 统计
+// todo 优化的话就是放在消息队列里
 func (s *PostService) UpdateSipScoreInfo(_ context.Context, req *pb.UpdateSipScoreInfoRequest, _ *pb.Response) error {
 	logger.Info("PostService UpdateSipScoreInfo")
 

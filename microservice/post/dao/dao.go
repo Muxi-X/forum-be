@@ -46,6 +46,8 @@ type Interface interface {
 	ListTagIDsBySipScoreId(sipScoreId uint32, tx ...*gorm.DB) ([]uint32, error)
 	DeleteSipScoreTagsBySipScoreId(sipScoreId uint32, tx ...*gorm.DB) error
 	GetSipScore(id uint32, tx ...*gorm.DB) (*SipScoreModel, error)
+	BatchCreateSipScoreEntries(entries []*SipScoreEntryModel, tx ...*gorm.DB) error
+	IncrSipScoreEntryCount(id uint32, incr int64, tx ...*gorm.DB) error
 
 	CreateComment(*CommentModel) (uint32, error)
 	GetCommentInfo(uint32) (*CommentInfo, error)

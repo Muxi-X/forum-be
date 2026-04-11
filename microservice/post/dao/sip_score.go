@@ -10,7 +10,7 @@ import (
 
 // todo 创建索引
 // todo 1. tag - content 二级索引
-// todo 2. LastModifiedBy 二级索引
+// todo 2.
 
 type SipScoreModel struct {
 	ID             uint32    `gorm:"primarykey;index:idx_rank,priority:3;index:idx_latest,priority:2;index:idx_creator,priority:2"`
@@ -19,6 +19,14 @@ type SipScoreModel struct {
 	DeletedAt      gorm.DeletedAt `gorm:"index"`
 	LastModifiedBy uint32
 	CreatorID      uint32 `gorm:"index:idx_creator,priority:1"`
+	EntryCount     uint32 `gorm:"type:int unsigned;default:0"`
+
+	// 冗余字段，用于排序
+	CollectCount     uint32 `gorm:"type:int unsigned;default:0;index:idx_rank,priority:1"`
+	ParticipantCount uint32 `gorm:"type:int unsigned;default:0;index:idx_rank,priority:2"`
+
+	// 是否被举报过多而被 ban 了
+	IsReport bool `gorm:"index"`
 
 	// 用户可编辑的字段
 	Name        string `gorm:"type:varchar(100);not null;index:,class:FULLTEXT,option:WITH PARSER ngram"`
@@ -26,16 +34,6 @@ type SipScoreModel struct {
 	CoverImg    string `gorm:"type:varchar(255)"`
 	Domain      string `gorm:"type:varchar(20);not null;index"`
 	Category    string `gorm:"type:varchar(20);not null;index"`
-
-	// 是否被举报过多而被 ban 了
-	IsReport bool `gorm:"index"`
-
-	// 榜单内的茶评数量 todo 暂时不用，没发现相关的需求
-	ItemCount uint32 `gorm:"type:int unsigned;default:0"`
-
-	// 冗余字段，用于排序
-	CollectCount     uint32 `gorm:"type:int unsigned;default:0;index:idx_rank,priority:1"`
-	ParticipantCount uint32 `gorm:"type:int unsigned;default:0;index:idx_rank,priority:2"`
 }
 
 func (SipScoreModel) TableName() string {
@@ -104,4 +102,72 @@ func (d *Dao) GetSipScore(id uint32, tx ...*gorm.DB) (*SipScoreModel, error) {
 	var sipScore SipScoreModel
 	err := db.First(&sipScore, id).Error
 	return &sipScore, err
+}
+
+func (d *Dao) IncrSipScoreEntryCount(id uint32, incr int64, tx ...*gorm.DB) error {
+	db := d.getDB(tx...)
+	result := db.Model(&SipScoreModel{}).Where("id = ?", id).UpdateColumn("entry_count", gorm.Expr("entry_count + ?", incr))
+
+	if result.RowsAffected == 0 {
+		return gorm.ErrRecordNotFound
+	}
+	return result.Error
+}
+
+// todo 添加唯一索引，确保榜单内的条目唯一
+
+type SipScoreEntryModel struct {
+	ID             uint32 `gorm:"primarykey"`
+	CreatedAt      time.Time
+	UpdatedAt      time.Time
+	DeletedAt      gorm.DeletedAt
+	SipScoreID     uint32
+	LastModifiedBy uint32
+	CreatorID      uint32
+	IsReport       bool
+
+	// 冗余统计字段 - 用于排序
+	ParticipantCount uint32
+	CommentCount     uint32
+	ScoreTotal       uint32
+
+	// 用户可编辑字段
+	Name        string `gorm:"type:varchar(100);not null;index:,class:FULLTEXT,option:WITH PARSER ngram"`
+	Description string `gorm:"type:varchar(500)"`
+	CoverImg    string `gorm:"type:varchar(255)"`
+}
+
+func (SipScoreEntryModel) TableName() string {
+	return "sip_score_entries"
+}
+
+func (s *SipScoreEntryModel) Create() error {
+	return dao.DB.Create(s).Error
+}
+
+func (s *SipScoreEntryModel) Save(tx ...*gorm.DB) error {
+	db := dao.DB
+	if len(tx) == 1 {
+		db = tx[0]
+	}
+
+	return db.Save(s).Error
+}
+
+func (s *SipScoreEntryModel) Delete(tx *gorm.DB) error {
+	return tx.Delete(s).Error
+}
+
+func (s *SipScoreEntryModel) Get(id uint32) error {
+	return dao.DB.First(s, id).Error
+}
+
+func (s *SipScoreEntryModel) BeReported() error {
+	s.IsReport = true
+	return s.Save()
+}
+
+func (d *Dao) BatchCreateSipScoreEntries(entries []*SipScoreEntryModel, tx ...*gorm.DB) error {
+	db := d.getDB(tx...)
+	return db.Create(entries).Error
 }

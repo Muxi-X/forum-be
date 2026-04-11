@@ -11,7 +11,7 @@ import (
 	"forum/pkg/unique"
 )
 
-// todo 可以进一步优化 - 消息队列
+// todo 可以进一步优化 - 将 tag 放到消息队列
 
 func (s *PostService) CreateSipScore(_ context.Context, req *pb.CreateSipScoreRequest, resp *pb.CreateSipScoreResponse) error {
 	logger.Info("PostService CreateSipScore")

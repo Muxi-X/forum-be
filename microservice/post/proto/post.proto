@@ -16,6 +16,7 @@ service PostService {
 
     rpc CreateSipScore(CreateSipScoreRequest) returns (CreateSipScoreResponse) {}
     rpc UpdateSipScoreInfo(UpdateSipScoreInfoRequest) returns (Response) {}
+    rpc CreateSipScoreEntry(CreateSipScoreEntryRequest) returns (CreateSipScoreEntryResponse) {}
 
     rpc GetComment(Request) returns (CommentInfo) {}
     rpc CreateComment(CreateCommentRequest) returns (CreateCommentResponse) {}
@@ -383,4 +384,31 @@ message UpdateSipScoreInfoRequest {
 
 message CreateSipScoreResponse {
     uint32 id = 1;
+}
+
+// =====================
+// SipScoreEntry Domain
+// =====================
+
+// ---- model ----
+
+message SipScoreEntryCreateInfo {
+    string name = 1;
+    string description = 2;
+    string cover_img = 3;
+}
+
+
+// ---- request ----
+
+message CreateSipScoreEntryRequest {
+    uint32 sip_score_id = 1;
+    repeated SipScoreEntryCreateInfo entries = 2;
+    uint32 creator_id = 3;
+}
+
+// ---- response ----
+
+message CreateSipScoreEntryResponse {
+    repeated uint32 entry_ids = 1;
 }

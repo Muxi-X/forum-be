@@ -1,6 +1,6 @@
 package unique
 
-// UniqueStrings 字符串去重
+// UniqueStrings 字符数组去重
 func UniqueStrings(strs []string) []string {
 	m := make(map[string]struct{})
 	res := make([]string, 0, len(strs))
