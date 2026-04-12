@@ -42,15 +42,16 @@ func (s *PostService) UpdateSipScoreInfo(_ context.Context, req *pb.UpdateSipSco
 	}
 
 	fieldMap := map[string]interface{}{
-		"name":             req.GetName(),
-		"description":      req.GetDescription(),
-		"cover_img":        req.GetCoverImg(),
-		"domain":           req.GetDomain(),
-		"category":         req.GetCategory(),
-		"last_modified_by": lastModifiedBy,
+		"name":        req.GetName(),
+		"description": req.GetDescription(),
+		"cover_img":   req.GetCoverImg(),
+		"domain":      req.GetDomain(),
+		"category":    req.GetCategory(),
 	}
 
-	update := map[string]interface{}{}
+	update := map[string]interface{}{
+		"last_modified_by": lastModifiedBy,
+	}
 	var uniqueTags []string
 	isTagsUpdate := false
 
@@ -68,6 +69,8 @@ func (s *PostService) UpdateSipScoreInfo(_ context.Context, req *pb.UpdateSipSco
 
 		if val, ok := fieldMap[path]; ok {
 			update[path] = val
+		} else {
+			return errno.ServerErr(errno.ErrBadRequest, "invalid update_mask path: "+path)
 		}
 	}
 

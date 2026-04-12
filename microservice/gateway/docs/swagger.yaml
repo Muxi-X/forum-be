@@ -609,6 +609,22 @@ definitions:
     - cover_img
     - name
     type: object
+  sipscore.UpdateSipScoreEntryRequest:
+    properties:
+      cover_img:
+        type: string
+      description:
+        type: string
+      entry_id:
+        type: integer
+      name:
+        type: string
+      sip_score_id:
+        type: integer
+    required:
+    - entry_id
+    - sip_score_id
+    type: object
   sipscore.UpdateSipScoreRequest:
     properties:
       category:
@@ -1515,6 +1531,32 @@ paths:
           schema:
             $ref: '#/definitions/sipscore.IdsResponse'
       summary: 创建榜单条目 api
+      tags:
+      - sipscore
+  /sip-score/entry:
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: token 用户令牌
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: update_sip_score_entry_request
+        in: body
+        name: object
+        required: true
+        schema:
+          $ref: '#/definitions/sipscore.UpdateSipScoreEntryRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Response'
+      summary: 修改榜单条目信息 api
       tags:
       - sipscore
   /user:

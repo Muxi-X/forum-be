@@ -17,6 +17,7 @@ service PostService {
     rpc CreateSipScore(CreateSipScoreRequest) returns (CreateSipScoreResponse) {}
     rpc UpdateSipScoreInfo(UpdateSipScoreInfoRequest) returns (Response) {}
     rpc CreateSipScoreEntry(CreateSipScoreEntryRequest) returns (CreateSipScoreEntryResponse) {}
+    rpc UpdateSipScoreEntryInfo(UpdateSipScoreEntryInfoRequest) returns (Response) {}
 
     rpc GetComment(Request) returns (CommentInfo) {}
     rpc CreateComment(CreateCommentRequest) returns (CreateCommentResponse) {}
@@ -405,6 +406,17 @@ message CreateSipScoreEntryRequest {
     uint32 sip_score_id = 1;
     repeated SipScoreEntryCreateInfo entries = 2;
     uint32 creator_id = 3;
+}
+
+message UpdateSipScoreEntryInfoRequest {
+    uint32 sip_score_id = 1;
+    uint32 sip_score_entry_id = 2;
+    string name = 3;
+    string description = 4;
+    string cover_img = 5;
+    uint32 last_modified_by = 6;
+
+    google.protobuf.FieldMask update_mask = 10;
 }
 
 // ---- response ----

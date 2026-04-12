@@ -27,7 +27,7 @@ func (a *Api) CreateSipScoreEntries(c *gin.Context) {
 	log.Info("Post CreateSipScoreEntries function called.", zap.String("X-Request-Id", util.GetReqID(c)))
 
 	var req CreateSipScoreEntryRequest
-	if err := c.BindJSON(&req); err != nil {
+	if err := c.ShouldBindJSON(&req); err != nil {
 		SendError(c, errno.ErrBind, nil, err.Error(), GetLine())
 		return
 	}

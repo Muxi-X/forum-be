@@ -58,6 +58,14 @@ type CreateSipScoreEntryRequest struct {
 	Entries    []*SipScoreEntryCreateInfo `json:"entries" binding:"required,dive"`
 }
 
+type UpdateSipScoreEntryRequest struct {
+	SipScoreID  uint32  `json:"sip_score_id" binding:"required"`
+	EntryID     uint32  `json:"entry_id" binding:"required"`
+	Name        string  `json:"name"`
+	Description *string `json:"description"`
+	CoverImg    string  `json:"cover_img"`
+}
+
 // =====================
 // Other Common Response
 // =====================

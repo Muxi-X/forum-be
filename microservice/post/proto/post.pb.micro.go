@@ -40,6 +40,7 @@ type PostService interface {
 	CreateSipScore(ctx context.Context, in *CreateSipScoreRequest, opts ...client.CallOption) (*CreateSipScoreResponse, error)
 	UpdateSipScoreInfo(ctx context.Context, in *UpdateSipScoreInfoRequest, opts ...client.CallOption) (*Response, error)
 	CreateSipScoreEntry(ctx context.Context, in *CreateSipScoreEntryRequest, opts ...client.CallOption) (*CreateSipScoreEntryResponse, error)
+	UpdateSipScoreEntryInfo(ctx context.Context, in *UpdateSipScoreEntryInfoRequest, opts ...client.CallOption) (*Response, error)
 	GetComment(ctx context.Context, in *Request, opts ...client.CallOption) (*CommentInfo, error)
 	CreateComment(ctx context.Context, in *CreateCommentRequest, opts ...client.CallOption) (*CreateCommentResponse, error)
 	DeleteItem(ctx context.Context, in *DeleteItemRequest, opts ...client.CallOption) (*Response, error)
@@ -175,6 +176,16 @@ func (c *postService) CreateSipScoreEntry(ctx context.Context, in *CreateSipScor
 	return out, nil
 }
 
+func (c *postService) UpdateSipScoreEntryInfo(ctx context.Context, in *UpdateSipScoreEntryInfoRequest, opts ...client.CallOption) (*Response, error) {
+	req := c.c.NewRequest(c.name, "PostService.UpdateSipScoreEntryInfo", in)
+	out := new(Response)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *postService) GetComment(ctx context.Context, in *Request, opts ...client.CallOption) (*CommentInfo, error) {
 	req := c.c.NewRequest(c.name, "PostService.GetComment", in)
 	out := new(CommentInfo)
@@ -299,6 +310,7 @@ type PostServiceHandler interface {
 	CreateSipScore(context.Context, *CreateSipScoreRequest, *CreateSipScoreResponse) error
 	UpdateSipScoreInfo(context.Context, *UpdateSipScoreInfoRequest, *Response) error
 	CreateSipScoreEntry(context.Context, *CreateSipScoreEntryRequest, *CreateSipScoreEntryResponse) error
+	UpdateSipScoreEntryInfo(context.Context, *UpdateSipScoreEntryInfoRequest, *Response) error
 	GetComment(context.Context, *Request, *CommentInfo) error
 	CreateComment(context.Context, *CreateCommentRequest, *CreateCommentResponse) error
 	DeleteItem(context.Context, *DeleteItemRequest, *Response) error
@@ -325,6 +337,7 @@ func RegisterPostServiceHandler(s server.Server, hdlr PostServiceHandler, opts .
 		CreateSipScore(ctx context.Context, in *CreateSipScoreRequest, out *CreateSipScoreResponse) error
 		UpdateSipScoreInfo(ctx context.Context, in *UpdateSipScoreInfoRequest, out *Response) error
 		CreateSipScoreEntry(ctx context.Context, in *CreateSipScoreEntryRequest, out *CreateSipScoreEntryResponse) error
+		UpdateSipScoreEntryInfo(ctx context.Context, in *UpdateSipScoreEntryInfoRequest, out *Response) error
 		GetComment(ctx context.Context, in *Request, out *CommentInfo) error
 		CreateComment(ctx context.Context, in *CreateCommentRequest, out *CreateCommentResponse) error
 		DeleteItem(ctx context.Context, in *DeleteItemRequest, out *Response) error
@@ -390,6 +403,10 @@ func (h *postServiceHandler) UpdateSipScoreInfo(ctx context.Context, in *UpdateS
 
 func (h *postServiceHandler) CreateSipScoreEntry(ctx context.Context, in *CreateSipScoreEntryRequest, out *CreateSipScoreEntryResponse) error {
 	return h.PostServiceHandler.CreateSipScoreEntry(ctx, in, out)
+}
+
+func (h *postServiceHandler) UpdateSipScoreEntryInfo(ctx context.Context, in *UpdateSipScoreEntryInfoRequest, out *Response) error {
+	return h.PostServiceHandler.UpdateSipScoreEntryInfo(ctx, in, out)
 }
 
 func (h *postServiceHandler) GetComment(ctx context.Context, in *Request, out *CommentInfo) error {

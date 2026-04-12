@@ -114,7 +114,8 @@ func (d *Dao) IncrSipScoreEntryCount(id uint32, incr int64, tx ...*gorm.DB) erro
 	return result.Error
 }
 
-// todo 添加唯一索引，确保榜单内的条目唯一
+// todo sipScoreID + name 唯一索引，确保同一榜单内条目名称唯一
+// todo sipScoreID ID 联合索引
 
 type SipScoreEntryModel struct {
 	ID             uint32 `gorm:"primarykey"`
@@ -170,4 +171,13 @@ func (s *SipScoreEntryModel) BeReported() error {
 func (d *Dao) BatchCreateSipScoreEntries(entries []*SipScoreEntryModel, tx ...*gorm.DB) error {
 	db := d.getDB(tx...)
 	return db.Create(entries).Error
+}
+
+func (d *Dao) UpdateSipScoreEntry(sipScoreID, entryID uint32, update map[string]interface{}, tx ...*gorm.DB) error {
+	db := d.getDB(tx...)
+	result := db.Model(&SipScoreEntryModel{}).Where("id = ? AND sip_score_id = ?", entryID, sipScoreID).Updates(update)
+	if result.RowsAffected == 0 {
+		return gorm.ErrRecordNotFound
+	}
+	return result.Error
 }

@@ -48,6 +48,7 @@ type Interface interface {
 	GetSipScore(id uint32, tx ...*gorm.DB) (*SipScoreModel, error)
 	BatchCreateSipScoreEntries(entries []*SipScoreEntryModel, tx ...*gorm.DB) error
 	IncrSipScoreEntryCount(id uint32, incr int64, tx ...*gorm.DB) error
+	UpdateSipScoreEntry(sipScoreID, entryID uint32, update map[string]interface{}, tx ...*gorm.DB) error
 
 	CreateComment(*CommentModel) (uint32, error)
 	GetCommentInfo(uint32) (*CommentInfo, error)
