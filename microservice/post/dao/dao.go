@@ -31,7 +31,6 @@ type Interface interface {
 	ListMainPost(*PostModel, string, uint32, uint32, uint32, bool, string, uint32) ([]*PostInfo, error)
 	GetPostInfo(uint32) (*PostInfo, error)
 	GetPost(uint32) (*PostModel, error)
-	IsUserCollectionPost(uint32, uint32) (bool, error)
 	ListPostInfoByPostIds([]uint32, *PostModel, uint32, uint32, uint32, bool) ([]*pb.PostPartInfo, error)
 	DeletePost(uint32, ...*gorm.DB) error
 	ChangeQualityPost(uint32, bool) error
@@ -44,6 +43,7 @@ type Interface interface {
 	BatchRemoveTagsFromSortedSet(tagIDs []uint32, category string) error
 	UpdateSipScore(id uint32, update map[string]interface{}, tx ...*gorm.DB) error
 	ListTagIDsBySipScoreId(sipScoreId uint32, tx ...*gorm.DB) ([]uint32, error)
+	ListTagsBySipScoreId(sipScoreId uint32, tx ...*gorm.DB) ([]string, []uint32, error)
 	DeleteSipScoreTagsBySipScoreId(sipScoreId uint32, tx ...*gorm.DB) error
 	GetSipScore(id uint32, tx ...*gorm.DB) (*SipScoreModel, error)
 	BatchCreateSipScoreEntries(entries []*SipScoreEntryModel, tx ...*gorm.DB) error
@@ -72,9 +72,10 @@ type Interface interface {
 	ListPopularTags(string) ([]string, error)
 
 	CreateCollection(*CollectionModel) (uint32, error)
-	DeleteCollection(*CollectionModel) error
-	GetCollectionNumByPostId(uint32) (uint32, error)
-	ListCollectionByUserId(uint32) ([]uint32, error)
+	DeleteCollection(collection *CollectionModel) error
+	GetCollectionNum(contentType uint8, contentId uint32) (uint32, error)
+	ListCollectionByUserId(userId uint32, contentType uint8) ([]uint32, error)
+	IsUserCollected(userId uint32, contentType uint8, contentId uint32) (bool, error)
 
 	ChangePostScore(uint32, int) error
 	AddChangeRecord(uint32) error

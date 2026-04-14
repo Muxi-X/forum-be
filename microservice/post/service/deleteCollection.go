@@ -10,11 +10,13 @@ import (
 	"forum/pkg/errno"
 )
 
+// todo 需要再传一个参数，表示什么类型的收藏，帖子、评论等
+
 func (s *PostService) DeleteCollection(_ context.Context, req *pb.Request, _ *pb.Response) error {
 	logger.Info("PostService DeleteCollection")
 
 	collection := &dao.CollectionModel{
-		Id: req.Id,
+		ID: req.Id,
 	}
 
 	if err := s.Dao.DeleteCollection(collection); err != nil {

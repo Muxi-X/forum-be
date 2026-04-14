@@ -65,4 +65,8 @@ const (
 	// delete type
 	DeletePost    = "0"
 	RemoveQuality = "1"
+
+	// collection type
+	CollectionPost     = 1
+	CollectionSipScore = 2
 )

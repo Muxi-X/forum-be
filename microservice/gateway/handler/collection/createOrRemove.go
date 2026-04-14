@@ -17,6 +17,11 @@ import (
 	"go.uber.org/zap"
 )
 
+// todo 这个接口需要更新，因为收藏的类型多了
+// 而且目前是纯 mysql
+// 之后和 like 互补一下，可以考虑 redis 先存一份，定时同步到 mysql
+// like 之后和 collection 互补一下， 在mysql存一份方便之后迁移
+
 // CreateOrRemove ... 收藏/取消收藏帖子
 // @Summary 收藏/取消收藏帖子 api
 // @Tags collection

@@ -7,8 +7,9 @@ import (
 	logger "forum/log"
 	"forum/pkg/constvar"
 	"forum/pkg/errno"
-	"forum/util"
 )
+
+// todo 需要再传一个参数，表示什么类型的收藏，帖子、评论等
 
 func (s *PostService) CreateOrRemoveCollection(_ context.Context, req *pb.Request, resp *pb.CreateOrRemoveCollectionResponse) error {
 	logger.Info("PostService CreateOrRemoveCollection")
@@ -16,12 +17,12 @@ func (s *PostService) CreateOrRemoveCollection(_ context.Context, req *pb.Reques
 	var score int
 
 	collection := &dao.CollectionModel{
-		CreateTime: util.GetCurrentTime(),
-		UserId:     req.UserId,
-		PostId:     req.Id,
+		UserID:      req.UserId,
+		ContentID:   req.Id,
+		ContentType: constvar.CollectionPost,
 	}
 
-	isCollection, err := s.Dao.IsUserCollectionPost(req.UserId, req.Id)
+	isCollection, err := s.Dao.IsUserCollected(req.UserId, constvar.CollectionPost, req.Id)
 	if err != nil {
 		return errno.ServerErr(errno.ErrDatabase, err.Error())
 	}

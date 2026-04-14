@@ -129,6 +129,55 @@ func (d *Dao) addTag(id uint32, content string) error {
 	return err
 }
 
+func (d *Dao) BatchGetTagsByIDs(tagIDs []uint32) ([]*TagModel, error) {
+	if len(tagIDs) == 0 {
+		return nil, nil
+	}
+
+	// redis
+	cacheHit, missIDs, err := d.batchGetTagsFromCache(tagIDs)
+	if err != nil {
+		return nil, err
+	}
+
+	res := make([]*TagModel, len(tagIDs))
+
+	// 填充 redis 命中
+	for i, id := range tagIDs {
+		if content, ok := cacheHit[id]; ok {
+			res[i] = &TagModel{
+				Id:      id,
+				Content: content,
+			}
+		}
+	}
+
+	// mysql
+	if len(missIDs) > 0 {
+		dbTags, err := d.batchGetTagsByIDsFromDB(missIDs)
+		if err != nil {
+			return nil, err
+		}
+
+		// 回填 redis
+		_ = d.batchSetTagsToCache(dbTags)
+
+		dbMap := make(map[uint32]*TagModel)
+		for _, tag := range dbTags {
+			dbMap[tag.Id] = tag
+		}
+
+		// 填充
+		for i, id := range tagIDs {
+			if res[i] == nil {
+				res[i] = dbMap[id]
+			}
+		}
+	}
+
+	return res, nil
+}
+
 // BatchGetOrCreateTags
 // NOTE:
 // 流程示意： redis miss -> mysql query -> mysql insert ignore -> mysql query -> redis set
@@ -137,25 +186,25 @@ func (d *Dao) BatchGetOrCreateTags(tags []string) ([]*TagModel, error) {
 		return nil, nil
 	}
 
-	// 批量 redis 查询
+	// redis query
 	redisHit, redisMiss, err := d.batchGetTagIDsFromCache(tags)
 	if err != nil {
 		return nil, err
 	}
 
-	// 未命中部分 批量查 Mysql
-	dbHit, dbMiss, err := d.batchGetTagsFromDB(redisMiss)
+	// redis miss -> mysql query
+	dbHit, dbMiss, err := d.batchGetTagsByContentsFromDB(redisMiss)
 	if err != nil {
 		return nil, err
 	}
 
-	// 将未命中部分插入数据库
+	// mysql insert ignore
 	dbTags, err := d.batchInsertTagsIgnoreConflict(dbMiss)
 	if err != nil {
 		return nil, err
 	}
 
-	// 将数据库命中部分和新建部分的 tagID 插入 redis
+	// 回填 redis
 	var tagsToAdd []*TagModel
 	tagsToAdd = append(tagsToAdd, dbHit...)
 	tagsToAdd = append(tagsToAdd, dbTags...)
@@ -246,7 +295,47 @@ func (d *Dao) batchGetTagIDsFromCache(contents []string) (map[string]uint32, []s
 	return hit, miss, err
 }
 
-func (d *Dao) batchGetTagsFromDB(contents []string) ([]*TagModel, []string, error) {
+func (d *Dao) batchGetTagsFromCache(ids []uint32) (map[uint32]string, []uint32, error) {
+	hit := make(map[uint32]string)
+	miss := make([]uint32, 0)
+
+	if len(ids) == 0 {
+		return hit, miss, nil
+	}
+
+	keys := make([]string, len(ids))
+	for i, id := range ids {
+		keys[i] = buildTagIDKey(id)
+	}
+
+	vals, err := d.Redis.MGet(keys...).Result()
+	if err != nil {
+		return nil, nil, err
+	}
+
+	pipe := d.Redis.TxPipeline()
+	for i, v := range vals {
+		if v == nil {
+			miss = append(miss, ids[i])
+			continue
+		}
+
+		content, ok := v.(string)
+		if !ok {
+			miss = append(miss, ids[i])
+			continue
+		}
+
+		hit[ids[i]] = content
+		pipe.Expire(keys[i], TagCacheTTL)
+	}
+
+	_, _ = pipe.Exec()
+
+	return hit, miss, nil
+}
+
+func (d *Dao) batchGetTagsByContentsFromDB(contents []string) ([]*TagModel, []string, error) {
 	var tags []*TagModel
 	miss := make([]string, 0)
 	if len(contents) == 0 {
@@ -272,6 +361,16 @@ func (d *Dao) batchGetTagsFromDB(contents []string) ([]*TagModel, []string, erro
 	}
 
 	return tags, miss, nil
+}
+
+func (d *Dao) batchGetTagsByIDsFromDB(ids []uint32) ([]*TagModel, error) {
+	if len(ids) == 0 {
+		return nil, nil
+	}
+
+	var tags []*TagModel
+	err := d.DB.Where("id IN ?", ids).Find(&tags).Error
+	return tags, err
 }
 
 func (d *Dao) batchInsertTagsIgnoreConflict(contents []string) ([]*TagModel, error) {
@@ -357,6 +456,27 @@ func (d *Dao) ListTagsByPostId(postId uint32) ([]string, []uint32, error) {
 	}
 
 	return contents, tagIds, nil
+}
+
+func (d *Dao) ListTagsBySipScoreId(sipScoreId uint32, tx ...*gorm.DB) ([]string, []uint32, error) {
+	tagIDs, err := d.ListTagIDsBySipScoreId(sipScoreId, tx...)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	tags, err := d.BatchGetTagsByIDs(tagIDs)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	contents := make([]string, len(tags))
+	for i, tag := range tags {
+		if tag != nil {
+			contents[i] = tag.Content
+		}
+	}
+
+	return contents, tagIDs, nil
 }
 
 func (d *Dao) AddTagToSortedSet(tagId uint32, category string) error {

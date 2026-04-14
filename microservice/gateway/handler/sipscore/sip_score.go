@@ -13,10 +13,52 @@ func New(i dao.Interface) *Api {
 }
 
 // ====================
+// Common
+// ====================
+
+// ---- model ----
+
+type userInfo struct {
+	ID     uint32 `json:"id"`
+	Name   string `json:"name"`
+	Avatar string `json:"avatar"`
+}
+
+// ---- response ----
+
+type IdResponse struct {
+	ID uint32 `json:"id"`
+}
+
+type IdsResponse struct {
+	IDs []uint32 `json:"ids"`
+}
+
+type EmptyResponse struct{}
+
+// ====================
 // SipScore Domain
 // ====================
 
 // ---- model ----
+
+type SipScore struct {
+	ID               uint32    `json:"id"`
+	CreatedAt        string    `json:"created_at"`
+	UpdatedAt        string    `json:"updated_at"`
+	Creator          *userInfo `json:"creator"`
+	LastModifiedBy   *userInfo `json:"last_modified_by"`
+	EntryCount       uint32    `json:"entry_count"`
+	CollectCount     uint32    `json:"collect_count"`
+	ParticipantCount uint32    `json:"participant_count"`
+	Name             string    `json:"name"`
+	Description      string    `json:"description"`
+	CoverImg         string    `json:"cover_img"`
+	Domain           string    `json:"domain"`
+	Category         string    `json:"category"`
+	Tags             []string  `json:"tags"`
+	IsCollected      bool      `json:"is_collected"`
+}
 
 // ---- request ----
 
@@ -37,6 +79,12 @@ type UpdateSipScoreRequest struct {
 	Domain      string   `json:"domain"`
 	Category    string   `json:"category"`
 	Tags        []string `json:"tags"`
+}
+
+// ---- response ----
+
+type GetSipScoreResponse struct {
+	SipScore *SipScore `json:"sip_score"`
 }
 
 // ====================
@@ -65,17 +113,3 @@ type UpdateSipScoreEntryRequest struct {
 	Description *string `json:"description"`
 	CoverImg    string  `json:"cover_img"`
 }
-
-// =====================
-// Other Common Response
-// =====================
-
-type IdResponse struct {
-	ID uint32 `json:"id"`
-}
-
-type IdsResponse struct {
-	IDs []uint32 `json:"ids"`
-}
-
-type EmptyResponse struct{}

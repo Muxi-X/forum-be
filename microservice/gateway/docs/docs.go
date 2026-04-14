@@ -1301,6 +1301,44 @@ const docTemplate = `{
                 }
             }
         },
+        "/sip-score/{sip_score_id}": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "sipscore"
+                ],
+                "summary": "获取榜单元数据 api",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token 用户令牌",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "sip_score_id",
+                        "name": "post_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/sipscore.GetSipScoreResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/user": {
             "put": {
                 "consumes": [
@@ -2560,6 +2598,14 @@ const docTemplate = `{
                 }
             }
         },
+        "sipscore.GetSipScoreResponse": {
+            "type": "object",
+            "properties": {
+                "sip_score": {
+                    "$ref": "#/definitions/sipscore.SipScore"
+                }
+            }
+        },
         "sipscore.IdResponse": {
             "type": "object",
             "properties": {
@@ -2576,6 +2622,59 @@ const docTemplate = `{
                     "items": {
                         "type": "integer"
                     }
+                }
+            }
+        },
+        "sipscore.SipScore": {
+            "type": "object",
+            "properties": {
+                "category": {
+                    "type": "string"
+                },
+                "collect_count": {
+                    "type": "integer"
+                },
+                "cover_img": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "creator": {
+                    "$ref": "#/definitions/sipscore.userInfo"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "domain": {
+                    "type": "string"
+                },
+                "entry_count": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "is_collected": {
+                    "type": "boolean"
+                },
+                "last_modified_by": {
+                    "$ref": "#/definitions/sipscore.userInfo"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "participant_count": {
+                    "type": "integer"
+                },
+                "tags": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "updated_at": {
+                    "type": "string"
                 }
             }
         },
@@ -2650,6 +2749,20 @@ const docTemplate = `{
                     "items": {
                         "type": "string"
                     }
+                }
+            }
+        },
+        "sipscore.userInfo": {
+            "type": "object",
+            "properties": {
+                "avatar": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
                 }
             }
         },

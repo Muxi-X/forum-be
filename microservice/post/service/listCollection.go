@@ -12,7 +12,7 @@ import (
 func (s *PostService) ListCollection(ctx context.Context, req *pb.ListPostPartInfoRequest, resp *pb.ListPostPartInfoResponse) error {
 	logger.Info("PostService ListCollections")
 
-	postIds, err := s.Dao.ListCollectionByUserId(req.TargetUserId)
+	postIds, err := s.Dao.ListCollectionByUserId(req.TargetUserId, constvar.CollectionPost)
 	if err != nil {
 		return errno.ServerErr(errno.ErrDatabase, err.Error())
 	}

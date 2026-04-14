@@ -2,6 +2,7 @@ syntax = "proto3";
 
 option go_package = "./proto";
 import "google/protobuf/field_mask.proto";
+import "google/protobuf/timestamp.proto";
 package post;
 
 service PostService {
@@ -18,6 +19,7 @@ service PostService {
     rpc UpdateSipScoreInfo(UpdateSipScoreInfoRequest) returns (Response) {}
     rpc CreateSipScoreEntry(CreateSipScoreEntryRequest) returns (CreateSipScoreEntryResponse) {}
     rpc UpdateSipScoreEntryInfo(UpdateSipScoreEntryInfoRequest) returns (Response) {}
+    rpc GetSipScore(Request) returns (SipScore) {}
 
     rpc GetComment(Request) returns (CommentInfo) {}
     rpc CreateComment(CreateCommentRequest) returns (CreateCommentResponse) {}
@@ -355,6 +357,26 @@ message UnReadPostNumResponse {
 // =====================
 
 // ---- model ----
+
+message SipScore {
+    uint32 id = 1;
+    google.protobuf.Timestamp created_at = 2;
+    google.protobuf.Timestamp updated_at = 3;
+    uint32 creator_id = 4;
+    uint32 last_modified_by = 5;
+    uint32 entry_count = 6;
+    uint32 collect_count = 7;
+    uint32 participant_count = 8;
+
+    string name = 9;
+    string description = 10;
+    string cover_img = 11;
+    string domain = 12;
+    string category = 13;
+
+    repeated string tags = 14;
+    bool is_collected = 15;
+}
 
 // ---- request ----
 

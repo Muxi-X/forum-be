@@ -5,6 +5,7 @@ import (
 	"forum-post/dao"
 	pb "forum-post/proto"
 	"forum-user/pkg/role"
+	pbu "forum-user/proto"
 	"forum/client"
 	logger "forum/log"
 	"forum/pkg/constvar"
@@ -12,8 +13,6 @@ import (
 	"sync"
 
 	_ "github.com/go-micro/plugins/v4/registry/kubernetes"
-
-	pbu "forum-user/proto"
 )
 
 // PostService ... 帖子服务
@@ -27,7 +26,7 @@ func New(i dao.Interface) *PostService {
 	return service
 }
 
-func (s PostService) processComments(userId uint32, commentInfos []*dao.CommentInfo) []*pb.CommentInfo {
+func (s *PostService) processComments(userId uint32, commentInfos []*dao.CommentInfo) []*pb.CommentInfo {
 	comments := make([]*pb.CommentInfo, len(commentInfos))
 	var wg sync.WaitGroup
 	var mu sync.Mutex
@@ -83,7 +82,7 @@ func (s PostService) processComments(userId uint32, commentInfos []*dao.CommentI
 	return comments
 }
 
-func (s PostService) getPostInfo(postId uint32, userId uint32) (bool, bool, uint32, []string, uint32, uint32) {
+func (s *PostService) getPostInfo(postId uint32, userId uint32) (bool, bool, uint32, []string, uint32, uint32) {
 	item := dao.Item{
 		Id:       postId,
 		TypeName: constvar.Post,
@@ -94,7 +93,7 @@ func (s PostService) getPostInfo(postId uint32, userId uint32) (bool, bool, uint
 		logger.Error(errno.ErrRedis.Error(), logger.String(err.Error()))
 	}
 
-	isCollection, err := s.Dao.IsUserCollectionPost(userId, postId)
+	isCollection, err := s.Dao.IsUserCollected(userId, constvar.CollectionPost, postId)
 	if err != nil {
 		logger.Error(errno.ErrDatabase.Error(), logger.String(err.Error()))
 	}
@@ -114,7 +113,7 @@ func (s PostService) getPostInfo(postId uint32, userId uint32) (bool, bool, uint
 		logger.Error(errno.ErrDatabase.Error(), logger.String(err.Error()))
 	}
 
-	collectionNum, err := s.Dao.GetCollectionNumByPostId(postId)
+	collectionNum, err := s.Dao.GetCollectionNum(constvar.CollectionPost, postId)
 	if err != nil {
 		logger.Error(errno.ErrDatabase.Error(), logger.String(err.Error()))
 	}
@@ -122,7 +121,7 @@ func (s PostService) getPostInfo(postId uint32, userId uint32) (bool, bool, uint
 	return isLiked, isCollection, uint32(likeNum), tags, commentNum, collectionNum
 }
 
-func (s PostService) GetUserDomain(ctx context.Context, userId uint32) (string, error) {
+func (s *PostService) GetUserDomain(ctx context.Context, userId uint32) (string, error) {
 	getResp, err := client.UserClient.GetProfile(ctx, &pbu.GetRequest{Id: userId})
 	if err != nil {
 		return "", err
@@ -131,7 +130,7 @@ func (s PostService) GetUserDomain(ctx context.Context, userId uint32) (string, 
 	return role.Role2Domain(getResp.Role), nil
 }
 
-func (s PostService) CreateMessage(ctx context.Context, userId uint32, message string) {
+func (s *PostService) CreateMessage(ctx context.Context, userId uint32, message string) {
 	go func() {
 		req := &pbu.CreateMessageRequest{
 			Message: message,
