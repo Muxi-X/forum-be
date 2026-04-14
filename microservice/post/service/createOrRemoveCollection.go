@@ -7,22 +7,33 @@ import (
 	logger "forum/log"
 	"forum/pkg/constvar"
 	"forum/pkg/errno"
+
+	"gorm.io/gorm"
 )
 
-// todo 需要再传一个参数，表示什么类型的收藏，帖子、评论等
-
-func (s *PostService) CreateOrRemoveCollection(_ context.Context, req *pb.Request, resp *pb.CreateOrRemoveCollectionResponse) error {
+func (s *PostService) CreateOrRemoveCollection(_ context.Context, req *pb.ToggleTargetRequest, resp *pb.CreateOrRemoveCollectionResponse) error {
 	logger.Info("PostService CreateOrRemoveCollection")
-
-	var score int
 
 	collection := &dao.CollectionModel{
 		UserID:      req.UserId,
-		ContentID:   req.Id,
-		ContentType: constvar.CollectionPost,
+		ContentID:   req.TargetId,
+		ContentType: req.TargetType,
 	}
 
-	isCollection, err := s.Dao.IsUserCollected(req.UserId, constvar.CollectionPost, req.Id)
+	switch req.TargetType {
+	case constvar.CollectionPost:
+		return s.createOrRemovePostCollection(collection, req, resp)
+	case constvar.CollectionSipScore:
+		return s.createOrRemoveSipScoreCollection(collection, req, resp)
+	default:
+		return errno.ServerErr(errno.ErrBadRequest, "target_type not legal")
+	}
+}
+
+func (s *PostService) createOrRemovePostCollection(collection *dao.CollectionModel, req *pb.ToggleTargetRequest, resp *pb.CreateOrRemoveCollectionResponse) error {
+	var score int
+
+	isCollection, err := s.Dao.IsUserCollected(req.UserId, req.TargetType, req.TargetId)
 	if err != nil {
 		return errno.ServerErr(errno.ErrDatabase, err.Error())
 	}
@@ -40,13 +51,16 @@ func (s *PostService) CreateOrRemoveCollection(_ context.Context, req *pb.Reques
 		return errno.ServerErr(errno.ErrDatabase, err.Error())
 	}
 
+	targetID := req.TargetId
+	scoreCopy := score
+
 	go func() {
-		if err := s.Dao.ChangePostScore(req.Id, score); err != nil {
+		if err := s.Dao.ChangePostScore(targetID, scoreCopy); err != nil {
 			logger.Error(errno.ErrChangeScore.Error(), logger.String(err.Error()))
 		}
 	}()
 
-	post, err := s.Dao.GetPost(req.Id)
+	post, err := s.Dao.GetPost(req.TargetId)
 	if err != nil {
 		return errno.ServerErr(errno.ErrDatabase, err.Error())
 	}
@@ -56,4 +70,46 @@ func (s *PostService) CreateOrRemoveCollection(_ context.Context, req *pb.Reques
 	resp.TypeName = post.Domain
 
 	return nil
+}
+
+func (s *PostService) createOrRemoveSipScoreCollection(collection *dao.CollectionModel, req *pb.ToggleTargetRequest, resp *pb.CreateOrRemoveCollectionResponse) error {
+	return s.Dao.Transaction(func(tx *gorm.DB) error {
+		// try delete
+		deleted, err := s.Dao.TryDeleteCollection(collection, tx)
+		if err != nil {
+			return err
+		}
+
+		if deleted {
+			// 取消收藏
+			if err = s.Dao.DecrSipScoreCollectCount(req.TargetId, tx); err != nil {
+				return err
+			}
+		} else {
+			// try create
+			created, err := s.Dao.TryCreateCollection(collection, tx)
+			if err != nil {
+				return err
+			}
+
+			if created {
+				// 收藏成功
+				if err = s.Dao.IncrSipScoreCollectCount(req.TargetId, tx); err != nil {
+					return err
+				}
+			}
+			// 如果 created == false 说明并发导致，忽略
+		}
+
+		sipScore, err := s.Dao.GetSipScore(req.TargetId, tx)
+		if err != nil {
+			return err
+		}
+
+		resp.UserId = sipScore.CreatorID
+		resp.Content = sipScore.Name
+		resp.TypeName = sipScore.Domain
+
+		return nil
+	})
 }

@@ -49,6 +49,8 @@ type Interface interface {
 	BatchCreateSipScoreEntries(entries []*SipScoreEntryModel, tx ...*gorm.DB) error
 	IncrSipScoreEntryCount(id uint32, incr int64, tx ...*gorm.DB) error
 	UpdateSipScoreEntry(sipScoreID, entryID uint32, update map[string]interface{}, tx ...*gorm.DB) error
+	IncrSipScoreCollectCount(sipScoreID uint32, tx ...*gorm.DB) error
+	DecrSipScoreCollectCount(sipScoreID uint32, tx ...*gorm.DB) error
 
 	CreateComment(*CommentModel) (uint32, error)
 	GetCommentInfo(uint32) (*CommentInfo, error)
@@ -71,11 +73,13 @@ type Interface interface {
 	AddTagToSortedSet(uint32, string) error
 	ListPopularTags(string) ([]string, error)
 
-	CreateCollection(*CollectionModel) (uint32, error)
-	DeleteCollection(collection *CollectionModel) error
-	GetCollectionNum(contentType uint8, contentId uint32) (uint32, error)
-	ListCollectionByUserId(userId uint32, contentType uint8) ([]uint32, error)
-	IsUserCollected(userId uint32, contentType uint8, contentId uint32) (bool, error)
+	CreateCollection(collection *CollectionModel, tx ...*gorm.DB) (uint32, error)
+	TryCreateCollection(collection *CollectionModel, tx ...*gorm.DB) (bool, error)
+	DeleteCollection(collection *CollectionModel, tx ...*gorm.DB) error
+	TryDeleteCollection(collection *CollectionModel, tx ...*gorm.DB) (bool, error)
+	GetCollectionNum(contentType uint32, contentId uint32) (uint32, error)
+	ListCollectionByUserId(userId uint32, contentType uint32) ([]uint32, error)
+	IsUserCollected(userID uint32, contentType uint32, contentID uint32, tx ...*gorm.DB) (bool, error)
 
 	ChangePostScore(uint32, int) error
 	AddChangeRecord(uint32) error

@@ -5,16 +5,14 @@ package proto
 
 import (
 	fmt "fmt"
-	math "math"
-
 	proto "google.golang.org/protobuf/proto"
 	_ "google.golang.org/protobuf/types/known/fieldmaskpb"
 	_ "google.golang.org/protobuf/types/known/timestamppb"
+	math "math"
 )
 
 import (
 	context "context"
-
 	client "go-micro.dev/v4/client"
 	server "go-micro.dev/v4/server"
 )
@@ -51,7 +49,7 @@ type PostService interface {
 	CreateOrRemoveLike(ctx context.Context, in *LikeRequest, opts ...client.CallOption) (*Response, error)
 	ListLikeByUserId(ctx context.Context, in *ListPostPartInfoRequest, opts ...client.CallOption) (*ListPostPartInfoResponse, error)
 	ListPopularTag(ctx context.Context, in *ListPopularTagRequest, opts ...client.CallOption) (*Tags, error)
-	CreateOrRemoveCollection(ctx context.Context, in *Request, opts ...client.CallOption) (*CreateOrRemoveCollectionResponse, error)
+	CreateOrRemoveCollection(ctx context.Context, in *ToggleTargetRequest, opts ...client.CallOption) (*CreateOrRemoveCollectionResponse, error)
 	ListCollection(ctx context.Context, in *ListPostPartInfoRequest, opts ...client.CallOption) (*ListPostPartInfoResponse, error)
 	CreateReport(ctx context.Context, in *CreateReportRequest, opts ...client.CallOption) (*Response, error)
 	ListReport(ctx context.Context, in *ListReportRequest, opts ...client.CallOption) (*ListReportResponse, error)
@@ -260,7 +258,7 @@ func (c *postService) ListPopularTag(ctx context.Context, in *ListPopularTagRequ
 	return out, nil
 }
 
-func (c *postService) CreateOrRemoveCollection(ctx context.Context, in *Request, opts ...client.CallOption) (*CreateOrRemoveCollectionResponse, error) {
+func (c *postService) CreateOrRemoveCollection(ctx context.Context, in *ToggleTargetRequest, opts ...client.CallOption) (*CreateOrRemoveCollectionResponse, error) {
 	req := c.c.NewRequest(c.name, "PostService.CreateOrRemoveCollection", in)
 	out := new(CreateOrRemoveCollectionResponse)
 	err := c.c.Call(ctx, req, out, opts...)
@@ -332,7 +330,7 @@ type PostServiceHandler interface {
 	CreateOrRemoveLike(context.Context, *LikeRequest, *Response) error
 	ListLikeByUserId(context.Context, *ListPostPartInfoRequest, *ListPostPartInfoResponse) error
 	ListPopularTag(context.Context, *ListPopularTagRequest, *Tags) error
-	CreateOrRemoveCollection(context.Context, *Request, *CreateOrRemoveCollectionResponse) error
+	CreateOrRemoveCollection(context.Context, *ToggleTargetRequest, *CreateOrRemoveCollectionResponse) error
 	ListCollection(context.Context, *ListPostPartInfoRequest, *ListPostPartInfoResponse) error
 	CreateReport(context.Context, *CreateReportRequest, *Response) error
 	ListReport(context.Context, *ListReportRequest, *ListReportResponse) error
@@ -360,7 +358,7 @@ func RegisterPostServiceHandler(s server.Server, hdlr PostServiceHandler, opts .
 		CreateOrRemoveLike(ctx context.Context, in *LikeRequest, out *Response) error
 		ListLikeByUserId(ctx context.Context, in *ListPostPartInfoRequest, out *ListPostPartInfoResponse) error
 		ListPopularTag(ctx context.Context, in *ListPopularTagRequest, out *Tags) error
-		CreateOrRemoveCollection(ctx context.Context, in *Request, out *CreateOrRemoveCollectionResponse) error
+		CreateOrRemoveCollection(ctx context.Context, in *ToggleTargetRequest, out *CreateOrRemoveCollectionResponse) error
 		ListCollection(ctx context.Context, in *ListPostPartInfoRequest, out *ListPostPartInfoResponse) error
 		CreateReport(ctx context.Context, in *CreateReportRequest, out *Response) error
 		ListReport(ctx context.Context, in *ListReportRequest, out *ListReportResponse) error
@@ -453,7 +451,7 @@ func (h *postServiceHandler) ListPopularTag(ctx context.Context, in *ListPopular
 	return h.PostServiceHandler.ListPopularTag(ctx, in, out)
 }
 
-func (h *postServiceHandler) CreateOrRemoveCollection(ctx context.Context, in *Request, out *CreateOrRemoveCollectionResponse) error {
+func (h *postServiceHandler) CreateOrRemoveCollection(ctx context.Context, in *ToggleTargetRequest, out *CreateOrRemoveCollectionResponse) error {
 	return h.PostServiceHandler.CreateOrRemoveCollection(ctx, in, out)
 }
 

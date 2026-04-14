@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"gorm.io/gorm"
+	"gorm.io/plugin/soft_delete"
 )
 
 // 茶评 榜单 对象
@@ -16,7 +17,7 @@ type SipScoreModel struct {
 	ID             uint32    `gorm:"primarykey;index:idx_rank,priority:3;index:idx_latest,priority:2;index:idx_creator,priority:2"`
 	CreatedAt      time.Time `gorm:"index:idx_latest,priority:1"`
 	UpdatedAt      time.Time
-	DeletedAt      gorm.DeletedAt `gorm:"index"`
+	DeletedAt      soft_delete.DeletedAt `gorm:"index"`
 	LastModifiedBy uint32
 	CreatorID      uint32 `gorm:"index:idx_creator,priority:1"`
 	EntryCount     uint32 `gorm:"type:int unsigned;default:0"`
@@ -114,14 +115,27 @@ func (d *Dao) IncrSipScoreEntryCount(id uint32, incr int64, tx ...*gorm.DB) erro
 	return result.Error
 }
 
-// todo sipScoreID + name 唯一索引，确保同一榜单内条目名称唯一
+func (d *Dao) IncrSipScoreCollectCount(sipScoreID uint32, tx ...*gorm.DB) error {
+	db := d.getDB(tx...)
+	return db.Model(&SipScoreModel{}).Where("id = ?", sipScoreID).
+		UpdateColumn("collect_count", gorm.Expr("collect_count + 1")).Error
+}
+
+func (d *Dao) DecrSipScoreCollectCount(sipScoreID uint32, tx ...*gorm.DB) error {
+	db := d.getDB(tx...)
+	return db.Model(&SipScoreModel{}).Where("id = ? AND collect_count > 0", sipScoreID).
+		UpdateColumn("collect_count", gorm.Expr("collect_count - 1")).Error
+}
+
+// todo sipScoreID + name deletedAt 唯一索引，确保同一榜单内条目名称唯一
 // todo sipScoreID ID 联合索引
+// todo deletedAt 纳秒级别
 
 type SipScoreEntryModel struct {
 	ID             uint32 `gorm:"primarykey"`
 	CreatedAt      time.Time
 	UpdatedAt      time.Time
-	DeletedAt      gorm.DeletedAt
+	DeletedAt      soft_delete.DeletedAt
 	SipScoreID     uint32
 	LastModifiedBy uint32
 	CreatorID      uint32

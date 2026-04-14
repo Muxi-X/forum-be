@@ -31,7 +31,7 @@ service PostService {
 
     rpc ListPopularTag(ListPopularTagRequest) returns (Tags) {}
 
-    rpc CreateOrRemoveCollection(Request) returns (CreateOrRemoveCollectionResponse) {}
+    rpc CreateOrRemoveCollection(ToggleTargetRequest) returns (CreateOrRemoveCollectionResponse) {}
     rpc ListCollection(ListPostPartInfoRequest) returns (ListPostPartInfoResponse) {}
 
     rpc CreateReport(CreateReportRequest) returns (Response) {}
@@ -51,6 +51,12 @@ service PostService {
 message Request {
     uint32 id = 1;
     uint32 user_id = 2;
+}
+
+message ToggleTargetRequest {
+    uint32 user_id = 1;
+    uint32 target_id = 2;
+    uint32 target_type = 3;
 }
 
 // --- response ----

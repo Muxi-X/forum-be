@@ -162,6 +162,16 @@ definitions:
       name:
         type: string
     type: object
+  collection.CreateRequest:
+    properties:
+      target_id:
+        type: integer
+      target_type:
+        type: integer
+    required:
+    - target_id
+    - target_type
+    type: object
   comment.Comment:
     properties:
       be_replied_content:
@@ -901,7 +911,7 @@ paths:
       summary: 建立 WebSocket 连接
       tags:
       - chat
-  /collection/{post_id}:
+  /collection:
     post:
       consumes:
       - application/json
@@ -911,11 +921,12 @@ paths:
         name: Authorization
         required: true
         type: string
-      - description: post_id
-        in: path
-        name: post_id
+      - description: create_request
+        in: body
+        name: object
         required: true
-        type: integer
+        schema:
+          $ref: '#/definitions/collection.CreateRequest'
       produces:
       - application/json
       responses:

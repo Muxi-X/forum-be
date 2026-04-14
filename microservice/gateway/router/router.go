@@ -134,7 +134,7 @@ func Load(g *gin.Engine, mw ...gin.HandlerFunc) *gin.Engine {
 	collectionRouter.Use(normalRequired)
 	{
 		collectionRouter.GET("/list/:user_id", collectionApi.List)
-		collectionRouter.POST("/:post_id", collectionApi.CreateOrRemove)
+		collectionRouter.POST("", collectionApi.CreateOrRemove)
 	}
 
 	// report
