@@ -132,12 +132,30 @@ func (d *Dao) DecrSipScoreCollectCount(sipScoreID uint32, tx ...*gorm.DB) error 
 		UpdateColumn("collect_count", gorm.Expr("collect_count - 1")).Error
 }
 
+func (d *Dao) DeleteSipScore(id uint32, tx ...*gorm.DB) error {
+	db := d.getDB(tx...)
+	return db.Delete(&SipScoreModel{}, id).Error
+}
+
+// DecrSipScoreStats 多字段递减，减少 DB 操作
+func (d *Dao) DecrSipScoreStats(sipScoreID uint32, entryCount uint32, participantCount uint32, tx ...*gorm.DB) error {
+	db := d.getDB(tx...)
+
+	return db.Model(&SipScoreModel{}).
+		Where("id = ?", sipScoreID).
+		UpdateColumns(map[string]interface{}{
+			"entry_count":       gorm.Expr("GREATEST(entry_count - ?, 0)", entryCount),
+			"participant_count": gorm.Expr("GREATEST(participant_count - ?, 0)", participantCount),
+		}).Error
+}
+
 // todo sipScoreID + name deletedAt 唯一索引，确保同一榜单内条目名称唯一
 // todo sipScoreID ID 联合索引
 // todo sipScoreID + UpdatedAt id 联合索引
 // todo sipScoreID + participantCount id 联合索引
 // todo sipScoreID + scoreAvg id 联合索引
 // todo deletedAt 纳秒级别
+// todo sipScoreID id participantCount 联合索引
 
 type SipScoreEntryModel struct {
 	ID             uint32 `gorm:"primarykey"`
@@ -203,6 +221,44 @@ func (d *Dao) UpdateSipScoreEntry(sipScoreID, entryID uint32, update map[string]
 		return gorm.ErrRecordNotFound
 	}
 	return result.Error
+}
+
+// GetSipScoreEntryIDs 用于筛选 未被删除的 entryID
+func (d *Dao) GetSipScoreEntryIDs(sipScoreID uint32, entryIDs []uint32, tx ...*gorm.DB) ([]uint32, error) {
+	db := d.getDB(tx...)
+
+	var result []uint32
+	err := db.Model(&SipScoreEntryModel{}).
+		Where("sip_score_id = ? AND id IN ?", sipScoreID, entryIDs).
+		Pluck("id", &result).Error
+
+	return result, err
+}
+
+func (d *Dao) DeleteSipScoreEntries(sipScoreID uint32, entryIDs []uint32, tx ...*gorm.DB) error {
+	db := d.getDB(tx...)
+	return db.Where("sip_score_id = ? AND id IN ?", sipScoreID, entryIDs).Delete(&SipScoreEntryModel{}).Error
+}
+
+func (d *Dao) GetSipScoreEntryStats(sipScoreID uint32, entryIDs []uint32, tx ...*gorm.DB) (entryCount uint32, participantCount uint32, err error) {
+	db := d.getDB(tx...)
+
+	type result struct {
+		EntryCount       uint32
+		ParticipantCount uint32
+	}
+
+	var r result
+
+	err = db.Model(&SipScoreEntryModel{}).
+		Select("COUNT(*) as entry_count, COALESCE(SUM(participant_count),0) as participant_count").
+		Where("sip_score_id = ? AND id IN ?", sipScoreID, entryIDs).Scan(&r).Error
+
+	if err != nil {
+		return
+	}
+
+	return r.EntryCount, r.ParticipantCount, nil
 }
 
 func (d *Dao) ListSipScoreEntriesNewest(sipScoreID, limit uint32, tx ...*gorm.DB) ([]*SipScoreEntryModel, error) {

@@ -21,6 +21,7 @@ service PostService {
     rpc UpdateSipScoreEntryInfo(UpdateSipScoreEntryInfoRequest) returns (Response) {}
     rpc GetSipScore(Request) returns (SipScore) {}
     rpc ListSipScoreEntry(ListSipScoreEntryRequest) returns (ListSipScoreEntryResponse) {}
+    rpc DeleteSipScoreEntries(DeleteSipScoreEntriesRequest) returns (Response) {}
 
     rpc GetComment(Request) returns (CommentInfo) {}
     rpc CreateComment(CreateCommentRequest) returns (CreateCommentResponse) {}
@@ -480,6 +481,12 @@ message ListSipScoreEntryRequest {
     string page_token = 2;
     uint32 page_size = 3;
     uint32 sort_type = 4;
+}
+
+message DeleteSipScoreEntriesRequest {
+    uint32 sip_score_id = 1;
+    repeated uint32 sip_score_entry_id = 2;
+    uint32 user_id = 3;
 }
 
 // ---- response ----

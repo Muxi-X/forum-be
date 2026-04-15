@@ -1261,9 +1261,47 @@ const docTemplate = `{
                         }
                     }
                 }
+            },
+            "delete": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "sipscore"
+                ],
+                "summary": "批量删除榜单条目 api",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token 用户令牌",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "delete_sip_score_entries_request",
+                        "name": "object",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/sipscore.DeleteSipScoreEntriesRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/Response"
+                        }
+                    }
+                }
             }
         },
-        "/sip-score/entries/list": {
+        "/sip-score/entries/list/{sip_score_id}": {
             "get": {
                 "consumes": [
                     "application/json"
@@ -1392,6 +1430,42 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/sipscore.GetSipScoreResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "sipscore"
+                ],
+                "summary": "删除榜单 api",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token 用户令牌",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "sip_score_id",
+                        "name": "sip_score_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/Response"
                         }
                     }
                 }
@@ -2668,6 +2742,24 @@ const docTemplate = `{
                     "items": {
                         "type": "string"
                     }
+                }
+            }
+        },
+        "sipscore.DeleteSipScoreEntriesRequest": {
+            "type": "object",
+            "required": [
+                "entry_ids",
+                "sip_score_id"
+            ],
+            "properties": {
+                "entry_ids": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "sip_score_id": {
+                    "type": "integer"
                 }
             }
         },

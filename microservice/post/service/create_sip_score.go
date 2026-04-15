@@ -15,6 +15,7 @@ import (
 )
 
 // todo 可以进一步优化 - 将 tag 放到消息队列
+// todo 这里的时间性能分析暂时不删除，暂时没测试到 7s 的情况，前端之后对接的时候看下日志
 
 func (s *PostService) CreateSipScore(_ context.Context, req *pb.CreateSipScoreRequest, resp *pb.CreateSipScoreResponse) error {
 	start := time.Now()

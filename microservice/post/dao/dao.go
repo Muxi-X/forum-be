@@ -59,6 +59,11 @@ type Interface interface {
 	ListSipScoreEntriesHighestScoreWithCursor(sipScoreID, lastID uint32, lastScore uint32, limit uint32, tx ...*gorm.DB) ([]*SipScoreEntryModel, error)
 	ListSipScoreEntriesLowestScore(sipScoreID, limit uint32, tx ...*gorm.DB) ([]*SipScoreEntryModel, error)
 	ListSipScoreEntriesLowestScoreWithCursor(sipScoreID, lastID uint32, lastScore uint32, limit uint32, tx ...*gorm.DB) ([]*SipScoreEntryModel, error)
+	DeleteSipScore(id uint32, tx ...*gorm.DB) error
+	GetSipScoreEntryIDs(sipScoreID uint32, entryIDs []uint32, tx ...*gorm.DB) ([]uint32, error)
+	DeleteSipScoreEntries(sipScoreID uint32, entryIDs []uint32, tx ...*gorm.DB) error
+	GetSipScoreEntryStats(sipScoreID uint32, entryIDs []uint32, tx ...*gorm.DB) (entryCount uint32, participantCount uint32, err error)
+	DecrSipScoreStats(sipScoreID uint32, entryCount uint32, participantCount uint32, tx ...*gorm.DB) error
 
 	CreateComment(*CommentModel) (uint32, error)
 	GetCommentInfo(uint32) (*CommentInfo, error)

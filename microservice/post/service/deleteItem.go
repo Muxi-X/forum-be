@@ -14,15 +14,19 @@ func (s *PostService) DeleteItem(_ context.Context, req *pb.DeleteItemRequest, _
 
 	var err error
 
-	if req.TypeName == constvar.Post {
+	switch req.TypeName {
+	case constvar.Post:
 		err = s.Dao.DeletePost(req.Id)
-	} else if req.TypeName == constvar.Comment {
+	case constvar.Comment:
 		err = s.Dao.DeleteComment(req.Id)
-	} else if req.TypeName == constvar.QualityPost {
+	case constvar.QualityPost:
 		err = s.Dao.ChangeQualityPost(req.Id, false)
-	} else {
+	case constvar.SipScore:
+		err = s.deleteSipScore(req.Id)
+	default:
 		return errno.ServerErr(errno.ErrBadRequest, "wrong TypeName")
 	}
+
 	if err != nil {
 		return errno.ServerErr(errno.ErrDatabase, err.Error())
 	}
@@ -33,5 +37,18 @@ func (s *PostService) DeleteItem(_ context.Context, req *pb.DeleteItemRequest, _
 		}
 	}
 
+	return nil
+}
+
+func (s *PostService) deleteSipScore(id uint32) error {
+	// 删除 主体
+	if err := s.Dao.DeleteSipScore(id); err != nil {
+		return err
+	}
+
+	// todo 消息队列中比较好
+	// 删除 sipScore tags
+	// 删除 sipScoreEntry, sipScoreEntryComment, sipScoreEntryReview
+	// 删除 sipScore collection
 	return nil
 }

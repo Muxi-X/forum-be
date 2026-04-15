@@ -130,6 +130,11 @@ type UpdateSipScoreEntryRequest struct {
 	CoverImg    string  `json:"cover_img"`
 }
 
+type DeleteSipScoreEntriesRequest struct {
+	SipScoreID uint32   `json:"sip_score_id" binding:"required"`
+	EntryIDs   []uint32 `json:"entry_ids" binding:"required"`
+}
+
 // ---- response ----
 
 type ListSipScoreEntriesResponse struct {

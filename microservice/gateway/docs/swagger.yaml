@@ -595,6 +595,18 @@ definitions:
     - name
     - tags
     type: object
+  sipscore.DeleteSipScoreEntriesRequest:
+    properties:
+      entry_ids:
+        items:
+          type: integer
+        type: array
+      sip_score_id:
+        type: integer
+    required:
+    - entry_ids
+    - sip_score_id
+    type: object
   sipscore.GetSipScoreResponse:
     properties:
       sip_score:
@@ -1608,6 +1620,30 @@ paths:
       tags:
       - sipscore
   /sip-score/{sip_score_id}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: token 用户令牌
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: sip_score_id
+        in: path
+        name: sip_score_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Response'
+      summary: 删除榜单 api
+      tags:
+      - sipscore
     get:
       consumes:
       - application/json
@@ -1633,6 +1669,31 @@ paths:
       tags:
       - sipscore
   /sip-score/entries:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: token 用户令牌
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: delete_sip_score_entries_request
+        in: body
+        name: object
+        required: true
+        schema:
+          $ref: '#/definitions/sipscore.DeleteSipScoreEntriesRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Response'
+      summary: 批量删除榜单条目 api
+      tags:
+      - sipscore
     post:
       consumes:
       - application/json
@@ -1658,7 +1719,7 @@ paths:
       summary: 创建榜单条目 api
       tags:
       - sipscore
-  /sip-score/entries/list:
+  /sip-score/entries/list/{sip_score_id}:
     get:
       consumes:
       - application/json

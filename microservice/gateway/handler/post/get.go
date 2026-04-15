@@ -4,13 +4,12 @@ import (
 	. "forum-gateway/handler"
 	"forum-gateway/util"
 	pb "forum-post/proto"
+	"forum/client"
 	"forum/log"
 	"forum/model"
 	"forum/pkg/constvar"
 	"forum/pkg/errno"
 	"strconv"
-
-	"forum/client"
 
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"

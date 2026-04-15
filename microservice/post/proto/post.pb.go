@@ -2875,7 +2875,7 @@ func (x *SipScoreEntry) GetScoreAvg() uint32 {
 type SipScoreEntryPageToken struct {
 	state   protoimpl.MessageState `protogen:"open.v1"`
 	EntryId uint32                 `protobuf:"varint,1,opt,name=entry_id,json=entryId,proto3" json:"entry_id,omitempty"`
-	// 时间排序（最新 / 最旧）
+	// 时间排序(最新 / 最旧 (可扩展))
 	UpdatedAt *timestamppb.Timestamp `protobuf:"bytes,2,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
 	// 热门排序
 	ParticipantCount uint32 `protobuf:"varint,3,opt,name=participant_count,json=participantCount,proto3" json:"participant_count,omitempty"`
@@ -3163,6 +3163,66 @@ func (x *ListSipScoreEntryRequest) GetSortType() uint32 {
 	return 0
 }
 
+type DeleteSipScoreEntriesRequest struct {
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	SipScoreId      uint32                 `protobuf:"varint,1,opt,name=sip_score_id,json=sipScoreId,proto3" json:"sip_score_id,omitempty"`
+	SipScoreEntryId []uint32               `protobuf:"varint,2,rep,packed,name=sip_score_entry_id,json=sipScoreEntryId,proto3" json:"sip_score_entry_id,omitempty"`
+	UserId          uint32                 `protobuf:"varint,3,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
+}
+
+func (x *DeleteSipScoreEntriesRequest) Reset() {
+	*x = DeleteSipScoreEntriesRequest{}
+	mi := &file_proto_post_proto_msgTypes[40]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteSipScoreEntriesRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteSipScoreEntriesRequest) ProtoMessage() {}
+
+func (x *DeleteSipScoreEntriesRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_post_proto_msgTypes[40]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteSipScoreEntriesRequest.ProtoReflect.Descriptor instead.
+func (*DeleteSipScoreEntriesRequest) Descriptor() ([]byte, []int) {
+	return file_proto_post_proto_rawDescGZIP(), []int{40}
+}
+
+func (x *DeleteSipScoreEntriesRequest) GetSipScoreId() uint32 {
+	if x != nil {
+		return x.SipScoreId
+	}
+	return 0
+}
+
+func (x *DeleteSipScoreEntriesRequest) GetSipScoreEntryId() []uint32 {
+	if x != nil {
+		return x.SipScoreEntryId
+	}
+	return nil
+}
+
+func (x *DeleteSipScoreEntriesRequest) GetUserId() uint32 {
+	if x != nil {
+		return x.UserId
+	}
+	return 0
+}
+
 type CreateSipScoreEntryResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	EntryIds      []uint32               `protobuf:"varint,1,rep,packed,name=entry_ids,json=entryIds,proto3" json:"entry_ids,omitempty"`
@@ -3172,7 +3232,7 @@ type CreateSipScoreEntryResponse struct {
 
 func (x *CreateSipScoreEntryResponse) Reset() {
 	*x = CreateSipScoreEntryResponse{}
-	mi := &file_proto_post_proto_msgTypes[40]
+	mi := &file_proto_post_proto_msgTypes[41]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3184,7 +3244,7 @@ func (x *CreateSipScoreEntryResponse) String() string {
 func (*CreateSipScoreEntryResponse) ProtoMessage() {}
 
 func (x *CreateSipScoreEntryResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_post_proto_msgTypes[40]
+	mi := &file_proto_post_proto_msgTypes[41]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3197,7 +3257,7 @@ func (x *CreateSipScoreEntryResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateSipScoreEntryResponse.ProtoReflect.Descriptor instead.
 func (*CreateSipScoreEntryResponse) Descriptor() ([]byte, []int) {
-	return file_proto_post_proto_rawDescGZIP(), []int{40}
+	return file_proto_post_proto_rawDescGZIP(), []int{41}
 }
 
 func (x *CreateSipScoreEntryResponse) GetEntryIds() []uint32 {
@@ -3218,7 +3278,7 @@ type ListSipScoreEntryResponse struct {
 
 func (x *ListSipScoreEntryResponse) Reset() {
 	*x = ListSipScoreEntryResponse{}
-	mi := &file_proto_post_proto_msgTypes[41]
+	mi := &file_proto_post_proto_msgTypes[42]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3230,7 +3290,7 @@ func (x *ListSipScoreEntryResponse) String() string {
 func (*ListSipScoreEntryResponse) ProtoMessage() {}
 
 func (x *ListSipScoreEntryResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_post_proto_msgTypes[41]
+	mi := &file_proto_post_proto_msgTypes[42]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3243,7 +3303,7 @@ func (x *ListSipScoreEntryResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListSipScoreEntryResponse.ProtoReflect.Descriptor instead.
 func (*ListSipScoreEntryResponse) Descriptor() ([]byte, []int) {
-	return file_proto_post_proto_rawDescGZIP(), []int{41}
+	return file_proto_post_proto_rawDescGZIP(), []int{42}
 }
 
 func (x *ListSipScoreEntryResponse) GetEntries() []*SipScoreEntry {
@@ -3569,14 +3629,19 @@ const file_proto_post_proto_rawDesc = "" +
 	"\n" +
 	"page_token\x18\x02 \x01(\tR\tpageToken\x12\x1b\n" +
 	"\tpage_size\x18\x03 \x01(\rR\bpageSize\x12\x1b\n" +
-	"\tsort_type\x18\x04 \x01(\rR\bsortType\":\n" +
+	"\tsort_type\x18\x04 \x01(\rR\bsortType\"\x86\x01\n" +
+	"\x1cDeleteSipScoreEntriesRequest\x12 \n" +
+	"\fsip_score_id\x18\x01 \x01(\rR\n" +
+	"sipScoreId\x12+\n" +
+	"\x12sip_score_entry_id\x18\x02 \x03(\rR\x0fsipScoreEntryId\x12\x17\n" +
+	"\auser_id\x18\x03 \x01(\rR\x06userId\":\n" +
 	"\x1bCreateSipScoreEntryResponse\x12\x1b\n" +
 	"\tentry_ids\x18\x01 \x03(\rR\bentryIds\"\x84\x01\n" +
 	"\x19ListSipScoreEntryResponse\x12-\n" +
 	"\aentries\x18\x01 \x03(\v2\x13.post.SipScoreEntryR\aentries\x12\x1d\n" +
 	"\n" +
 	"page_token\x18\x02 \x01(\tR\tpageToken\x12\x19\n" +
-	"\bhas_more\x18\x03 \x01(\bR\ahasMore2\xd6\r\n" +
+	"\bhas_more\x18\x03 \x01(\bR\ahasMore2\xa5\x0e\n" +
 	"\vPostService\x12A\n" +
 	"\n" +
 	"CreatePost\x12\x17.post.CreatePostRequest\x1a\x18.post.CreatePostResponse\"\x00\x12&\n" +
@@ -3593,7 +3658,8 @@ const file_proto_post_proto_rawDesc = "" +
 	"\x13CreateSipScoreEntry\x12 .post.CreateSipScoreEntryRequest\x1a!.post.CreateSipScoreEntryResponse\"\x00\x12Q\n" +
 	"\x17UpdateSipScoreEntryInfo\x12$.post.UpdateSipScoreEntryInfoRequest\x1a\x0e.post.Response\"\x00\x12.\n" +
 	"\vGetSipScore\x12\r.post.Request\x1a\x0e.post.SipScore\"\x00\x12V\n" +
-	"\x11ListSipScoreEntry\x12\x1e.post.ListSipScoreEntryRequest\x1a\x1f.post.ListSipScoreEntryResponse\"\x00\x120\n" +
+	"\x11ListSipScoreEntry\x12\x1e.post.ListSipScoreEntryRequest\x1a\x1f.post.ListSipScoreEntryResponse\"\x00\x12M\n" +
+	"\x15DeleteSipScoreEntries\x12\".post.DeleteSipScoreEntriesRequest\x1a\x0e.post.Response\"\x00\x120\n" +
 	"\n" +
 	"GetComment\x12\r.post.Request\x1a\x11.post.CommentInfo\"\x00\x12J\n" +
 	"\rCreateComment\x12\x1a.post.CreateCommentRequest\x1a\x1b.post.CreateCommentResponse\"\x00\x127\n" +
@@ -3622,7 +3688,7 @@ func file_proto_post_proto_rawDescGZIP() []byte {
 	return file_proto_post_proto_rawDescData
 }
 
-var file_proto_post_proto_msgTypes = make([]protoimpl.MessageInfo, 42)
+var file_proto_post_proto_msgTypes = make([]protoimpl.MessageInfo, 43)
 var file_proto_post_proto_goTypes = []any{
 	(*Request)(nil),                          // 0: post.Request
 	(*ToggleTargetRequest)(nil),              // 1: post.ToggleTargetRequest
@@ -3664,10 +3730,11 @@ var file_proto_post_proto_goTypes = []any{
 	(*CreateSipScoreEntryRequest)(nil),       // 37: post.CreateSipScoreEntryRequest
 	(*UpdateSipScoreEntryInfoRequest)(nil),   // 38: post.UpdateSipScoreEntryInfoRequest
 	(*ListSipScoreEntryRequest)(nil),         // 39: post.ListSipScoreEntryRequest
-	(*CreateSipScoreEntryResponse)(nil),      // 40: post.CreateSipScoreEntryResponse
-	(*ListSipScoreEntryResponse)(nil),        // 41: post.ListSipScoreEntryResponse
-	(*timestamppb.Timestamp)(nil),            // 42: google.protobuf.Timestamp
-	(*fieldmaskpb.FieldMask)(nil),            // 43: google.protobuf.FieldMask
+	(*DeleteSipScoreEntriesRequest)(nil),     // 40: post.DeleteSipScoreEntriesRequest
+	(*CreateSipScoreEntryResponse)(nil),      // 41: post.CreateSipScoreEntryResponse
+	(*ListSipScoreEntryResponse)(nil),        // 42: post.ListSipScoreEntryResponse
+	(*timestamppb.Timestamp)(nil),            // 43: google.protobuf.Timestamp
+	(*fieldmaskpb.FieldMask)(nil),            // 44: google.protobuf.FieldMask
 }
 var file_proto_post_proto_depIdxs = []int32{
 	13, // 0: post.Post.comments:type_name -> post.CommentInfo
@@ -3676,14 +3743,14 @@ var file_proto_post_proto_depIdxs = []int32{
 	16, // 3: post.LikeRequest.item:type_name -> post.LikeItem
 	22, // 4: post.ListReportResponse.reports:type_name -> post.Report
 	27, // 5: post.UnReadPostNumResponse.un_read_num:type_name -> post.UnReadPostNum
-	42, // 6: post.SipScore.created_at:type_name -> google.protobuf.Timestamp
-	42, // 7: post.SipScore.updated_at:type_name -> google.protobuf.Timestamp
-	43, // 8: post.UpdateSipScoreInfoRequest.update_mask:type_name -> google.protobuf.FieldMask
-	42, // 9: post.SipScoreEntry.created_at:type_name -> google.protobuf.Timestamp
-	42, // 10: post.SipScoreEntry.updated_at:type_name -> google.protobuf.Timestamp
-	42, // 11: post.SipScoreEntryPageToken.updated_at:type_name -> google.protobuf.Timestamp
+	43, // 6: post.SipScore.created_at:type_name -> google.protobuf.Timestamp
+	43, // 7: post.SipScore.updated_at:type_name -> google.protobuf.Timestamp
+	44, // 8: post.UpdateSipScoreInfoRequest.update_mask:type_name -> google.protobuf.FieldMask
+	43, // 9: post.SipScoreEntry.created_at:type_name -> google.protobuf.Timestamp
+	43, // 10: post.SipScoreEntry.updated_at:type_name -> google.protobuf.Timestamp
+	43, // 11: post.SipScoreEntryPageToken.updated_at:type_name -> google.protobuf.Timestamp
 	34, // 12: post.CreateSipScoreEntryRequest.entries:type_name -> post.SipScoreEntryCreateInfo
-	43, // 13: post.UpdateSipScoreEntryInfoRequest.update_mask:type_name -> google.protobuf.FieldMask
+	44, // 13: post.UpdateSipScoreEntryInfoRequest.update_mask:type_name -> google.protobuf.FieldMask
 	35, // 14: post.ListSipScoreEntryResponse.entries:type_name -> post.SipScoreEntry
 	6,  // 15: post.PostService.CreatePost:input_type -> post.CreatePostRequest
 	0,  // 16: post.PostService.GetPost:input_type -> post.Request
@@ -3699,44 +3766,46 @@ var file_proto_post_proto_depIdxs = []int32{
 	38, // 26: post.PostService.UpdateSipScoreEntryInfo:input_type -> post.UpdateSipScoreEntryInfoRequest
 	0,  // 27: post.PostService.GetSipScore:input_type -> post.Request
 	39, // 28: post.PostService.ListSipScoreEntry:input_type -> post.ListSipScoreEntryRequest
-	0,  // 29: post.PostService.GetComment:input_type -> post.Request
-	14, // 30: post.PostService.CreateComment:input_type -> post.CreateCommentRequest
-	2,  // 31: post.PostService.DeleteItem:input_type -> post.DeleteItemRequest
-	17, // 32: post.PostService.CreateOrRemoveLike:input_type -> post.LikeRequest
-	8,  // 33: post.PostService.ListLikeByUserId:input_type -> post.ListPostPartInfoRequest
-	21, // 34: post.PostService.ListPopularTag:input_type -> post.ListPopularTagRequest
-	1,  // 35: post.PostService.CreateOrRemoveCollection:input_type -> post.ToggleTargetRequest
-	8,  // 36: post.PostService.ListCollection:input_type -> post.ListPostPartInfoRequest
-	25, // 37: post.PostService.CreateReport:input_type -> post.CreateReportRequest
-	24, // 38: post.PostService.ListReport:input_type -> post.ListReportRequest
-	23, // 39: post.PostService.HandleReport:input_type -> post.HandleReportRequest
-	10, // 40: post.PostService.CreatePost:output_type -> post.CreatePostResponse
-	4,  // 41: post.PostService.GetPost:output_type -> post.Post
-	11, // 42: post.PostService.ListMainPost:output_type -> post.ListPostResponse
-	12, // 43: post.PostService.ListUserCreatedPost:output_type -> post.ListPostPartInfoResponse
-	3,  // 44: post.PostService.UpdatePostInfo:output_type -> post.Response
-	3,  // 45: post.PostService.SetQualityPost:output_type -> post.Response
-	29, // 46: post.PostService.GetUnReadPostNum:output_type -> post.UnReadPostNumResponse
-	3,  // 47: post.PostService.UpdateLastReadTime:output_type -> post.Response
-	33, // 48: post.PostService.CreateSipScore:output_type -> post.CreateSipScoreResponse
-	3,  // 49: post.PostService.UpdateSipScoreInfo:output_type -> post.Response
-	40, // 50: post.PostService.CreateSipScoreEntry:output_type -> post.CreateSipScoreEntryResponse
-	3,  // 51: post.PostService.UpdateSipScoreEntryInfo:output_type -> post.Response
-	30, // 52: post.PostService.GetSipScore:output_type -> post.SipScore
-	41, // 53: post.PostService.ListSipScoreEntry:output_type -> post.ListSipScoreEntryResponse
-	13, // 54: post.PostService.GetComment:output_type -> post.CommentInfo
-	15, // 55: post.PostService.CreateComment:output_type -> post.CreateCommentResponse
-	3,  // 56: post.PostService.DeleteItem:output_type -> post.Response
-	3,  // 57: post.PostService.CreateOrRemoveLike:output_type -> post.Response
-	12, // 58: post.PostService.ListLikeByUserId:output_type -> post.ListPostPartInfoResponse
-	20, // 59: post.PostService.ListPopularTag:output_type -> post.Tags
-	19, // 60: post.PostService.CreateOrRemoveCollection:output_type -> post.CreateOrRemoveCollectionResponse
-	12, // 61: post.PostService.ListCollection:output_type -> post.ListPostPartInfoResponse
-	3,  // 62: post.PostService.CreateReport:output_type -> post.Response
-	26, // 63: post.PostService.ListReport:output_type -> post.ListReportResponse
-	3,  // 64: post.PostService.HandleReport:output_type -> post.Response
-	40, // [40:65] is the sub-list for method output_type
-	15, // [15:40] is the sub-list for method input_type
+	40, // 29: post.PostService.DeleteSipScoreEntries:input_type -> post.DeleteSipScoreEntriesRequest
+	0,  // 30: post.PostService.GetComment:input_type -> post.Request
+	14, // 31: post.PostService.CreateComment:input_type -> post.CreateCommentRequest
+	2,  // 32: post.PostService.DeleteItem:input_type -> post.DeleteItemRequest
+	17, // 33: post.PostService.CreateOrRemoveLike:input_type -> post.LikeRequest
+	8,  // 34: post.PostService.ListLikeByUserId:input_type -> post.ListPostPartInfoRequest
+	21, // 35: post.PostService.ListPopularTag:input_type -> post.ListPopularTagRequest
+	1,  // 36: post.PostService.CreateOrRemoveCollection:input_type -> post.ToggleTargetRequest
+	8,  // 37: post.PostService.ListCollection:input_type -> post.ListPostPartInfoRequest
+	25, // 38: post.PostService.CreateReport:input_type -> post.CreateReportRequest
+	24, // 39: post.PostService.ListReport:input_type -> post.ListReportRequest
+	23, // 40: post.PostService.HandleReport:input_type -> post.HandleReportRequest
+	10, // 41: post.PostService.CreatePost:output_type -> post.CreatePostResponse
+	4,  // 42: post.PostService.GetPost:output_type -> post.Post
+	11, // 43: post.PostService.ListMainPost:output_type -> post.ListPostResponse
+	12, // 44: post.PostService.ListUserCreatedPost:output_type -> post.ListPostPartInfoResponse
+	3,  // 45: post.PostService.UpdatePostInfo:output_type -> post.Response
+	3,  // 46: post.PostService.SetQualityPost:output_type -> post.Response
+	29, // 47: post.PostService.GetUnReadPostNum:output_type -> post.UnReadPostNumResponse
+	3,  // 48: post.PostService.UpdateLastReadTime:output_type -> post.Response
+	33, // 49: post.PostService.CreateSipScore:output_type -> post.CreateSipScoreResponse
+	3,  // 50: post.PostService.UpdateSipScoreInfo:output_type -> post.Response
+	41, // 51: post.PostService.CreateSipScoreEntry:output_type -> post.CreateSipScoreEntryResponse
+	3,  // 52: post.PostService.UpdateSipScoreEntryInfo:output_type -> post.Response
+	30, // 53: post.PostService.GetSipScore:output_type -> post.SipScore
+	42, // 54: post.PostService.ListSipScoreEntry:output_type -> post.ListSipScoreEntryResponse
+	3,  // 55: post.PostService.DeleteSipScoreEntries:output_type -> post.Response
+	13, // 56: post.PostService.GetComment:output_type -> post.CommentInfo
+	15, // 57: post.PostService.CreateComment:output_type -> post.CreateCommentResponse
+	3,  // 58: post.PostService.DeleteItem:output_type -> post.Response
+	3,  // 59: post.PostService.CreateOrRemoveLike:output_type -> post.Response
+	12, // 60: post.PostService.ListLikeByUserId:output_type -> post.ListPostPartInfoResponse
+	20, // 61: post.PostService.ListPopularTag:output_type -> post.Tags
+	19, // 62: post.PostService.CreateOrRemoveCollection:output_type -> post.CreateOrRemoveCollectionResponse
+	12, // 63: post.PostService.ListCollection:output_type -> post.ListPostPartInfoResponse
+	3,  // 64: post.PostService.CreateReport:output_type -> post.Response
+	26, // 65: post.PostService.ListReport:output_type -> post.ListReportResponse
+	3,  // 66: post.PostService.HandleReport:output_type -> post.Response
+	41, // [41:67] is the sub-list for method output_type
+	15, // [15:41] is the sub-list for method input_type
 	15, // [15:15] is the sub-list for extension type_name
 	15, // [15:15] is the sub-list for extension extendee
 	0,  // [0:15] is the sub-list for field type_name
@@ -3753,7 +3822,7 @@ func file_proto_post_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_post_proto_rawDesc), len(file_proto_post_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   42,
+			NumMessages:   43,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
