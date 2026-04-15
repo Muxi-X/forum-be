@@ -5,14 +5,16 @@ package proto
 
 import (
 	fmt "fmt"
+	math "math"
+
 	proto "google.golang.org/protobuf/proto"
 	_ "google.golang.org/protobuf/types/known/fieldmaskpb"
 	_ "google.golang.org/protobuf/types/known/timestamppb"
-	math "math"
 )
 
 import (
 	context "context"
+
 	client "go-micro.dev/v4/client"
 	server "go-micro.dev/v4/server"
 )
@@ -45,6 +47,7 @@ type PostService interface {
 	GetSipScore(ctx context.Context, in *Request, opts ...client.CallOption) (*SipScore, error)
 	ListSipScoreEntry(ctx context.Context, in *ListSipScoreEntryRequest, opts ...client.CallOption) (*ListSipScoreEntryResponse, error)
 	DeleteSipScoreEntries(ctx context.Context, in *DeleteSipScoreEntriesRequest, opts ...client.CallOption) (*Response, error)
+	ListSipScore(ctx context.Context, in *ListSipScoreRequest, opts ...client.CallOption) (*ListSipScoreResponse, error)
 	GetComment(ctx context.Context, in *Request, opts ...client.CallOption) (*CommentInfo, error)
 	CreateComment(ctx context.Context, in *CreateCommentRequest, opts ...client.CallOption) (*CreateCommentResponse, error)
 	DeleteItem(ctx context.Context, in *DeleteItemRequest, opts ...client.CallOption) (*Response, error)
@@ -220,6 +223,16 @@ func (c *postService) DeleteSipScoreEntries(ctx context.Context, in *DeleteSipSc
 	return out, nil
 }
 
+func (c *postService) ListSipScore(ctx context.Context, in *ListSipScoreRequest, opts ...client.CallOption) (*ListSipScoreResponse, error) {
+	req := c.c.NewRequest(c.name, "PostService.ListSipScore", in)
+	out := new(ListSipScoreResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *postService) GetComment(ctx context.Context, in *Request, opts ...client.CallOption) (*CommentInfo, error) {
 	req := c.c.NewRequest(c.name, "PostService.GetComment", in)
 	out := new(CommentInfo)
@@ -348,6 +361,7 @@ type PostServiceHandler interface {
 	GetSipScore(context.Context, *Request, *SipScore) error
 	ListSipScoreEntry(context.Context, *ListSipScoreEntryRequest, *ListSipScoreEntryResponse) error
 	DeleteSipScoreEntries(context.Context, *DeleteSipScoreEntriesRequest, *Response) error
+	ListSipScore(context.Context, *ListSipScoreRequest, *ListSipScoreResponse) error
 	GetComment(context.Context, *Request, *CommentInfo) error
 	CreateComment(context.Context, *CreateCommentRequest, *CreateCommentResponse) error
 	DeleteItem(context.Context, *DeleteItemRequest, *Response) error
@@ -378,6 +392,7 @@ func RegisterPostServiceHandler(s server.Server, hdlr PostServiceHandler, opts .
 		GetSipScore(ctx context.Context, in *Request, out *SipScore) error
 		ListSipScoreEntry(ctx context.Context, in *ListSipScoreEntryRequest, out *ListSipScoreEntryResponse) error
 		DeleteSipScoreEntries(ctx context.Context, in *DeleteSipScoreEntriesRequest, out *Response) error
+		ListSipScore(ctx context.Context, in *ListSipScoreRequest, out *ListSipScoreResponse) error
 		GetComment(ctx context.Context, in *Request, out *CommentInfo) error
 		CreateComment(ctx context.Context, in *CreateCommentRequest, out *CreateCommentResponse) error
 		DeleteItem(ctx context.Context, in *DeleteItemRequest, out *Response) error
@@ -459,6 +474,10 @@ func (h *postServiceHandler) ListSipScoreEntry(ctx context.Context, in *ListSipS
 
 func (h *postServiceHandler) DeleteSipScoreEntries(ctx context.Context, in *DeleteSipScoreEntriesRequest, out *Response) error {
 	return h.PostServiceHandler.DeleteSipScoreEntries(ctx, in, out)
+}
+
+func (h *postServiceHandler) ListSipScore(ctx context.Context, in *ListSipScoreRequest, out *ListSipScoreResponse) error {
+	return h.PostServiceHandler.ListSipScore(ctx, in, out)
 }
 
 func (h *postServiceHandler) GetComment(ctx context.Context, in *Request, out *CommentInfo) error {

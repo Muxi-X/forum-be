@@ -64,6 +64,11 @@ type Interface interface {
 	DeleteSipScoreEntries(sipScoreID uint32, entryIDs []uint32, tx ...*gorm.DB) error
 	GetSipScoreEntryStats(sipScoreID uint32, entryIDs []uint32, tx ...*gorm.DB) (entryCount uint32, participantCount uint32, err error)
 	DecrSipScoreStats(sipScoreID uint32, entryCount uint32, participantCount uint32, tx ...*gorm.DB) error
+	ListSipScoreNewest(limit uint32, tx ...*gorm.DB) ([]*SipScoreModel, error)
+	ListSipScoreNewestWithCursor(lastID uint32, lastUpdatedAt time.Time, limit uint32, tx ...*gorm.DB) ([]*SipScoreModel, error)
+	ListSipScoreHottest(limit uint32, tx ...*gorm.DB) ([]*SipScoreModel, error)
+	ListSipScoreHottestWithCursor(lastID uint32, lastCount uint32, limit uint32, tx ...*gorm.DB) ([]*SipScoreModel, error)
+	BatchListSipScoreEntriesHottest(sipScoreIDs []uint32, limit uint32, tx ...*gorm.DB) (map[uint32][]*SipScoreEntryModel, error)
 
 	CreateComment(*CommentModel) (uint32, error)
 	GetCommentInfo(uint32) (*CommentInfo, error)
@@ -93,6 +98,7 @@ type Interface interface {
 	GetCollectionNum(contentType uint32, contentId uint32) (uint32, error)
 	ListCollectionByUserId(userId uint32, contentType uint32) ([]uint32, error)
 	IsUserCollected(userID uint32, contentType uint32, contentID uint32, tx ...*gorm.DB) (bool, error)
+	ListIsUserCollected(userID, contentType uint32, contentIDs []uint32, tx ...*gorm.DB) (map[uint32]bool, error)
 
 	ChangePostScore(uint32, int) error
 	AddChangeRecord(uint32) error

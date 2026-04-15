@@ -137,6 +137,85 @@ func (d *Dao) DeleteSipScore(id uint32, tx ...*gorm.DB) error {
 	return db.Delete(&SipScoreModel{}, id).Error
 }
 
+func (d *Dao) ListSipScoreNewest(limit uint32, tx ...*gorm.DB) ([]*SipScoreModel, error) {
+	return d.listSipScoreByTimeField("updated_at", orderDirDesc, limit, tx...)
+}
+
+func (d *Dao) ListSipScoreNewestWithCursor(lastID uint32, lastUpdatedAt time.Time, limit uint32, tx ...*gorm.DB) ([]*SipScoreModel, error) {
+	return d.listSipScoreByTimeFieldWithCursor("updated_at", orderDirDesc, lastID, lastUpdatedAt, limit, tx...)
+}
+
+func (d *Dao) ListSipScoreHottest(limit uint32, tx ...*gorm.DB) ([]*SipScoreModel, error) {
+	return d.listSipScoreByUintField("participant_count", orderDirDesc, limit, tx...)
+}
+
+func (d *Dao) ListSipScoreHottestWithCursor(lastID uint32, lastCount uint32, limit uint32, tx ...*gorm.DB) ([]*SipScoreModel, error) {
+	return d.listSipScoreByUintFieldWithCursor("participant_count", orderDirDesc, lastID, lastCount, limit, tx...)
+}
+
+func (d *Dao) listSipScoreByTimeFieldWithCursor(field string, orderDir string, lastID uint32, lastTime time.Time, limit uint32, tx ...*gorm.DB) ([]*SipScoreModel, error) {
+	db := d.getDB(tx...)
+
+	whereOp := ">"
+	idOp := ">"
+	order := field + " ASC, id ASC"
+	if orderDir == orderDirDesc {
+		whereOp = "<"
+		idOp = "<"
+		order = field + " DESC, id DESC"
+	}
+
+	var sipScores []*SipScoreModel
+	err := db.Where(field+" "+whereOp+" ? OR ("+field+" = ? AND id "+idOp+" ?)", lastTime, lastTime, lastID).
+		Order(order).Limit(int(limit)).Find(&sipScores).Error
+
+	return sipScores, err
+}
+
+func (d *Dao) listSipScoreByTimeField(field string, orderDir string, limit uint32, tx ...*gorm.DB) ([]*SipScoreModel, error) {
+	db := d.getDB(tx...)
+	order := field + " ASC, id ASC"
+	if orderDir == orderDirDesc {
+		order = field + " DESC, id DESC"
+	}
+
+	var sipScores []*SipScoreModel
+	err := db.Order(order).Limit(int(limit)).Find(&sipScores).Error
+
+	return sipScores, err
+}
+
+func (d *Dao) listSipScoreByUintFieldWithCursor(field string, orderDir string, lastID uint32, lastValue uint32, limit uint32, tx ...*gorm.DB) ([]*SipScoreModel, error) {
+	db := d.getDB(tx...)
+	whereOp := ">"
+	idOp := ">"
+	order := field + " ASC, id ASC"
+	if orderDir == orderDirDesc {
+		whereOp = "<"
+		idOp = "<"
+		order = field + " DESC, id DESC"
+	}
+
+	var sipScores []*SipScoreModel
+	err := db.Where(field+" "+whereOp+" ? OR ("+field+" = ? AND id "+idOp+" ?)", lastValue, lastValue, lastID).
+		Order(order).Limit(int(limit)).Find(&sipScores).Error
+
+	return sipScores, err
+}
+
+func (d *Dao) listSipScoreByUintField(field string, orderDir string, limit uint32, tx ...*gorm.DB) ([]*SipScoreModel, error) {
+	db := d.getDB(tx...)
+	order := field + " ASC, id ASC"
+	if orderDir == orderDirDesc {
+		order = field + " DESC, id DESC"
+	}
+
+	var sipScores []*SipScoreModel
+	err := db.Order(order).Limit(int(limit)).Find(&sipScores).Error
+
+	return sipScores, err
+}
+
 // DecrSipScoreStats 多字段递减，减少 DB 操作
 func (d *Dao) DecrSipScoreStats(sipScoreID uint32, entryCount uint32, participantCount uint32, tx ...*gorm.DB) error {
 	db := d.getDB(tx...)
@@ -359,9 +438,7 @@ func (d *Dao) listSipScoreEntriesByUintFieldWithCursor(sipScoreID uint32, field 
 		Where("sip_score_id = ? AND ("+field+" "+whereOp+" ? OR ("+field+" = ? AND id "+idOp+" ?))",
 			sipScoreID, lastValue, lastValue, lastID,
 		).
-		Order(order).
-		Limit(int(limit)).
-		Find(&entries).Error
+		Order(order).Limit(int(limit)).Find(&entries).Error
 
 	return entries, err
 }
@@ -384,3 +461,76 @@ func (d *Dao) listSipScoreEntriesByUintField(sipScoreID uint32, field string, or
 
 	return entries, err
 }
+
+// BatchListSipScoreEntriesHottest 批量获取多个榜单的热门条目，返回结果按榜单 ID 分组
+// 不如窗口函数
+func (d *Dao) BatchListSipScoreEntriesHottest(sipScoreIDs []uint32, limit uint32, tx ...*gorm.DB) (map[uint32][]*SipScoreEntryModel, error) {
+	if len(sipScoreIDs) == 0 {
+		return map[uint32][]*SipScoreEntryModel{}, nil
+	}
+
+	db := d.getDB(tx...)
+
+	var entries []*SipScoreEntryModel
+
+	// 按热门排序查全部
+	err := db.
+		Where("sip_score_id IN ?", sipScoreIDs).
+		Order("sip_score_id ASC, participant_count DESC, id DESC").
+		Find(&entries).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	// 分组并截断
+	result := make(map[uint32][]*SipScoreEntryModel)
+
+	for _, e := range entries {
+		list := result[e.SipScoreID]
+		if uint32(len(list)) >= limit {
+			continue
+		}
+		result[e.SipScoreID] = append(list, e)
+	}
+
+	return result, nil
+}
+
+//// BatchListSipScoreEntriesHottest 批量获取多个 sipScoreID 的热门条目，返回结果按 sipScoreID 分组
+//// 学习 SQL 语句是对的（虽然我数据库作业也是抄的）
+//// 虽然因为 mysql-5.7 不支持，但保留给予提示——sql语句🐮
+//func (d *Dao) BatchListSipScoreEntriesHottest(sipScoreIDs []uint32, limit uint32, tx ...*gorm.DB) (map[uint32][]*SipScoreEntryModel, error) {
+//	if len(sipScoreIDs) == 0 {
+//		return map[uint32][]*SipScoreEntryModel{}, nil
+//	}
+//
+//	db := d.getDB(tx...)
+//
+//	var entries []*SipScoreEntryModel
+//
+//	err := db.Raw(`
+//		SELECT * FROM (
+//			SELECT *,
+//			       ROW_NUMBER() OVER (
+//			           PARTITION BY sip_score_id
+//			           ORDER BY participant_count DESC, id DESC
+//			       ) AS rn
+//			FROM sip_score_entry_models
+//			WHERE sip_score_id IN ?
+//		) t
+//		WHERE t.rn <= ?
+//	`, sipScoreIDs, limit).Scan(&entries).Error
+//
+//	if err != nil {
+//		return nil, err
+//	}
+//
+//	// 转换成 map
+//	result := make(map[uint32][]*SipScoreEntryModel)
+//	for _, e := range entries {
+//		result[e.SipScoreID] = append(result[e.SipScoreID], e)
+//	}
+//
+//	return result, nil
+//}

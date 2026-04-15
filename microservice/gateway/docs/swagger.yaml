@@ -635,6 +635,17 @@ definitions:
       page_token:
         type: string
     type: object
+  sipscore.ListSipScoresResponse:
+    properties:
+      has_more:
+        type: boolean
+      page_token:
+        type: string
+      sip_scores:
+        items:
+          $ref: '#/definitions/sipscore.SipScoreWithEntries'
+        type: array
+    type: object
   sipscore.SipScore:
     properties:
       category:
@@ -710,6 +721,15 @@ definitions:
     required:
     - cover_img
     - name
+    type: object
+  sipscore.SipScoreWithEntries:
+    properties:
+      entries:
+        items:
+          $ref: '#/definitions/sipscore.SipScoreEntry'
+        type: array
+      sip_score:
+        $ref: '#/definitions/sipscore.SipScore'
     type: object
   sipscore.UpdateSipScoreEntryRequest:
     properties:
@@ -1780,6 +1800,38 @@ paths:
           schema:
             $ref: '#/definitions/Response'
       summary: 修改榜单条目信息 api
+      tags:
+      - sipscore
+  /sip-score/list:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: token 用户令牌
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: sort_type
+        in: query
+        name: sort_type
+        type: integer
+      - description: page_size
+        in: query
+        name: page_size
+        type: integer
+      - description: page_token
+        in: query
+        name: page_token
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/sipscore.ListSipScoresResponse'
+      summary: list 批量获取榜单 api
       tags:
       - sipscore
   /user:

@@ -22,6 +22,7 @@ service PostService {
     rpc GetSipScore(Request) returns (SipScore) {}
     rpc ListSipScoreEntry(ListSipScoreEntryRequest) returns (ListSipScoreEntryResponse) {}
     rpc DeleteSipScoreEntries(DeleteSipScoreEntriesRequest) returns (Response) {}
+    rpc ListSipScore(ListSipScoreRequest) returns (ListSipScoreResponse) {}
 
     rpc GetComment(Request) returns (CommentInfo) {}
     rpc CreateComment(CreateCommentRequest) returns (CreateCommentResponse) {}
@@ -386,6 +387,20 @@ message SipScore {
     bool is_collected = 15;
 }
 
+message SipScoreWithEntries  {
+    SipScore meta = 1;
+    repeated SipScoreEntry entries = 2;
+}
+
+message SipScorePageToken {
+    uint32 id = 1;
+    // 时间排序(最新 / 最旧 (可扩展))
+    google.protobuf.Timestamp updated_at = 2;
+    // 热门排序
+    uint32 participant_count = 3;
+    uint32 sort_type = 4;
+}
+
 // ---- request ----
 
 message CreateSipScoreRequest {
@@ -411,10 +426,23 @@ message UpdateSipScoreInfoRequest {
     google.protobuf.FieldMask update_mask = 10;
 }
 
+message ListSipScoreRequest {
+    string page_token = 1;
+    uint32 page_size = 2;
+    uint32 sort_type = 3;
+    uint32 user_id = 4;
+}
+
 // ---- response ----
 
 message CreateSipScoreResponse {
     uint32 id = 1;
+}
+
+message ListSipScoreResponse  {
+   repeated SipScoreWithEntries  sip_scores = 1;
+   string page_token = 2;
+   bool has_more = 3;
 }
 
 // =====================
@@ -455,6 +483,8 @@ message SipScoreEntryPageToken {
     uint32 participant_count = 3;
     // 评分排序（高分 / 低分）
     uint32 score_avg = 4;
+
+    uint32 sort_type = 5;
 }
 
 // ---- request ----

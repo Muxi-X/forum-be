@@ -1397,6 +1397,55 @@ const docTemplate = `{
                 }
             }
         },
+        "/sip-score/list": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "sipscore"
+                ],
+                "summary": "list 批量获取榜单 api",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token 用户令牌",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "sort_type",
+                        "name": "sort_type",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "page_size",
+                        "name": "page_size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "page_token",
+                        "name": "page_token",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/sipscore.ListSipScoresResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/sip-score/{sip_score_id}": {
             "get": {
                 "consumes": [
@@ -2807,6 +2856,23 @@ const docTemplate = `{
                 }
             }
         },
+        "sipscore.ListSipScoresResponse": {
+            "type": "object",
+            "properties": {
+                "has_more": {
+                    "type": "boolean"
+                },
+                "page_token": {
+                    "type": "string"
+                },
+                "sip_scores": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/sipscore.SipScoreWithEntries"
+                    }
+                }
+            }
+        },
         "sipscore.SipScore": {
             "type": "object",
             "properties": {
@@ -2919,6 +2985,20 @@ const docTemplate = `{
                 },
                 "name": {
                     "type": "string"
+                }
+            }
+        },
+        "sipscore.SipScoreWithEntries": {
+            "type": "object",
+            "properties": {
+                "entries": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/sipscore.SipScoreEntry"
+                    }
+                },
+                "sip_score": {
+                    "$ref": "#/definitions/sipscore.SipScore"
                 }
             }
         },

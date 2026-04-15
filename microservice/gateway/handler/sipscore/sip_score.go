@@ -60,6 +60,11 @@ type SipScore struct {
 	IsCollected      bool      `json:"is_collected"`
 }
 
+type SipScoreWithEntries struct {
+	SipScore *SipScore        `json:"sip_score"`
+	Entries  []*SipScoreEntry `json:"entries"`
+}
+
 // ---- request ----
 
 type CreateSipScoreRequest struct {
@@ -85,6 +90,12 @@ type UpdateSipScoreRequest struct {
 
 type GetSipScoreResponse struct {
 	SipScore *SipScore `json:"sip_score"`
+}
+
+type ListSipScoresResponse struct {
+	SipScores []*SipScoreWithEntries `json:"sip_scores"`
+	PageToken string                 `json:"page_token"`
+	HasMore   bool                   `json:"has_more"`
 }
 
 // ====================

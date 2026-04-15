@@ -74,10 +74,7 @@ func (d *Dao) TryDeleteCollection(collection *CollectionModel, tx ...*gorm.DB) (
 func (d *Dao) ListCollectionByUserId(userId uint32, contentType uint32) ([]uint32, error) {
 	var ids []uint32
 	err := d.DB.Model(&CollectionModel{}).
-		Select("content_id").
-		Where("user_id = ? AND content_type = ?", userId, contentType).
-		Find(&ids).
-		Error
+		Select("content_id").Where("user_id = ? AND content_type = ?", userId, contentType).Find(&ids).Error
 
 	return ids, err
 }
@@ -97,11 +94,35 @@ func (d *Dao) IsUserCollected(userID uint32, contentType uint32, contentID uint3
 	return err == nil, err
 }
 
-func (d *Dao) GetCollectionNum(contentType uint32, contentId uint32) (uint32, error) {
+func (d *Dao) ListIsUserCollected(userID, contentType uint32, contentIDs []uint32, tx ...*gorm.DB) (map[uint32]bool, error) {
+	result := make(map[uint32]bool, len(contentIDs))
+	if len(contentIDs) == 0 {
+		return result, nil
+	}
+
+	db := d.getDB(tx...)
+	var collectedIDs []uint32
+	err := db.Model(&CollectionModel{}).
+		Select("content_id").
+		Where("user_id = ? AND content_type = ? AND content_id IN ?",
+			userID, contentType, contentIDs,
+		).Find(&collectedIDs).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	for _, id := range collectedIDs {
+		result[id] = true
+	}
+	return result, nil
+}
+
+func (d *Dao) GetCollectionNum(contentType uint32, contentID uint32) (uint32, error) {
 	var count int64
 	err := d.DB.Model(&CollectionModel{}).
 		Where("content_type = ? AND content_id = ?",
-			contentType, contentId,
+			contentType, contentID,
 		).Count(&count).Error
 
 	return uint32(count), err
