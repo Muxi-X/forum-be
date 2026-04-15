@@ -612,6 +612,17 @@ definitions:
           type: integer
         type: array
     type: object
+  sipscore.ListSipScoreEntriesResponse:
+    properties:
+      entries:
+        items:
+          $ref: '#/definitions/sipscore.SipScoreEntry'
+        type: array
+      has_more:
+        type: boolean
+      page_token:
+        type: string
+    type: object
   sipscore.SipScore:
     properties:
       category:
@@ -644,6 +655,35 @@ definitions:
         items:
           type: string
         type: array
+      updated_at:
+        type: string
+    type: object
+  sipscore.SipScoreEntry:
+    properties:
+      comment_num:
+        type: integer
+      cover_img:
+        type: string
+      created_at:
+        type: string
+      creator:
+        $ref: '#/definitions/sipscore.userInfo'
+      description:
+        type: string
+      id:
+        type: integer
+      last_modified_by:
+        $ref: '#/definitions/sipscore.userInfo'
+      name:
+        type: string
+      participant_num:
+        type: integer
+      score_avg:
+        type: integer
+      score_total:
+        type: integer
+      sip_score_id:
+        type: integer
       updated_at:
         type: string
     type: object
@@ -1616,6 +1656,43 @@ paths:
           schema:
             $ref: '#/definitions/sipscore.IdsResponse'
       summary: 创建榜单条目 api
+      tags:
+      - sipscore
+  /sip-score/entries/list:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: token 用户令牌
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: sip_score_id
+        in: path
+        name: sip_score_id
+        required: true
+        type: integer
+      - description: sort_type
+        in: query
+        name: sort_type
+        type: integer
+      - description: page_size
+        in: query
+        name: page_size
+        type: integer
+      - description: page_token
+        in: query
+        name: page_token
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/sipscore.ListSipScoreEntriesResponse'
+      summary: list 获取榜单条目 api
       tags:
       - sipscore
   /sip-score/entry:

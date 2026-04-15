@@ -27,7 +27,7 @@ func (a *Api) UpdateSipScore(c *gin.Context) {
 
 	var req UpdateSipScoreRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		SendError(c, errno.ErrBind, nil, err.Error(), GetLine())
+		SendError(c, errno.ErrBind, &EmptyResponse{}, err.Error(), GetLine())
 		return
 	}
 
@@ -35,23 +35,23 @@ func (a *Api) UpdateSipScore(c *gin.Context) {
 
 	ok, err := model.Enforce(userID, constvar.SipScore, req.Id, constvar.Write)
 	if err != nil {
-		SendError(c, errno.ErrCasbin, nil, err.Error(), GetLine())
+		SendError(c, errno.ErrCasbin, &EmptyResponse{}, err.Error(), GetLine())
 		return
 	}
 
 	if !ok {
-		SendError(c, errno.ErrPermissionDenied, nil, "权限不足", GetLine())
+		SendError(c, errno.ErrPermissionDenied, &EmptyResponse{}, "权限不足", GetLine())
 		return
 	}
 
 	if ok = a.Dao.AllowN(userID, 3); !ok {
-		SendError(c, errno.ErrExceededTrafficLimit, nil, "Please try again later", GetLine())
+		SendError(c, errno.ErrExceededTrafficLimit, &EmptyResponse{}, "Please try again later", GetLine())
 		return
 	}
 
 	paths := buildSipScoreUpdatePaths(&req)
 	if len(paths) == 0 {
-		SendError(c, errno.ErrBadRequest, nil, "no fields to update", GetLine())
+		SendError(c, errno.ErrBadRequest, &EmptyResponse{}, "no fields to update", GetLine())
 		return
 	}
 
@@ -74,7 +74,7 @@ func (a *Api) UpdateSipScore(c *gin.Context) {
 
 	_, err = client.PostClient.UpdateSipScoreInfo(c.Request.Context(), &updateReq)
 	if err != nil {
-		SendError(c, err, nil, "", GetLine())
+		SendError(c, err, &EmptyResponse{}, "", GetLine())
 		return
 	}
 

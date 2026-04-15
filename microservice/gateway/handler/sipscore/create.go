@@ -28,29 +28,29 @@ func (a *Api) CreateSipScore(c *gin.Context) {
 
 	var req CreateSipScoreRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		SendError(c, errno.ErrBind, nil, err.Error(), GetLine())
+		SendError(c, errno.ErrBind, &EmptyResponse{}, err.Error(), GetLine())
 		return
 	}
 
 	if req.Domain != constvar.NormalDomain && req.Domain != constvar.MuxiDomain {
-		SendError(c, errno.ErrBadRequest, nil, "domain must be "+constvar.NormalDomain+" or "+constvar.MuxiDomain, GetLine())
+		SendError(c, errno.ErrBadRequest, &EmptyResponse{}, "domain must be "+constvar.NormalDomain+" or "+constvar.MuxiDomain, GetLine())
 		return
 	}
 
 	userID := c.MustGet("userId").(uint32)
 	ok, err := model.Enforce(userID, constvar.SipScore, req.Domain, constvar.Read)
 	if err != nil {
-		SendError(c, errno.ErrCasbin, nil, err.Error(), GetLine())
+		SendError(c, errno.ErrCasbin, &EmptyResponse{}, err.Error(), GetLine())
 		return
 	}
 
 	if !ok {
-		SendError(c, errno.ErrPermissionDenied, nil, "权限不足", GetLine())
+		SendError(c, errno.ErrPermissionDenied, &EmptyResponse{}, "权限不足", GetLine())
 		return
 	}
 
 	if ok = a.Dao.AllowN(userID, 30); !ok {
-		SendError(c, errno.ErrExceededTrafficLimit, nil, "Please try again later", GetLine())
+		SendError(c, errno.ErrExceededTrafficLimit, &EmptyResponse{}, "Please try again later", GetLine())
 		return
 	}
 
@@ -66,7 +66,7 @@ func (a *Api) CreateSipScore(c *gin.Context) {
 
 	resp, err := client.PostClient.CreateSipScore(c.Request.Context(), &createReq)
 	if err != nil {
-		SendError(c, err, nil, "", GetLine())
+		SendError(c, err, &EmptyResponse{}, "", GetLine())
 		return
 	}
 

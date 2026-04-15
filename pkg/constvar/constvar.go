@@ -69,4 +69,14 @@ const (
 	// collection type
 	CollectionPost     = 1
 	CollectionSipScore = 2
+
+	// sort type
+	SortByNewest       = 1
+	SortByHottest      = 2
+	SortByHighestScore = 3
+	SortByLowestScore  = 4
+
+	// page size
+	DefaultPageSize = 10
+	MaxPageSize     = 50
 )

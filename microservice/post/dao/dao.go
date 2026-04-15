@@ -51,6 +51,14 @@ type Interface interface {
 	UpdateSipScoreEntry(sipScoreID, entryID uint32, update map[string]interface{}, tx ...*gorm.DB) error
 	IncrSipScoreCollectCount(sipScoreID uint32, tx ...*gorm.DB) error
 	DecrSipScoreCollectCount(sipScoreID uint32, tx ...*gorm.DB) error
+	ListSipScoreEntriesNewest(sipScoreID, limit uint32, tx ...*gorm.DB) ([]*SipScoreEntryModel, error)
+	ListSipScoreEntriesNewestWithCursor(sipScoreID, lastEntryID uint32, lastUpdatedAt time.Time, limit uint32, tx ...*gorm.DB) ([]*SipScoreEntryModel, error)
+	ListSipScoreEntriesHottest(sipScoreID, limit uint32, tx ...*gorm.DB) ([]*SipScoreEntryModel, error)
+	ListSipScoreEntriesHottestWithCursor(sipScoreID, lastID uint32, lastCount uint32, limit uint32, tx ...*gorm.DB) ([]*SipScoreEntryModel, error)
+	ListSipScoreEntriesHighestScore(sipScoreID, limit uint32, tx ...*gorm.DB) ([]*SipScoreEntryModel, error)
+	ListSipScoreEntriesHighestScoreWithCursor(sipScoreID, lastID uint32, lastScore uint32, limit uint32, tx ...*gorm.DB) ([]*SipScoreEntryModel, error)
+	ListSipScoreEntriesLowestScore(sipScoreID, limit uint32, tx ...*gorm.DB) ([]*SipScoreEntryModel, error)
+	ListSipScoreEntriesLowestScoreWithCursor(sipScoreID, lastID uint32, lastScore uint32, limit uint32, tx ...*gorm.DB) ([]*SipScoreEntryModel, error)
 
 	CreateComment(*CommentModel) (uint32, error)
 	GetCommentInfo(uint32) (*CommentInfo, error)

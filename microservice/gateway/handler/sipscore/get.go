@@ -36,11 +36,11 @@ func (a *Api) GetSipScore(c *gin.Context) {
 	fmt.Println(1)
 	sipScoreID, err := strconv.Atoi(c.Param("sip_score_id"))
 	if err != nil {
-		SendError(c, errno.ErrPathParam, nil, err.Error(), GetLine())
+		SendError(c, errno.ErrPathParam, &EmptyResponse{}, err.Error(), GetLine())
 		return
 	}
 	if sipScoreID <= 0 {
-		SendError(c, errno.ErrPathParam, nil, "sip_score_id must be positive", GetLine())
+		SendError(c, errno.ErrPathParam, &EmptyResponse{}, "sip_score_id must be positive", GetLine())
 		return
 	}
 
@@ -48,11 +48,11 @@ func (a *Api) GetSipScore(c *gin.Context) {
 
 	ok, err := model.Enforce(userID, constvar.SipScore, sipScoreID, constvar.Read)
 	if err != nil {
-		SendError(c, err, nil, "", GetLine())
+		SendError(c, err, &EmptyResponse{}, "", GetLine())
 		return
 	}
 	if !ok {
-		SendError(c, errno.ErrPermissionDenied, nil, "权限不足", GetLine())
+		SendError(c, errno.ErrPermissionDenied, &EmptyResponse{}, "权限不足", GetLine())
 		return
 	}
 
@@ -66,10 +66,9 @@ func (a *Api) GetSipScore(c *gin.Context) {
 	fmt.Println(2.5)
 	fmt.Println(err)
 	if err != nil {
-		SendError(c, err, nil, "", GetLine())
+		SendError(c, err, &EmptyResponse{}, "", GetLine())
 		return
 	}
-	fmt.Println(2.6)
 
 	userIDs := []uint32{
 		sipScoreResp.CreatorId,
@@ -77,8 +76,6 @@ func (a *Api) GetSipScore(c *gin.Context) {
 	}
 
 	// 确保顺序一致
-	fmt.Println(3)
-
 	userResp, err := client.UserClient.GetInfo(c.Request.Context(), &userpb.GetInfoRequest{Ids: userIDs})
 	if err != nil {
 		log.Error("Failed to get user info",
@@ -112,7 +109,6 @@ func (a *Api) GetSipScore(c *gin.Context) {
 			lastModifiedBy = build(userList[1], userIDs[1])
 		}
 	}
-	fmt.Println(4)
 
 	sipScore := &SipScore{
 		ID:               sipScoreResp.Id,

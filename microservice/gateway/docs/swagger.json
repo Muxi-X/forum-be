@@ -1257,6 +1257,62 @@
                 }
             }
         },
+        "/sip-score/entries/list": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "sipscore"
+                ],
+                "summary": "list 获取榜单条目 api",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token 用户令牌",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "sip_score_id",
+                        "name": "sip_score_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "sort_type",
+                        "name": "sort_type",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "page_size",
+                        "name": "page_size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "page_token",
+                        "name": "page_token",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/sipscore.ListSipScoreEntriesResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/sip-score/entry": {
             "put": {
                 "consumes": [
@@ -2636,6 +2692,23 @@
                 }
             }
         },
+        "sipscore.ListSipScoreEntriesResponse": {
+            "type": "object",
+            "properties": {
+                "entries": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/sipscore.SipScoreEntry"
+                    }
+                },
+                "has_more": {
+                    "type": "boolean"
+                },
+                "page_token": {
+                    "type": "string"
+                }
+            }
+        },
         "sipscore.SipScore": {
             "type": "object",
             "properties": {
@@ -2683,6 +2756,50 @@
                     "items": {
                         "type": "string"
                     }
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "sipscore.SipScoreEntry": {
+            "type": "object",
+            "properties": {
+                "comment_num": {
+                    "type": "integer"
+                },
+                "cover_img": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "creator": {
+                    "$ref": "#/definitions/sipscore.userInfo"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "last_modified_by": {
+                    "$ref": "#/definitions/sipscore.userInfo"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "participant_num": {
+                    "type": "integer"
+                },
+                "score_avg": {
+                    "type": "integer"
+                },
+                "score_total": {
+                    "type": "integer"
+                },
+                "sip_score_id": {
+                    "type": "integer"
                 },
                 "updated_at": {
                     "type": "string"

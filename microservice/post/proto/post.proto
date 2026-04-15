@@ -20,6 +20,7 @@ service PostService {
     rpc CreateSipScoreEntry(CreateSipScoreEntryRequest) returns (CreateSipScoreEntryResponse) {}
     rpc UpdateSipScoreEntryInfo(UpdateSipScoreEntryInfoRequest) returns (Response) {}
     rpc GetSipScore(Request) returns (SipScore) {}
+    rpc ListSipScoreEntry(ListSipScoreEntryRequest) returns (ListSipScoreEntryResponse) {}
 
     rpc GetComment(Request) returns (CommentInfo) {}
     rpc CreateComment(CreateCommentRequest) returns (CreateCommentResponse) {}
@@ -427,6 +428,33 @@ message SipScoreEntryCreateInfo {
     string cover_img = 3;
 }
 
+message SipScoreEntry {
+    uint32 id = 1;
+    uint32 sip_score_id = 2;
+    google.protobuf.Timestamp created_at = 3;
+    google.protobuf.Timestamp updated_at = 4;
+    uint32 creator_id = 5;
+    uint32 last_modified_by = 6;
+
+    string name = 7;
+    string description = 8;
+    string cover_img = 9;
+
+    uint32 participant_count = 10;
+    uint32 comment_count = 11;
+    uint32 ScoreTotal = 12;
+    uint32 ScoreAvg = 13;
+}
+
+message SipScoreEntryPageToken {
+    uint32 entry_id = 1;
+    // 时间排序(最新 / 最旧 (可扩展))
+    google.protobuf.Timestamp updated_at = 2;
+    // 热门排序
+    uint32 participant_count = 3;
+    // 评分排序（高分 / 低分）
+    uint32 score_avg = 4;
+}
 
 // ---- request ----
 
@@ -447,8 +475,21 @@ message UpdateSipScoreEntryInfoRequest {
     google.protobuf.FieldMask update_mask = 10;
 }
 
+message ListSipScoreEntryRequest {
+    uint32 sip_score_id = 1;
+    string page_token = 2;
+    uint32 page_size = 3;
+    uint32 sort_type = 4;
+}
+
 // ---- response ----
 
 message CreateSipScoreEntryResponse {
     repeated uint32 entry_ids = 1;
+}
+
+message ListSipScoreEntryResponse {
+    repeated SipScoreEntry entries = 1;
+    string page_token = 2;
+    bool has_more = 3;
 }

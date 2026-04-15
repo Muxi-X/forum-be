@@ -15,12 +15,12 @@ func (s *PostService) CreateOrRemoveCollection(_ context.Context, req *pb.Toggle
 	logger.Info("PostService CreateOrRemoveCollection")
 
 	collection := &dao.CollectionModel{
-		UserID:      req.UserId,
-		ContentID:   req.TargetId,
-		ContentType: req.TargetType,
+		UserID:      req.GetUserId(),
+		ContentID:   req.GetTargetType(),
+		ContentType: req.GetTargetType(),
 	}
 
-	switch req.TargetType {
+	switch req.GetTargetType() {
 	case constvar.CollectionPost:
 		return s.createOrRemovePostCollection(collection, req, resp)
 	case constvar.CollectionSipScore:
@@ -33,7 +33,7 @@ func (s *PostService) CreateOrRemoveCollection(_ context.Context, req *pb.Toggle
 func (s *PostService) createOrRemovePostCollection(collection *dao.CollectionModel, req *pb.ToggleTargetRequest, resp *pb.CreateOrRemoveCollectionResponse) error {
 	var score int
 
-	isCollection, err := s.Dao.IsUserCollected(req.UserId, req.TargetType, req.TargetId)
+	isCollection, err := s.Dao.IsUserCollected(req.GetUserId(), req.GetTargetType(), req.GetTargetId())
 	if err != nil {
 		return errno.ServerErr(errno.ErrDatabase, err.Error())
 	}
@@ -51,7 +51,7 @@ func (s *PostService) createOrRemovePostCollection(collection *dao.CollectionMod
 		return errno.ServerErr(errno.ErrDatabase, err.Error())
 	}
 
-	targetID := req.TargetId
+	targetID := req.GetTargetId()
 	scoreCopy := score
 
 	go func() {
@@ -60,7 +60,7 @@ func (s *PostService) createOrRemovePostCollection(collection *dao.CollectionMod
 		}
 	}()
 
-	post, err := s.Dao.GetPost(req.TargetId)
+	post, err := s.Dao.GetPost(req.GetTargetId())
 	if err != nil {
 		return errno.ServerErr(errno.ErrDatabase, err.Error())
 	}
@@ -82,7 +82,7 @@ func (s *PostService) createOrRemoveSipScoreCollection(collection *dao.Collectio
 
 		if deleted {
 			// 取消收藏
-			if err = s.Dao.DecrSipScoreCollectCount(req.TargetId, tx); err != nil {
+			if err = s.Dao.DecrSipScoreCollectCount(req.GetTargetId(), tx); err != nil {
 				return err
 			}
 		} else {
@@ -94,14 +94,14 @@ func (s *PostService) createOrRemoveSipScoreCollection(collection *dao.Collectio
 
 			if created {
 				// 收藏成功
-				if err = s.Dao.IncrSipScoreCollectCount(req.TargetId, tx); err != nil {
+				if err = s.Dao.IncrSipScoreCollectCount(req.GetTargetId(), tx); err != nil {
 					return err
 				}
 			}
 			// 如果 created == false 说明并发导致，忽略
 		}
 
-		sipScore, err := s.Dao.GetSipScore(req.TargetId, tx)
+		sipScore, err := s.Dao.GetSipScore(req.GetTargetId(), tx)
 		if err != nil {
 			return err
 		}

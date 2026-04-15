@@ -9,19 +9,26 @@ import (
 	"forum/pkg/constvar"
 	"forum/pkg/errno"
 	"forum/pkg/unique"
+	"time"
+
+	"go.uber.org/zap"
 )
 
 // todo 可以进一步优化 - 将 tag 放到消息队列
 
 func (s *PostService) CreateSipScore(_ context.Context, req *pb.CreateSipScoreRequest, resp *pb.CreateSipScoreResponse) error {
+	start := time.Now()
 	logger.Info("PostService CreateSipScore")
 
 	// 参数检验
+	t1 := time.Now()
 	domain := req.GetDomain()
 	if domain != constvar.NormalDomain && domain != constvar.MuxiDomain {
 		return errno.ServerErr(errno.ErrBadRequest, "domain not legal")
 	}
+	logger.Info("check domain cost:", zap.String("time", time.Since(t1).String()))
 
+	t2 := time.Now()
 	tags := req.GetTags()
 	uniqueTags := unique.UniqueStrings(tags)
 	for _, content := range uniqueTags {
@@ -29,7 +36,9 @@ func (s *PostService) CreateSipScore(_ context.Context, req *pb.CreateSipScoreRe
 			return errno.ServerErr(errno.ErrBadRequest, "tag content cannot be empty")
 		}
 	}
+	logger.Info("check tags cost:", zap.String("time", time.Since(t2).String()))
 
+	t3 := time.Now()
 	creatorID := req.GetCreatorId()
 	data := &dao.SipScoreModel{
 		Name:           req.GetName(),
@@ -45,8 +54,10 @@ func (s *PostService) CreateSipScore(_ context.Context, req *pb.CreateSipScoreRe
 	if err != nil {
 		return errno.ServerErr(errno.ErrDatabase, err.Error())
 	}
+	logger.Info("CreateSipScore cost:", zap.String("time", time.Since(t3).String()))
 
 	// 创建者具有写权限
+	t4 := time.Now()
 	if err = model.AddPolicy(req.CreatorId, constvar.SipScore, sipScoreID, constvar.Write); err != nil {
 		return errno.ServerErr(errno.ErrCasbin, err.Error())
 	}
@@ -54,8 +65,10 @@ func (s *PostService) CreateSipScore(_ context.Context, req *pb.CreateSipScoreRe
 	if err = model.AddResourceRole(constvar.SipScore, sipScoreID, domain); err != nil {
 		return errno.ServerErr(errno.ErrCasbin, err.Error())
 	}
+	logger.Info("add casbin policy cost:", zap.String("time", time.Since(t4).String()))
 
 	// 获取 tagID
+	t5 := time.Now()
 	tagsModel, err := s.Dao.BatchGetOrCreateTags(uniqueTags)
 	if err != nil {
 		return errno.ServerErr(errno.ErrDatabase, err.Error())
@@ -72,13 +85,16 @@ func (s *PostService) CreateSipScore(_ context.Context, req *pb.CreateSipScoreRe
 			SipScoreID: sipScoreID,
 		})
 	}
+	logger.Info("BatchGetOrCreateTags cost:", zap.String("time", time.Since(t5).String()))
 
+	t6 := time.Now()
 	err = s.Dao.BatchCreateSipScoreTags(sipScoreTags)
 	if err != nil {
 		return errno.ServerErr(errno.ErrDatabase, err.Error())
 	}
 
 	category := req.GetCategory()
+	logger.Info("BatchCreateSipScore cost:", zap.String("time", time.Since(t6).String()))
 
 	go func(tagIDs []uint32, category string) {
 		if err := s.Dao.BatchAddTagsToSortedSet(tagIDs, category); err != nil {
@@ -87,5 +103,6 @@ func (s *PostService) CreateSipScore(_ context.Context, req *pb.CreateSipScoreRe
 	}(tagIDs, category)
 
 	resp.Id = sipScoreID
+	logger.Info("PostService CreateSipScore cost:", zap.String("time", time.Since(start).String()))
 	return nil
 }

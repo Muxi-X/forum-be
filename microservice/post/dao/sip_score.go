@@ -9,6 +9,11 @@ import (
 
 // 茶评 榜单 对象
 
+const (
+	orderDirDesc = "DESC"
+	orderDirAsc  = "ASC"
+)
+
 // todo 创建索引
 // todo 1. tag - content 二级索引
 // todo 2.
@@ -17,7 +22,7 @@ type SipScoreModel struct {
 	ID             uint32    `gorm:"primarykey;index:idx_rank,priority:3;index:idx_latest,priority:2;index:idx_creator,priority:2"`
 	CreatedAt      time.Time `gorm:"index:idx_latest,priority:1"`
 	UpdatedAt      time.Time
-	DeletedAt      soft_delete.DeletedAt `gorm:"index"`
+	DeletedAt      soft_delete.DeletedAt `gorm:"index;softDelete:nano"`
 	LastModifiedBy uint32
 	CreatorID      uint32 `gorm:"index:idx_creator,priority:1"`
 	EntryCount     uint32 `gorm:"type:int unsigned;default:0"`
@@ -129,13 +134,16 @@ func (d *Dao) DecrSipScoreCollectCount(sipScoreID uint32, tx ...*gorm.DB) error 
 
 // todo sipScoreID + name deletedAt 唯一索引，确保同一榜单内条目名称唯一
 // todo sipScoreID ID 联合索引
+// todo sipScoreID + UpdatedAt id 联合索引
+// todo sipScoreID + participantCount id 联合索引
+// todo sipScoreID + scoreAvg id 联合索引
 // todo deletedAt 纳秒级别
 
 type SipScoreEntryModel struct {
 	ID             uint32 `gorm:"primarykey"`
 	CreatedAt      time.Time
 	UpdatedAt      time.Time
-	DeletedAt      soft_delete.DeletedAt
+	DeletedAt      soft_delete.DeletedAt `gorm:"index;softDelete:nano"`
 	SipScoreID     uint32
 	LastModifiedBy uint32
 	CreatorID      uint32
@@ -145,6 +153,7 @@ type SipScoreEntryModel struct {
 	ParticipantCount uint32
 	CommentCount     uint32
 	ScoreTotal       uint32
+	ScoreAvg         uint32 // 实际是 ScoreAvg * 100 保留两位小数
 
 	// 用户可编辑字段
 	Name        string `gorm:"type:varchar(100);not null;index:,class:FULLTEXT,option:WITH PARSER ngram"`
@@ -194,4 +203,128 @@ func (d *Dao) UpdateSipScoreEntry(sipScoreID, entryID uint32, update map[string]
 		return gorm.ErrRecordNotFound
 	}
 	return result.Error
+}
+
+func (d *Dao) ListSipScoreEntriesNewest(sipScoreID, limit uint32, tx ...*gorm.DB) ([]*SipScoreEntryModel, error) {
+	return d.listSipScoreEntriesByTimeField(sipScoreID, "updated_at", orderDirDesc, limit, tx...)
+}
+
+func (d *Dao) ListSipScoreEntriesNewestWithCursor(sipScoreID, lastID uint32, lastUpdatedAt time.Time, limit uint32, tx ...*gorm.DB) ([]*SipScoreEntryModel, error) {
+	return d.listSipScoreEntriesByTimeFieldWithCursor(sipScoreID, "updated_at", "DESC", lastID, lastUpdatedAt, limit, tx...)
+}
+
+// 热门
+func (d *Dao) ListSipScoreEntriesHottest(sipScoreID, limit uint32, tx ...*gorm.DB) ([]*SipScoreEntryModel, error) {
+	return d.listSipScoreEntriesByUintField(sipScoreID, "participant_count", "DESC", limit, tx...)
+}
+
+func (d *Dao) ListSipScoreEntriesHottestWithCursor(sipScoreID, lastID uint32, lastCount uint32, limit uint32, tx ...*gorm.DB) ([]*SipScoreEntryModel, error) {
+	return d.listSipScoreEntriesByUintFieldWithCursor(sipScoreID, "participant_count", "DESC", lastID, lastCount, limit, tx...)
+}
+
+// 高分 / 低分
+func (d *Dao) ListSipScoreEntriesHighestScore(sipScoreID, limit uint32, tx ...*gorm.DB) ([]*SipScoreEntryModel, error) {
+	return d.listSipScoreEntriesByUintField(sipScoreID, "score_avg", "DESC", limit, tx...)
+}
+
+func (d *Dao) ListSipScoreEntriesHighestScoreWithCursor(sipScoreID, lastID uint32, lastScore uint32, limit uint32, tx ...*gorm.DB) ([]*SipScoreEntryModel, error) {
+	return d.listSipScoreEntriesByUintFieldWithCursor(sipScoreID, "score_avg", "DESC", lastID, lastScore, limit, tx...)
+}
+
+func (d *Dao) ListSipScoreEntriesLowestScore(sipScoreID, limit uint32, tx ...*gorm.DB) ([]*SipScoreEntryModel, error) {
+	return d.listSipScoreEntriesByUintField(sipScoreID, "score_avg", "ASC", limit, tx...)
+}
+
+func (d *Dao) ListSipScoreEntriesLowestScoreWithCursor(sipScoreID, lastID uint32, lastScore uint32, limit uint32, tx ...*gorm.DB) ([]*SipScoreEntryModel, error) {
+	return d.listSipScoreEntriesByUintFieldWithCursor(sipScoreID, "score_avg", "ASC", lastID, lastScore, limit, tx...)
+}
+
+// listSipScoreEntriesByTimeFieldWithCursor
+// field: e.g. "updated_at", "created_at"
+// orderDir: "ASC" or "DESC"
+// 按时间字段排序的通用函数，支持 cursor 分页
+func (d *Dao) listSipScoreEntriesByTimeFieldWithCursor(sipScoreID uint32, field string, orderDir string, lastID uint32, lastTime time.Time, limit uint32, tx ...*gorm.DB) ([]*SipScoreEntryModel, error) {
+	db := d.getDB(tx...)
+
+	whereOp := ">"
+	idOp := ">"
+	order := field + " ASC, id ASC"
+	if orderDir == orderDirDesc {
+		whereOp = "<"
+		idOp = "<"
+		order = field + " DESC, id DESC"
+	}
+
+	// e.g. sip_score_id = ? AND (updated_at < ? OR (updated_at = ? AND id < ?))
+	var entries []*SipScoreEntryModel
+	err := db.Where("sip_score_id = ? AND ("+field+" "+whereOp+" ? OR ("+field+" = ? AND id "+idOp+" ?))",
+		sipScoreID, lastTime, lastTime, lastID,
+	).Order(order).Limit(int(limit)).Find(&entries).Error
+
+	return entries, err
+}
+
+// listSipScoreEntriesByTimeField
+// field: 同上
+// orderDir: 同上
+// 按时间字段排序的通用函数，适用于第一页请求（没有 cursor）
+func (d *Dao) listSipScoreEntriesByTimeField(sipScoreID uint32, field string, orderDir string, limit uint32, tx ...*gorm.DB) ([]*SipScoreEntryModel, error) {
+	db := d.getDB(tx...)
+	order := field + " ASC, id ASC"
+	if orderDir == orderDirDesc {
+		order = field + " DESC, id DESC"
+	}
+
+	var entries []*SipScoreEntryModel
+	err := db.Where("sip_score_id = ?", sipScoreID).
+		Order(order).Limit(int(limit)).Find(&entries).Error
+
+	return entries, err
+}
+
+// listSipScoreEntriesByUintFieldWithCursor
+// field: e.g. "participant_count" or "score_avg"
+// orderDir: "ASC" or "DESC"
+// 按 uint 字段排序的通用函数，支持 cursor 分页
+func (d *Dao) listSipScoreEntriesByUintFieldWithCursor(sipScoreID uint32, field string, orderDir string, lastID uint32, lastValue uint32, limit uint32, tx ...*gorm.DB) ([]*SipScoreEntryModel, error) {
+	db := d.getDB(tx...)
+
+	whereOp := ">"
+	idOp := ">"
+	order := field + " ASC, id ASC"
+	if orderDir == orderDirDesc {
+		whereOp = "<"
+		idOp = "<"
+		order = field + " DESC, id DESC"
+	}
+
+	var entries []*SipScoreEntryModel
+	err := db.
+		Where("sip_score_id = ? AND ("+field+" "+whereOp+" ? OR ("+field+" = ? AND id "+idOp+" ?))",
+			sipScoreID, lastValue, lastValue, lastID,
+		).
+		Order(order).
+		Limit(int(limit)).
+		Find(&entries).Error
+
+	return entries, err
+}
+
+// listSipScoreEntriesByUintField
+// field: e.g. 同上
+// orderDir: 同上
+// 按 uint 字段排序的通用函数，适用于第一页请求（没有 cursor）
+func (d *Dao) listSipScoreEntriesByUintField(sipScoreID uint32, field string, orderDir string, limit uint32, tx ...*gorm.DB) ([]*SipScoreEntryModel, error) {
+	db := d.getDB(tx...)
+	order := field + " ASC, id ASC"
+	if orderDir == orderDirDesc {
+		order = field + " DESC, id DESC"
+	}
+
+	var entries []*SipScoreEntryModel
+	err := db.
+		Where("sip_score_id = ?", sipScoreID).
+		Order(order).Limit(int(limit)).Find(&entries).Error
+
+	return entries, err
 }

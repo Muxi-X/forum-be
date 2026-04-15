@@ -99,6 +99,22 @@ type SipScoreEntryCreateInfo struct {
 	CoverImg    string `json:"cover_img" binding:"required"`
 }
 
+type SipScoreEntry struct {
+	ID               uint32    `json:"id"`
+	SipScoreID       uint32    `json:"sip_score_id"`
+	CreatedAt        string    `json:"created_at"`
+	UpdatedAt        string    `json:"updated_at"`
+	Creator          *userInfo `json:"creator"`
+	LastModifiedBy   *userInfo `json:"last_modified_by"`
+	Name             string    `json:"name"`
+	Description      string    `json:"description"`
+	CoverImg         string    `json:"cover_img"`
+	ParticipantCount uint32    `json:"participant_num"`
+	CommentCount     uint32    `json:"comment_num"`
+	ScoreTotal       uint32    `json:"score_total"`
+	ScoreAvg         uint32    `json:"score_avg"`
+}
+
 // ---- request ----
 
 type CreateSipScoreEntryRequest struct {
@@ -112,4 +128,12 @@ type UpdateSipScoreEntryRequest struct {
 	Name        string  `json:"name"`
 	Description *string `json:"description"`
 	CoverImg    string  `json:"cover_img"`
+}
+
+// ---- response ----
+
+type ListSipScoreEntriesResponse struct {
+	Entries   []*SipScoreEntry `json:"entries"`
+	PageToken string           `json:"page_token"`
+	HasMore   bool             `json:"has_more"`
 }
