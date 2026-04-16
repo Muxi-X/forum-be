@@ -69,11 +69,15 @@ type Interface interface {
 	ListSipScoreHottest(limit uint32, tx ...*gorm.DB) ([]*SipScoreModel, error)
 	ListSipScoreHottestWithCursor(lastID uint32, lastCount uint32, limit uint32, tx ...*gorm.DB) ([]*SipScoreModel, error)
 	BatchListSipScoreEntriesHottest(sipScoreIDs []uint32, limit uint32, tx ...*gorm.DB) (map[uint32][]*SipScoreEntryModel, error)
+	GetSipScoreEntry(sipScoreID, entryID uint32, tx ...*gorm.DB) (*SipScoreEntryModel, error)
+	CreateSipScoreEntryCommentRating(rating *SipScoreEntryCommentRating, tx ...*gorm.DB) (uint32, error)
+	IncrSipScoreParticipantCount(sipScoreID uint32, incr int64, tx ...*gorm.DB) error
+	IncrSipScoreEntryScore(sipScoreID, entryID uint32, scoreIncr uint32, participantIncr uint32, tx ...*gorm.DB) error
 
-	CreateComment(*CommentModel) (uint32, error)
+	CreateComment(comment *CommentModel, tx ...*gorm.DB) (uint32, error)
 	GetCommentInfo(uint32) (*CommentInfo, error)
 	GetComment(uint32) (*CommentModel, error)
-	ListCommentByPostId(uint32) ([]*CommentInfo, error)
+	ListCommentByPostId(postId uint32) ([]*CommentInfo, error)
 	GetCommentNumByPostId(uint32) (uint32, error)
 	DeleteComment(uint32, ...*gorm.DB) error
 
@@ -223,7 +227,7 @@ func (d *Dao) DeleteComment(id uint32, tx ...*gorm.DB) error {
 		return err
 	}
 
-	return d.ChangePostScore(comment.PostId, -constvar.CommentScore)
+	return d.ChangePostScore(comment.TargetID, -constvar.CommentScore)
 }
 
 func (d *Dao) Transaction(fc func(tx *gorm.DB) error) error {

@@ -5,18 +5,16 @@ package proto
 
 import (
 	fmt "fmt"
-	math "math"
-
 	proto "google.golang.org/protobuf/proto"
 	_ "google.golang.org/protobuf/types/known/fieldmaskpb"
 	_ "google.golang.org/protobuf/types/known/timestamppb"
+	math "math"
 )
 
 import (
 	context "context"
-
-	client "go-micro.dev/v4/client"
-	server "go-micro.dev/v4/server"
+	client "go-micro.dev/v5/client"
+	server "go-micro.dev/v5/server"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -48,8 +46,9 @@ type PostService interface {
 	ListSipScoreEntry(ctx context.Context, in *ListSipScoreEntryRequest, opts ...client.CallOption) (*ListSipScoreEntryResponse, error)
 	DeleteSipScoreEntries(ctx context.Context, in *DeleteSipScoreEntriesRequest, opts ...client.CallOption) (*Response, error)
 	ListSipScore(ctx context.Context, in *ListSipScoreRequest, opts ...client.CallOption) (*ListSipScoreResponse, error)
+	CreateSipScoreEntryCommentRating(ctx context.Context, in *CreateSipScoreEntryCommentRatingRequest, opts ...client.CallOption) (*Response, error)
 	GetComment(ctx context.Context, in *Request, opts ...client.CallOption) (*CommentInfo, error)
-	CreateComment(ctx context.Context, in *CreateCommentRequest, opts ...client.CallOption) (*CreateCommentResponse, error)
+	CreatePostComment(ctx context.Context, in *CreatePostCommentRequest, opts ...client.CallOption) (*CreatePostCommentResponse, error)
 	DeleteItem(ctx context.Context, in *DeleteItemRequest, opts ...client.CallOption) (*Response, error)
 	CreateOrRemoveLike(ctx context.Context, in *LikeRequest, opts ...client.CallOption) (*Response, error)
 	ListLikeByUserId(ctx context.Context, in *ListPostPartInfoRequest, opts ...client.CallOption) (*ListPostPartInfoResponse, error)
@@ -233,6 +232,16 @@ func (c *postService) ListSipScore(ctx context.Context, in *ListSipScoreRequest,
 	return out, nil
 }
 
+func (c *postService) CreateSipScoreEntryCommentRating(ctx context.Context, in *CreateSipScoreEntryCommentRatingRequest, opts ...client.CallOption) (*Response, error) {
+	req := c.c.NewRequest(c.name, "PostService.CreateSipScoreEntryCommentRating", in)
+	out := new(Response)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *postService) GetComment(ctx context.Context, in *Request, opts ...client.CallOption) (*CommentInfo, error) {
 	req := c.c.NewRequest(c.name, "PostService.GetComment", in)
 	out := new(CommentInfo)
@@ -243,9 +252,9 @@ func (c *postService) GetComment(ctx context.Context, in *Request, opts ...clien
 	return out, nil
 }
 
-func (c *postService) CreateComment(ctx context.Context, in *CreateCommentRequest, opts ...client.CallOption) (*CreateCommentResponse, error) {
-	req := c.c.NewRequest(c.name, "PostService.CreateComment", in)
-	out := new(CreateCommentResponse)
+func (c *postService) CreatePostComment(ctx context.Context, in *CreatePostCommentRequest, opts ...client.CallOption) (*CreatePostCommentResponse, error) {
+	req := c.c.NewRequest(c.name, "PostService.CreatePostComment", in)
+	out := new(CreatePostCommentResponse)
 	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
 		return nil, err
@@ -362,8 +371,9 @@ type PostServiceHandler interface {
 	ListSipScoreEntry(context.Context, *ListSipScoreEntryRequest, *ListSipScoreEntryResponse) error
 	DeleteSipScoreEntries(context.Context, *DeleteSipScoreEntriesRequest, *Response) error
 	ListSipScore(context.Context, *ListSipScoreRequest, *ListSipScoreResponse) error
+	CreateSipScoreEntryCommentRating(context.Context, *CreateSipScoreEntryCommentRatingRequest, *Response) error
 	GetComment(context.Context, *Request, *CommentInfo) error
-	CreateComment(context.Context, *CreateCommentRequest, *CreateCommentResponse) error
+	CreatePostComment(context.Context, *CreatePostCommentRequest, *CreatePostCommentResponse) error
 	DeleteItem(context.Context, *DeleteItemRequest, *Response) error
 	CreateOrRemoveLike(context.Context, *LikeRequest, *Response) error
 	ListLikeByUserId(context.Context, *ListPostPartInfoRequest, *ListPostPartInfoResponse) error
@@ -393,8 +403,9 @@ func RegisterPostServiceHandler(s server.Server, hdlr PostServiceHandler, opts .
 		ListSipScoreEntry(ctx context.Context, in *ListSipScoreEntryRequest, out *ListSipScoreEntryResponse) error
 		DeleteSipScoreEntries(ctx context.Context, in *DeleteSipScoreEntriesRequest, out *Response) error
 		ListSipScore(ctx context.Context, in *ListSipScoreRequest, out *ListSipScoreResponse) error
+		CreateSipScoreEntryCommentRating(ctx context.Context, in *CreateSipScoreEntryCommentRatingRequest, out *Response) error
 		GetComment(ctx context.Context, in *Request, out *CommentInfo) error
-		CreateComment(ctx context.Context, in *CreateCommentRequest, out *CreateCommentResponse) error
+		CreatePostComment(ctx context.Context, in *CreatePostCommentRequest, out *CreatePostCommentResponse) error
 		DeleteItem(ctx context.Context, in *DeleteItemRequest, out *Response) error
 		CreateOrRemoveLike(ctx context.Context, in *LikeRequest, out *Response) error
 		ListLikeByUserId(ctx context.Context, in *ListPostPartInfoRequest, out *ListPostPartInfoResponse) error
@@ -480,12 +491,16 @@ func (h *postServiceHandler) ListSipScore(ctx context.Context, in *ListSipScoreR
 	return h.PostServiceHandler.ListSipScore(ctx, in, out)
 }
 
+func (h *postServiceHandler) CreateSipScoreEntryCommentRating(ctx context.Context, in *CreateSipScoreEntryCommentRatingRequest, out *Response) error {
+	return h.PostServiceHandler.CreateSipScoreEntryCommentRating(ctx, in, out)
+}
+
 func (h *postServiceHandler) GetComment(ctx context.Context, in *Request, out *CommentInfo) error {
 	return h.PostServiceHandler.GetComment(ctx, in, out)
 }
 
-func (h *postServiceHandler) CreateComment(ctx context.Context, in *CreateCommentRequest, out *CreateCommentResponse) error {
-	return h.PostServiceHandler.CreateComment(ctx, in, out)
+func (h *postServiceHandler) CreatePostComment(ctx context.Context, in *CreatePostCommentRequest, out *CreatePostCommentResponse) error {
+	return h.PostServiceHandler.CreatePostComment(ctx, in, out)
 }
 
 func (h *postServiceHandler) DeleteItem(ctx context.Context, in *DeleteItemRequest, out *Response) error {

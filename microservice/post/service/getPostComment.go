@@ -8,10 +8,11 @@ import (
 	"forum/pkg/constvar"
 	"forum/pkg/errno"
 	"strconv"
+	"time"
 )
 
 func (s *PostService) GetComment(_ context.Context, req *pb.Request, resp *pb.CommentInfo) error {
-	logger.Info("PostService GetComment")
+	logger.Info("PostService GetPostComment")
 
 	comment, err := s.Dao.GetCommentInfo(req.Id)
 	if err != nil {
@@ -37,7 +38,7 @@ func (s *PostService) GetComment(_ context.Context, req *pb.Request, resp *pb.Co
 	resp.TypeName = comment.TypeName
 	resp.Id = comment.Id
 	resp.Content = comment.Content
-	resp.Time = comment.CreateTime
+	resp.Time = comment.CreateTime.Format(time.DateTime)
 	resp.CreatorId = comment.CreatorId
 	resp.CreatorAvatar = comment.CreatorAvatar
 	resp.CreatorName = comment.CreatorName

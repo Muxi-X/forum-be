@@ -24,8 +24,10 @@ service PostService {
     rpc DeleteSipScoreEntries(DeleteSipScoreEntriesRequest) returns (Response) {}
     rpc ListSipScore(ListSipScoreRequest) returns (ListSipScoreResponse) {}
 
+    rpc CreateSipScoreEntryCommentRating(CreateSipScoreEntryCommentRatingRequest) returns (Response) {}
+
     rpc GetComment(Request) returns (CommentInfo) {}
-    rpc CreateComment(CreateCommentRequest) returns (CreateCommentResponse) {}
+    rpc CreatePostComment(CreatePostCommentRequest) returns (CreatePostCommentResponse) {}
 
     rpc DeleteItem(DeleteItemRequest) returns (Response) {}
 
@@ -204,7 +206,7 @@ message CommentInfo {
 
 // ---- request ----
 
-message CreateCommentRequest {
+message CreatePostCommentRequest {
     uint32 post_id = 1;
     string type_name = 2;
     uint32 father_id = 3;
@@ -215,7 +217,7 @@ message CreateCommentRequest {
 
 // ---- response ----
 
-message CreateCommentResponse {
+message CreatePostCommentResponse {
     uint32 id = 1;
     uint32 user_id = 2;
     string father_content = 3;
@@ -530,3 +532,22 @@ message ListSipScoreEntryResponse {
     string page_token = 2;
     bool has_more = 3;
 }
+
+// =================================
+// SipScoreEntryCommentRating Domain
+// =================================
+
+// ---- model ----
+message CreateSipScoreEntryCommentRatingRequest {
+    uint32 sip_score_id = 1;
+    uint32 sip_score_entry_id = 2;
+    uint32 user_id = 3;
+    string comment = 4;
+    uint32 rating = 5;
+    string img_url = 6;
+}
+
+
+// ---- request ----
+
+// ---- response ----

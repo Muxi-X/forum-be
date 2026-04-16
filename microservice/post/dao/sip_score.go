@@ -132,6 +132,12 @@ func (d *Dao) DecrSipScoreCollectCount(sipScoreID uint32, tx ...*gorm.DB) error 
 		UpdateColumn("collect_count", gorm.Expr("collect_count - 1")).Error
 }
 
+func (d *Dao) IncrSipScoreParticipantCount(sipScoreID uint32, incr int64, tx ...*gorm.DB) error {
+	db := d.getDB(tx...)
+	return db.Model(&SipScoreModel{}).Where("id = ?", sipScoreID).
+		UpdateColumn("participant_count", gorm.Expr("participant_count + ?", incr)).Error
+}
+
 func (d *Dao) DeleteSipScore(id uint32, tx ...*gorm.DB) error {
 	db := d.getDB(tx...)
 	return db.Delete(&SipScoreModel{}, id).Error
@@ -288,9 +294,32 @@ func (s *SipScoreEntryModel) BeReported() error {
 	return s.Save()
 }
 
+func (d *Dao) GetSipScoreEntry(sipScoreID, entryID uint32, tx ...*gorm.DB) (*SipScoreEntryModel, error) {
+	db := d.getDB(tx...)
+	var entry SipScoreEntryModel
+	err := db.Where("id = ? AND sip_score_id = ?", entryID, sipScoreID).First(&entry).Error
+	return &entry, err
+}
+
 func (d *Dao) BatchCreateSipScoreEntries(entries []*SipScoreEntryModel, tx ...*gorm.DB) error {
 	db := d.getDB(tx...)
 	return db.Create(entries).Error
+}
+
+func (d *Dao) IncrSipScoreEntryScore(sipScoreID, entryID uint32, scoreIncr uint32, participantIncr uint32, tx ...*gorm.DB) error {
+	db := d.getDB(tx...)
+
+	return db.Model(&SipScoreEntryModel{}).
+		Where("id = ? AND sip_score_id = ?", entryID, sipScoreID).
+		UpdateColumns(map[string]interface{}{
+			"score_total":       gorm.Expr("score_total + ?", scoreIncr),
+			"participant_count": gorm.Expr("participant_count + ?", participantIncr),
+			"score_avg": gorm.Expr(
+				"((score_total + ?) * 100) / (participant_count + ?)",
+				scoreIncr,
+				participantIncr,
+			),
+		}).Error
 }
 
 func (d *Dao) UpdateSipScoreEntry(sipScoreID, entryID uint32, update map[string]interface{}, tx ...*gorm.DB) error {
@@ -534,3 +563,26 @@ func (d *Dao) BatchListSipScoreEntriesHottest(sipScoreIDs []uint32, limit uint32
 //
 //	return result, nil
 //}
+
+type SipScoreEntryCommentRating struct {
+	ID             uint32 `gorm:"primarykey"`
+	CreatedAt      time.Time
+	UpdatedAt      time.Time
+	DeletedAt      soft_delete.DeletedAt `gorm:"index;softDelete:nano"`
+	CreatorID      uint32
+	LastModifiedBy uint32
+	SipScoreID     uint32
+	EntryID        uint32
+	CommentID      uint32
+	LikeNum        uint32
+}
+
+func (SipScoreEntryCommentRating) TableName() string {
+	return "sip_score_entry_comment_ratings"
+}
+
+func (d *Dao) CreateSipScoreEntryCommentRating(rating *SipScoreEntryCommentRating, tx ...*gorm.DB) (uint32, error) {
+	db := d.getDB(tx...)
+	err := db.Create(rating).Error
+	return rating.ID, err
+}

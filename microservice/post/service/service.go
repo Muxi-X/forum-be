@@ -11,6 +11,7 @@ import (
 	"forum/pkg/constvar"
 	"forum/pkg/errno"
 	"sync"
+	"time"
 
 	_ "github.com/go-micro/plugins/v4/registry/kubernetes"
 )
@@ -63,7 +64,7 @@ func (s *PostService) processComments(userId uint32, commentInfos []*dao.Comment
 				TypeName:      comment.TypeName,
 				Content:       comment.Content,
 				FatherId:      comment.FatherId,
-				Time:          comment.CreateTime,
+				Time:          comment.CreateTime.Format(time.DateTime),
 				CreatorId:     comment.CreatorId,
 				CreatorName:   comment.CreatorName,
 				CreatorAvatar: comment.CreatorAvatar,
