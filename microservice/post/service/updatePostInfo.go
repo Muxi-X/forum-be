@@ -6,8 +6,9 @@ import (
 	logger "forum/log"
 	"forum/pkg/errno"
 	"forum/util"
-	"gorm.io/gorm"
 	"strconv"
+
+	"gorm.io/gorm"
 )
 
 func (s *PostService) UpdatePostInfo(_ context.Context, req *pb.UpdatePostInfoRequest, _ *pb.Response) error {

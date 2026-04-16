@@ -3,33 +3,29 @@ package main
 import (
 	"errors"
 	"fmt"
-	"net/http"
-	"time"
-
 	"forum-gateway/dao"
 	"forum-gateway/router"
 	"forum-gateway/router/middleware"
+	forumclient "forum/client"
 	"forum/config"
 	"forum/log"
-
-	"forum/client"
-
 	"forum/pkg/handler"
-
 	"forum/pkg/tracer"
+	"net/http"
+	"time"
 
+	"github.com/gin-gonic/gin"
 	"github.com/go-micro/plugins/v4/registry/etcd"
 	_ "github.com/go-micro/plugins/v4/registry/kubernetes"
 	opentracingWrapper "github.com/go-micro/plugins/v4/wrapper/trace/opentracing"
 	"github.com/joho/godotenv"
 	"github.com/opentracing-contrib/go-gin/ginhttp"
 	"github.com/opentracing/opentracing-go"
-	"go-micro.dev/v4"
-	"go-micro.dev/v4/registry"
-
-	"github.com/gin-gonic/gin"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
+	"go-micro.dev/v4"
+	microclient "go-micro.dev/v4/client"
+	"go-micro.dev/v4/registry"
 	"go.uber.org/zap"
 )
 
@@ -89,6 +85,14 @@ func main() {
 	)
 	service := micro.NewService(
 		micro.Name("forum.gateway.client"),
+
+		// google.protobuf.Timestamp
+		// 遇到这种 proto 的时间类型，默认的 json 编码会有问题，使用 protobuf 的编码方式就不会有问题了
+		micro.Client(
+			microclient.NewClient(
+				microclient.ContentType("application/protobuf"),
+			),
+		),
 		micro.Registry(r),
 		micro.WrapClient(
 			opentracingWrapper.NewClientWrapper(opentracing.GlobalTracer()),
@@ -99,10 +103,10 @@ func main() {
 
 	// logger sync
 	defer log.SyncLogger()
-	client.UserInit(service)
-	client.ChatInit(service)
-	client.PostInit(service)
-	client.FeedInit(service)
+	forumclient.UserInit(service)
+	forumclient.ChatInit(service)
+	forumclient.PostInit(service)
+	forumclient.FeedInit(service)
 	dao.Init()
 	// Set gin mode.
 	gin.SetMode(viper.GetString("runmode"))

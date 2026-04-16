@@ -1,7 +1,8 @@
 syntax = "proto3";
 
 option go_package = "./proto";
-
+import "google/protobuf/field_mask.proto";
+import "google/protobuf/timestamp.proto";
 package post;
 
 service PostService {
@@ -14,8 +15,19 @@ service PostService {
     rpc GetUnReadPostNum(Request) returns (UnReadPostNumResponse) {}
     rpc UpdateLastReadTime(UpdateLastReadRequest) returns (Response) {}
 
+    rpc CreateSipScore(CreateSipScoreRequest) returns (CreateSipScoreResponse) {}
+    rpc UpdateSipScoreInfo(UpdateSipScoreInfoRequest) returns (Response) {}
+    rpc CreateSipScoreEntry(CreateSipScoreEntryRequest) returns (CreateSipScoreEntryResponse) {}
+    rpc UpdateSipScoreEntryInfo(UpdateSipScoreEntryInfoRequest) returns (Response) {}
+    rpc GetSipScore(Request) returns (SipScore) {}
+    rpc ListSipScoreEntry(ListSipScoreEntryRequest) returns (ListSipScoreEntryResponse) {}
+    rpc DeleteSipScoreEntries(DeleteSipScoreEntriesRequest) returns (Response) {}
+    rpc ListSipScore(ListSipScoreRequest) returns (ListSipScoreResponse) {}
+
+    rpc CreateSipScoreEntryCommentRating(CreateSipScoreEntryCommentRatingRequest) returns (Response) {}
+
     rpc GetComment(Request) returns (CommentInfo) {}
-    rpc CreateComment(CreateCommentRequest) returns (CreateCommentResponse) {}
+    rpc CreatePostComment(CreatePostCommentRequest) returns (CreatePostCommentResponse) {}
 
     rpc DeleteItem(DeleteItemRequest) returns (Response) {}
 
@@ -24,7 +36,7 @@ service PostService {
 
     rpc ListPopularTag(ListPopularTagRequest) returns (Tags) {}
 
-    rpc CreateOrRemoveCollection(Request) returns (CreateOrRemoveCollectionResponse) {}
+    rpc CreateOrRemoveCollection(ToggleTargetRequest) returns (CreateOrRemoveCollectionResponse) {}
     rpc ListCollection(ListPostPartInfoRequest) returns (ListPostPartInfoResponse) {}
 
     rpc CreateReport(CreateReportRequest) returns (Response) {}
@@ -32,161 +44,42 @@ service PostService {
     rpc HandleReport(HandleReportRequest) returns (Response) {}
 }
 
-message CreatePostResponse {
-    uint32 id = 1;
-}
 
-message HandleReportRequest {
-    uint32 id = 1;
-    string result = 2;
-}
+// =====================
+// common
+// =====================
 
-message ListReportRequest {
-    uint32 last_id = 1;
-    uint32 offset = 2;
-    uint32 limit = 3;
-    bool pagination = 4;
-}
+// ---- model ----
 
-message Report {
-    uint32 id = 1;
-    uint32 post_id = 2;
-    uint32 user_id = 3;
-    string cause = 4;
-    string type_name = 5;
-    string create_time = 6;
-    string user_avatar = 7;
-    string user_name = 8;
-    uint32 be_reported_user_id = 9;
-    string be_reported_user_name = 10;
-    string be_reported_content = 11;
-    string category = 12;
-    uint32 target_id = 13;
-}
-
-message ListReportResponse {
-    repeated Report reports = 1;
-}
-
-message CreateReportRequest {
-    uint32 user_id = 1;
-    uint32 id = 2;
-    string type_name = 3;
-    string cause = 4;
-    string category = 5;
-}
-
-message ListPopularTagRequest {
-    string category = 1;
-}
-
-message LikeItem {
-    uint32 target_id = 1;
-    string type_name = 2;
-}
-
-message LikeRequest {
-    uint32 user_id = 1;
-    LikeItem item = 2;
-}
-
-message CreateCommentRequest {
-    uint32 post_id = 1;
-    string type_name = 2;
-    uint32 father_id = 3;
-    string content = 4;
-    uint32 creator_id = 5;
-    string img_url = 6;
-}
-
-message CommentInfo {
-    uint32 id = 1;
-    string type_name = 2;
-    string content = 3;
-    uint32 father_id = 4;
-    string time = 5;
-    uint32 creator_id = 6;
-    string creator_name = 7;
-    string creator_avatar = 8;
-    uint32 like_num = 9;
-    bool is_liked = 10;
-    uint32 be_replied_user_id = 11;
-    string be_replied_user_name = 12;
-    string father_content = 13;
-    string img_url = 14;
-}
+// ---- request ----
 
 message Request {
     uint32 id = 1;
     uint32 user_id = 2;
 }
 
+message ToggleTargetRequest {
+    uint32 user_id = 1;
+    uint32 target_id = 2;
+    uint32 target_type = 3;
+}
+
+// --- response ----
 message DeleteItemRequest {
     uint32 id = 1;
     string type_name = 2;
     uint32 user_id = 3;
 }
 
-message UpdatePostInfoRequest {
-    uint32 id = 1;
-    string content = 2;
-    string compiled_content = 3;
-    uint32 user_id = 4;
-    string category = 5;
-    string title = 6;
-    string summary = 7;
-    repeated string tags = 8;
-    string domain = 9;
-}
-
-message CreatePostRequest {
-    uint32 user_id = 1;
-    string content = 2;
-    string domain = 3;
-    string title = 4;
-    string category = 5;
-    string content_type = 6;
-    string compiled_content = 7;
-    string summary = 8;
-    repeated string tags = 9;
-}
 
 message Response {}
 
-message CreateOrRemoveCollectionResponse {
-    uint32 id = 1;
-    uint32 user_id = 2;
-    string content = 3;
-    string type_name = 4;
-}
 
-message CreateCommentResponse {
-    uint32 id = 1;
-    uint32 user_id = 2;
-    string father_content = 3;
-    uint32 father_user_id = 4;
-    string create_time = 5;
-    string creator_name = 6;
-    string creator_avatar = 7;
-    string type_name = 8;
-}
+// =====================
+// Post Domain
+// =====================
 
-message ListMainPostRequest {
-    uint32 last_id = 1;
-    uint32 offset = 2;
-    uint32 limit = 3;
-    string domain = 4;
-    string category = 5;
-    uint32 user_id = 6;
-    bool pagination = 7;
-    string search_content = 8;
-    string filter = 9;
-    string tag = 10;
-}
-
-message ListPostResponse {
-    repeated Post posts = 1;
-}
+// ---- model ----
 
 message Post {
     uint32 id = 1;
@@ -210,24 +103,6 @@ message Post {
     repeated CommentInfo comments = 19;
 }
 
-message Tags {
-    repeated string tags = 1;
-}
-
-message ListPostPartInfoRequest {
-    uint32 last_id = 1;
-    uint32 offset = 2;
-    uint32 limit = 3;
-    uint32 id = 4;
-    uint32 user_id = 5;
-    bool pagination = 6;
-    uint32 target_user_id = 7;
-}
-
-message ListPostPartInfoResponse {
-    repeated PostPartInfo posts = 1;
-}
-
 message PostPartInfo {
     uint32 id = 1;
     string title = 2;
@@ -243,20 +118,436 @@ message PostPartInfo {
     repeated string tags = 12;
 }
 
+// ---- request ----
+
+message CreatePostRequest {
+    uint32 user_id = 1;
+    string content = 2;
+    string domain = 3;
+    string title = 4;
+    string category = 5;
+    string content_type = 6;
+    string compiled_content = 7;
+    string summary = 8;
+    repeated string tags = 9;
+}
+
+message UpdatePostInfoRequest {
+    uint32 id = 1;
+    string content = 2;
+    string compiled_content = 3;
+    uint32 user_id = 4;
+    string category = 5;
+    string title = 6;
+    string summary = 7;
+    repeated string tags = 8;
+    string domain = 9;
+}
+
+message ListPostPartInfoRequest {
+    uint32 last_id = 1;
+    uint32 offset = 2;
+    uint32 limit = 3;
+    uint32 id = 4;
+    uint32 user_id = 5;
+    bool pagination = 6;
+    uint32 target_user_id = 7;
+}
+
+message ListMainPostRequest {
+    uint32 last_id = 1;
+    uint32 offset = 2;
+    uint32 limit = 3;
+    string domain = 4;
+    string category = 5;
+    uint32 user_id = 6;
+    bool pagination = 7;
+    string search_content = 8;
+    string filter = 9;
+    string tag = 10;
+}
+
+// ---- response ----
+
+message CreatePostResponse {
+    uint32 id = 1;
+}
+
+message ListPostResponse {
+    repeated Post posts = 1;
+}
+
+message ListPostPartInfoResponse {
+    repeated PostPartInfo posts = 1;
+}
+
+// =====================
+// Comment Domain
+// =====================
+
+// ---- model ----
+
+message CommentInfo {
+    uint32 id = 1;
+    string type_name = 2;
+    string content = 3;
+    uint32 father_id = 4;
+    string time = 5;
+    uint32 creator_id = 6;
+    string creator_name = 7;
+    string creator_avatar = 8;
+    uint32 like_num = 9;
+    bool is_liked = 10;
+    uint32 be_replied_user_id = 11;
+    string be_replied_user_name = 12;
+    string father_content = 13;
+    string img_url = 14;
+}
+
+// ---- request ----
+
+message CreatePostCommentRequest {
+    uint32 post_id = 1;
+    string type_name = 2;
+    uint32 father_id = 3;
+    string content = 4;
+    uint32 creator_id = 5;
+    string img_url = 6;
+}
+
+// ---- response ----
+
+message CreatePostCommentResponse {
+    uint32 id = 1;
+    uint32 user_id = 2;
+    string father_content = 3;
+    uint32 father_user_id = 4;
+    string create_time = 5;
+    string creator_name = 6;
+    string creator_avatar = 7;
+    string type_name = 8;
+}
+
+// =====================
+// Like Domain
+// =====================
+
+// ---- model ----
+
+message LikeItem {
+    uint32 target_id = 1;
+    string type_name = 2;
+}
+
+// ---- request ----
+
+message LikeRequest {
+    uint32 user_id = 1;
+    LikeItem item = 2;
+}
+
+// =====================
+// Collection Domain
+// =====================
+
+// ---- model ----
+
+// ---- request ----
+
 message DeleteCollectionRequest {
     uint32 id = 1;
 }
+
+// ---- response ----
+
+message CreateOrRemoveCollectionResponse {
+    uint32 id = 1;
+    uint32 user_id = 2;
+    string content = 3;
+    string type_name = 4;
+}
+
+// =====================
+// Tag Domain
+// =====================
+
+// ---- model ----
+
+message Tags {
+    repeated string tags = 1;
+}
+
+// ---- request ----
+
+message ListPopularTagRequest {
+    string category = 1;
+}
+
+
+// ---- response ----
+
+
+// =====================
+// Report Domain
+// =====================
+
+// ---- model ----
+
+message Report {
+    uint32 id = 1;
+    uint32 post_id = 2;
+    uint32 user_id = 3;
+    string cause = 4;
+    string type_name = 5;
+    string create_time = 6;
+    string user_avatar = 7;
+    string user_name = 8;
+    uint32 be_reported_user_id = 9;
+    string be_reported_user_name = 10;
+    string be_reported_content = 11;
+    string category = 12;
+    uint32 target_id = 13;
+}
+
+
+// ---- request ----
+
+message HandleReportRequest {
+    uint32 id = 1;
+    string result = 2;
+}
+
+message ListReportRequest {
+    uint32 last_id = 1;
+    uint32 offset = 2;
+    uint32 limit = 3;
+    bool pagination = 4;
+}
+
+message CreateReportRequest {
+    uint32 user_id = 1;
+    uint32 id = 2;
+    string type_name = 3;
+    string cause = 4;
+    string category = 5;
+}
+
+// ---- response ----
+
+message ListReportResponse {
+    repeated Report reports = 1;
+}
+
+// =====================
+// Unread Domain
+// =====================
+
+// ---- model ----
 
 message UnReadPostNum {
     uint32 num = 1;
     string category = 2;
 }
 
-message UnReadPostNumResponse {
-    repeated UnReadPostNum un_read_num = 1;
-}
+// ---- request ----
 
 message UpdateLastReadRequest {
     uint32 user_id = 1;
     string category = 2;
 }
+
+// ---- response ----
+
+message UnReadPostNumResponse {
+    repeated UnReadPostNum un_read_num = 1;
+}
+
+
+// =====================
+// SipScore Domain
+// =====================
+
+// ---- model ----
+
+message SipScore {
+    uint32 id = 1;
+    google.protobuf.Timestamp created_at = 2;
+    google.protobuf.Timestamp updated_at = 3;
+    uint32 creator_id = 4;
+    uint32 last_modified_by = 5;
+    uint32 entry_count = 6;
+    uint32 collect_count = 7;
+    uint32 participant_count = 8;
+
+    string name = 9;
+    string description = 10;
+    string cover_img = 11;
+    string domain = 12;
+    string category = 13;
+
+    repeated string tags = 14;
+    bool is_collected = 15;
+}
+
+message SipScoreWithEntries  {
+    SipScore meta = 1;
+    repeated SipScoreEntry entries = 2;
+}
+
+message SipScorePageToken {
+    uint32 id = 1;
+    // 时间排序(最新 / 最旧 (可扩展))
+    google.protobuf.Timestamp updated_at = 2;
+    // 热门排序
+    uint32 participant_count = 3;
+    uint32 sort_type = 4;
+}
+
+// ---- request ----
+
+message CreateSipScoreRequest {
+    uint32 creator_id = 1;
+    string name = 2;
+    string description = 3;
+    string cover_img = 4;
+    repeated string tags = 5;
+    string domain = 6;
+    string category = 7;
+}
+
+message UpdateSipScoreInfoRequest {
+    uint32 id = 1;
+    string name = 2;
+    string description = 3;
+    string cover_img = 4;
+    repeated string tags = 5;
+    string domain = 6;
+    string category = 7;
+    uint32 last_modified_by = 8;
+
+    google.protobuf.FieldMask update_mask = 10;
+}
+
+message ListSipScoreRequest {
+    string page_token = 1;
+    uint32 page_size = 2;
+    uint32 sort_type = 3;
+    uint32 user_id = 4;
+}
+
+// ---- response ----
+
+message CreateSipScoreResponse {
+    uint32 id = 1;
+}
+
+message ListSipScoreResponse  {
+   repeated SipScoreWithEntries  sip_scores = 1;
+   string page_token = 2;
+   bool has_more = 3;
+}
+
+// =====================
+// SipScoreEntry Domain
+// =====================
+
+// ---- model ----
+
+message SipScoreEntryCreateInfo {
+    string name = 1;
+    string description = 2;
+    string cover_img = 3;
+}
+
+message SipScoreEntry {
+    uint32 id = 1;
+    uint32 sip_score_id = 2;
+    google.protobuf.Timestamp created_at = 3;
+    google.protobuf.Timestamp updated_at = 4;
+    uint32 creator_id = 5;
+    uint32 last_modified_by = 6;
+
+    string name = 7;
+    string description = 8;
+    string cover_img = 9;
+
+    uint32 participant_count = 10;
+    uint32 comment_count = 11;
+    uint32 ScoreTotal = 12;
+    uint32 ScoreAvg = 13;
+}
+
+message SipScoreEntryPageToken {
+    uint32 entry_id = 1;
+    // 时间排序(最新 / 最旧 (可扩展))
+    google.protobuf.Timestamp updated_at = 2;
+    // 热门排序
+    uint32 participant_count = 3;
+    // 评分排序（高分 / 低分）
+    uint32 score_avg = 4;
+
+    uint32 sort_type = 5;
+}
+
+// ---- request ----
+
+message CreateSipScoreEntryRequest {
+    uint32 sip_score_id = 1;
+    repeated SipScoreEntryCreateInfo entries = 2;
+    uint32 creator_id = 3;
+}
+
+message UpdateSipScoreEntryInfoRequest {
+    uint32 sip_score_id = 1;
+    uint32 sip_score_entry_id = 2;
+    string name = 3;
+    string description = 4;
+    string cover_img = 5;
+    uint32 last_modified_by = 6;
+
+    google.protobuf.FieldMask update_mask = 10;
+}
+
+message ListSipScoreEntryRequest {
+    uint32 sip_score_id = 1;
+    string page_token = 2;
+    uint32 page_size = 3;
+    uint32 sort_type = 4;
+}
+
+message DeleteSipScoreEntriesRequest {
+    uint32 sip_score_id = 1;
+    repeated uint32 sip_score_entry_id = 2;
+    uint32 user_id = 3;
+}
+
+// ---- response ----
+
+message CreateSipScoreEntryResponse {
+    repeated uint32 entry_ids = 1;
+}
+
+message ListSipScoreEntryResponse {
+    repeated SipScoreEntry entries = 1;
+    string page_token = 2;
+    bool has_more = 3;
+}
+
+// =================================
+// SipScoreEntryCommentRating Domain
+// =================================
+
+// ---- model ----
+message CreateSipScoreEntryCommentRatingRequest {
+    uint32 sip_score_id = 1;
+    uint32 sip_score_entry_id = 2;
+    uint32 user_id = 3;
+    string comment = 4;
+    uint32 rating = 5;
+    string img_url = 6;
+}
+
+
+// ---- request ----
+
+// ---- response ----

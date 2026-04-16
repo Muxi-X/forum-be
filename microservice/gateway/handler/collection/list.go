@@ -29,6 +29,7 @@ import (
 // @Param last_id query int false "last_id"
 // @Success 200 {object} post.PostPartInfoResponse
 // @Router /collection/list/{user_id} [get]
+// todo 需要修改成通用接口
 func (a *Api) List(c *gin.Context) {
 	log.Info("Collection List function called.", zap.String("X-Request-Id", util.GetReqID(c)))
 

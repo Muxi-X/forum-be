@@ -11,8 +11,8 @@ import (
 	"forum/util"
 )
 
-func (s *PostService) CreateComment(_ context.Context, req *pb.CreateCommentRequest, resp *pb.CreateCommentResponse) error {
-	logger.Info("PostService CreateComment")
+func (s *PostService) CreatePostComment(_ context.Context, req *pb.CreatePostCommentRequest, resp *pb.CreatePostCommentResponse) error {
+	logger.Info("PostService CreatPostComment")
 
 	post, err := s.Dao.GetPost(req.PostId)
 	if err != nil {
@@ -47,17 +47,13 @@ func (s *PostService) CreateComment(_ context.Context, req *pb.CreateCommentRequ
 		return errno.ServerErr(errno.ErrBadRequest, "type_name not legal")
 	}
 
-	createTime := util.GetCurrentTime()
-
 	data := &dao.CommentModel{
-		TypeName:   req.TypeName,
-		Content:    req.Content,
-		FatherId:   req.FatherId,
-		CreateTime: createTime,
-		Re:         false,
-		CreatorId:  req.CreatorId,
-		PostId:     req.PostId,
-		ImgUrl:     req.ImgUrl,
+		TypeName:  req.TypeName,
+		Content:   req.Content,
+		FatherId:  req.FatherId,
+		CreatorId: req.CreatorId,
+		TargetID:  post.Id,
+		ImgUrl:    req.ImgUrl,
 	}
 
 	commentId, err := s.Dao.CreateComment(data)
@@ -86,7 +82,7 @@ func (s *PostService) CreateComment(_ context.Context, req *pb.CreateCommentRequ
 
 	resp.Id = commentId
 	resp.TypeName = post.Domain
-	resp.CreateTime = createTime
+	resp.CreateTime = util.GetCurrentTime()
 	resp.CreatorName = commentInfo.CreatorName
 	resp.CreatorAvatar = commentInfo.CreatorAvatar
 

@@ -57,7 +57,7 @@ func (a *Api) Create(c *gin.Context) {
 		return
 	}
 
-	createReq := pb.CreateCommentRequest{
+	createReq := pb.CreatePostCommentRequest{
 		PostId:    req.PostId,
 		TypeName:  req.TypeName,
 		FatherId:  req.FatherId,
@@ -66,7 +66,7 @@ func (a *Api) Create(c *gin.Context) {
 		ImgUrl:    req.ImgUrl,
 	}
 
-	createResp, err := client.PostClient.CreateComment(c.Request.Context(), &createReq)
+	createResp, err := client.PostClient.CreatePostComment(c.Request.Context(), &createReq)
 	if err != nil {
 		SendError(c, err, nil, "", GetLine())
 		return

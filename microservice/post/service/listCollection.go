@@ -9,10 +9,12 @@ import (
 	"forum/pkg/errno"
 )
 
+// ListCollection
+// todo 后续需要修改成通用的 ListCollection 接口，支持不同类型的收藏
 func (s *PostService) ListCollection(ctx context.Context, req *pb.ListPostPartInfoRequest, resp *pb.ListPostPartInfoResponse) error {
 	logger.Info("PostService ListCollections")
 
-	postIds, err := s.Dao.ListCollectionByUserId(req.TargetUserId)
+	postIds, err := s.Dao.ListCollectionByUserId(req.TargetUserId, constvar.CollectionPost)
 	if err != nil {
 		return errno.ServerErr(errno.ErrDatabase, err.Error())
 	}

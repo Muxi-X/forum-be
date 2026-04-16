@@ -28,6 +28,7 @@ func AuthMiddleware(limit uint32) gin.HandlerFunc {
 		c.Set("role", ctx.Role)
 		c.Set("expiresAt", ctx.ExpiresAt)
 
+		// fmt.Println("userId:", ctx.Id, "role:", ctx.Role, "expiresAt:", ctx.ExpiresAt)
 		c.Next()
 	}
 }

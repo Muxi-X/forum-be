@@ -248,7 +248,7 @@ func (d Dao) ListPostInfoByPostIds(postIds []uint32, filter *PostModel, offset, 
 			return nil, err
 		}
 
-		post.CollectionNum, err = d.GetCollectionNumByPostId(post.Id)
+		post.CollectionNum, err = d.GetCollectionNum(constvar.CollectionPost, post.Id)
 		if err != nil {
 			return nil, err
 		}

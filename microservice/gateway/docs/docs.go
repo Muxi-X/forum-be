@@ -83,6 +83,38 @@ const docTemplate = `{
                 }
             }
         },
+        "/auth/set_role/{id}": {
+            "post": {
+                "description": "前端无需接此接口，casbin只会在启动时读取一遍数据库，因此改权限不能直接修改数据库，故写一个接口",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "设置权限",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token 用户令牌",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/Response"
+                        }
+                    }
+                }
+            }
+        },
         "/chat/history/{id}": {
             "get": {
                 "consumes": [
@@ -193,6 +225,46 @@ const docTemplate = `{
                 }
             }
         },
+        "/collection": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "collection"
+                ],
+                "summary": "收藏/取消收藏帖子 api",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token 用户令牌",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "create_request",
+                        "name": "object",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/collection.CreateRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/Response"
+                        }
+                    }
+                }
+            }
+        },
         "/collection/list/{user_id}": {
             "get": {
                 "consumes": [
@@ -244,44 +316,6 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/post.PostPartInfoResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/collection/{post_id}": {
-            "post": {
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "collection"
-                ],
-                "summary": "收藏/取消收藏帖子 api",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "token 用户令牌",
-                        "name": "Authorization",
-                        "in": "header",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "description": "post_id",
-                        "name": "post_id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/Response"
                         }
                     }
                 }
@@ -1111,6 +1145,381 @@ const docTemplate = `{
                 }
             }
         },
+        "/sip-score": {
+            "put": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "sipscore"
+                ],
+                "summary": "修改榜单信息 api",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token 用户令牌",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "update_sip_score_request",
+                        "name": "object",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/sipscore.UpdateSipScoreRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/Response"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "sipscore"
+                ],
+                "summary": "创建榜单 api",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token 用户令牌",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "create_sip_score_request",
+                        "name": "object",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/sipscore.CreateSipScoreRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/sipscore.IdResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/sip-score/entries": {
+            "post": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "sipscore"
+                ],
+                "summary": "创建榜单条目 api",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token 用户令牌",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "create_sip_score_entry_request",
+                        "name": "object",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/sipscore.CreateSipScoreEntryRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/sipscore.IdsResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "sipscore"
+                ],
+                "summary": "批量删除榜单条目 api",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token 用户令牌",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "delete_sip_score_entries_request",
+                        "name": "object",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/sipscore.DeleteSipScoreEntriesRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/sip-score/entries/list/{sip_score_id}": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "sipscore"
+                ],
+                "summary": "list 获取榜单条目 api",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token 用户令牌",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "sip_score_id",
+                        "name": "sip_score_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "sort_type",
+                        "name": "sort_type",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "page_size",
+                        "name": "page_size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "page_token",
+                        "name": "page_token",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/sipscore.ListSipScoreEntriesResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/sip-score/entry": {
+            "put": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "sipscore"
+                ],
+                "summary": "修改榜单条目信息 api",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token 用户令牌",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "update_sip_score_entry_request",
+                        "name": "object",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/sipscore.UpdateSipScoreEntryRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/sip-score/list": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "sipscore"
+                ],
+                "summary": "list 批量获取榜单 api",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token 用户令牌",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "sort_type",
+                        "name": "sort_type",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "page_size",
+                        "name": "page_size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "page_token",
+                        "name": "page_token",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/sipscore.ListSipScoresResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/sip-score/{sip_score_id}": {
+            "get": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "sipscore"
+                ],
+                "summary": "获取榜单元数据 api",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token 用户令牌",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "sip_score_id",
+                        "name": "post_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/sipscore.GetSipScoreResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "sipscore"
+                ],
+                "summary": "删除榜单 api",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token 用户令牌",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "sip_score_id",
+                        "name": "sip_score_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/Response"
+                        }
+                    }
+                }
+            }
+        },
         "/user": {
             "put": {
                 "consumes": [
@@ -1570,12 +1979,23 @@ const docTemplate = `{
         },
         "StudentLoginRequest": {
             "type": "object",
-            "required": [
-                "password",
-                "student_id"
-            ],
             "properties": {
+                "action": {
+                    "type": "string"
+                },
+                "captcha": {
+                    "type": "string"
+                },
                 "password": {
+                    "type": "string"
+                },
+                "second_auth_code": {
+                    "type": "string"
+                },
+                "second_auth_method": {
+                    "type": "string"
+                },
+                "session_id": {
                     "type": "string"
                 },
                 "student_id": {
@@ -1586,6 +2006,33 @@ const docTemplate = `{
         "StudentLoginResponse": {
             "type": "object",
             "properties": {
+                "available_second_auth_methods": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "captcha_image_base64": {
+                    "type": "string"
+                },
+                "current_second_auth_method": {
+                    "type": "string"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "second_auth_email_target": {
+                    "type": "string"
+                },
+                "second_auth_sms_target": {
+                    "type": "string"
+                },
+                "session_id": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
                 "token": {
                     "type": "string"
                 }
@@ -1701,6 +2148,21 @@ const docTemplate = `{
                 },
                 "name": {
                     "type": "string"
+                }
+            }
+        },
+        "collection.CreateRequest": {
+            "type": "object",
+            "required": [
+                "target_id",
+                "target_type"
+            ],
+            "properties": {
+                "target_id": {
+                    "type": "integer"
+                },
+                "target_type": {
+                    "type": "integer"
                 }
             }
         },
@@ -2276,6 +2738,336 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "user_name": {
+                    "type": "string"
+                }
+            }
+        },
+        "sipscore.CreateSipScoreEntryRequest": {
+            "type": "object",
+            "required": [
+                "entries",
+                "sip_score_id"
+            ],
+            "properties": {
+                "entries": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/sipscore.SipScoreEntryCreateInfo"
+                    }
+                },
+                "sip_score_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "sipscore.CreateSipScoreRequest": {
+            "type": "object",
+            "required": [
+                "category",
+                "cover_img",
+                "description",
+                "domain",
+                "name",
+                "tags"
+            ],
+            "properties": {
+                "category": {
+                    "type": "string"
+                },
+                "cover_img": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "domain": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "tags": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "sipscore.DeleteSipScoreEntriesRequest": {
+            "type": "object",
+            "required": [
+                "entry_ids",
+                "sip_score_id"
+            ],
+            "properties": {
+                "entry_ids": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                },
+                "sip_score_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "sipscore.GetSipScoreResponse": {
+            "type": "object",
+            "properties": {
+                "sip_score": {
+                    "$ref": "#/definitions/sipscore.SipScore"
+                }
+            }
+        },
+        "sipscore.IdResponse": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "sipscore.IdsResponse": {
+            "type": "object",
+            "properties": {
+                "ids": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                }
+            }
+        },
+        "sipscore.ListSipScoreEntriesResponse": {
+            "type": "object",
+            "properties": {
+                "entries": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/sipscore.SipScoreEntry"
+                    }
+                },
+                "has_more": {
+                    "type": "boolean"
+                },
+                "page_token": {
+                    "type": "string"
+                }
+            }
+        },
+        "sipscore.ListSipScoresResponse": {
+            "type": "object",
+            "properties": {
+                "has_more": {
+                    "type": "boolean"
+                },
+                "page_token": {
+                    "type": "string"
+                },
+                "sip_scores": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/sipscore.SipScoreWithEntries"
+                    }
+                }
+            }
+        },
+        "sipscore.SipScore": {
+            "type": "object",
+            "properties": {
+                "category": {
+                    "type": "string"
+                },
+                "collect_count": {
+                    "type": "integer"
+                },
+                "cover_img": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "creator": {
+                    "$ref": "#/definitions/sipscore.userInfo"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "domain": {
+                    "type": "string"
+                },
+                "entry_count": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "is_collected": {
+                    "type": "boolean"
+                },
+                "last_modified_by": {
+                    "$ref": "#/definitions/sipscore.userInfo"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "participant_count": {
+                    "type": "integer"
+                },
+                "tags": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "sipscore.SipScoreEntry": {
+            "type": "object",
+            "properties": {
+                "comment_num": {
+                    "type": "integer"
+                },
+                "cover_img": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "creator": {
+                    "$ref": "#/definitions/sipscore.userInfo"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "last_modified_by": {
+                    "$ref": "#/definitions/sipscore.userInfo"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "participant_num": {
+                    "type": "integer"
+                },
+                "score_avg": {
+                    "type": "integer"
+                },
+                "score_total": {
+                    "type": "integer"
+                },
+                "sip_score_id": {
+                    "type": "integer"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "sipscore.SipScoreEntryCreateInfo": {
+            "type": "object",
+            "required": [
+                "cover_img",
+                "name"
+            ],
+            "properties": {
+                "cover_img": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "sipscore.SipScoreWithEntries": {
+            "type": "object",
+            "properties": {
+                "entries": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/sipscore.SipScoreEntry"
+                    }
+                },
+                "sip_score": {
+                    "$ref": "#/definitions/sipscore.SipScore"
+                }
+            }
+        },
+        "sipscore.UpdateSipScoreEntryRequest": {
+            "type": "object",
+            "required": [
+                "entry_id",
+                "sip_score_id"
+            ],
+            "properties": {
+                "cover_img": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "entry_id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "sip_score_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "sipscore.UpdateSipScoreRequest": {
+            "type": "object",
+            "required": [
+                "id"
+            ],
+            "properties": {
+                "category": {
+                    "type": "string"
+                },
+                "cover_img": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "domain": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "tags": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "sipscore.userInfo": {
+            "type": "object",
+            "properties": {
+                "avatar": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
                     "type": "string"
                 }
             }

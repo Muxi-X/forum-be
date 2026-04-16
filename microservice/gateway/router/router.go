@@ -12,6 +12,7 @@ import (
 	"forum-gateway/handler/post"
 	"forum-gateway/handler/report"
 	"forum-gateway/handler/sd"
+	"forum-gateway/handler/sipscore"
 	"forum-gateway/handler/user"
 	"forum-gateway/router/middleware"
 	"forum/pkg/constvar"
@@ -91,6 +92,21 @@ func Load(g *gin.Engine, mw ...gin.HandlerFunc) *gin.Engine {
 		postRouter.PATCH("/set_quality/:post_id", postApi.SetQualityPost)
 	}
 
+	sipScoreRouter := g.Group("api/v1/sip-score")
+	sipScoreApi := sipscore.New(dao.GetDao())
+	sipScoreRouter.Use(normalRequired)
+	{
+		sipScoreRouter.POST("", sipScoreApi.CreateSipScore)
+		sipScoreRouter.PUT("", sipScoreApi.UpdateSipScore)
+		sipScoreRouter.POST("/entries", sipScoreApi.CreateSipScoreEntries)
+		sipScoreRouter.PUT("/entry", sipScoreApi.UpdateSipScoreEntry)
+		sipScoreRouter.GET("/:sip_score_id", sipScoreApi.GetSipScore)
+		sipScoreRouter.GET("/entries/list/:sip_score_id", sipScoreApi.ListEntries)
+		sipScoreRouter.GET("/list", sipScoreApi.ListSipScores)
+		sipScoreRouter.DELETE("/:sip_score_id", sipScoreApi.DeleteSipScore)
+		sipScoreRouter.DELETE("/entries", sipScoreApi.DeleteSipScoreEntries)
+	}
+
 	commentRouter := g.Group("api/v1/comment")
 	commentApi := comment.New(dao.GetDao())
 	commentRouter.Use(normalRequired)
@@ -122,7 +138,7 @@ func Load(g *gin.Engine, mw ...gin.HandlerFunc) *gin.Engine {
 	collectionRouter.Use(normalRequired)
 	{
 		collectionRouter.GET("/list/:user_id", collectionApi.List)
-		collectionRouter.POST("/:post_id", collectionApi.CreateOrRemove)
+		collectionRouter.POST("", collectionApi.CreateOrRemove)
 	}
 
 	// report

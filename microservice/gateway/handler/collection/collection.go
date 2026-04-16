@@ -15,5 +15,6 @@ func New(i dao.Interface) *Api {
 }
 
 type CreateRequest struct {
-	PostId uint32 `json:"post_id" binding:"required"`
+	TargetID   uint64 `json:"target_id" binding:"required"`
+	TargetType uint32 `json:"target_type" binding:"required"`
 }

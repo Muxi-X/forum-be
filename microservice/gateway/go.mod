@@ -29,9 +29,9 @@ require (
 	github.com/golang/protobuf v1.5.4
 	github.com/gorilla/websocket v1.5.3
 	github.com/joho/godotenv v1.5.1
+	github.com/opentracing-contrib/go-gin v0.0.0-20241203023905-a5650667207a
 	github.com/opentracing/opentracing-go v1.2.0
 	github.com/qiniu/api.v7/v7 v7.8.2
-	github.com/satori/go.uuid v1.2.0
 	github.com/shirou/gopsutil/v3 v3.24.5
 	github.com/spf13/pflag v1.0.6
 	github.com/spf13/viper v1.20.1
@@ -140,7 +140,6 @@ require (
 	github.com/nacos-group/nacos-sdk-go v1.1.6 // indirect
 	github.com/ncruces/go-strftime v0.1.9 // indirect
 	github.com/nxadm/tail v1.4.8 // indirect
-	github.com/opentracing-contrib/go-gin v0.0.0-20241203023905-a5650667207a // indirect
 	github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c // indirect
 	github.com/patrickmn/go-cache v2.1.0+incompatible // indirect
 	github.com/pelletier/go-toml/v2 v2.2.3 // indirect

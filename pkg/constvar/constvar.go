@@ -21,9 +21,11 @@ const (
 	SuperAdminRole  = "SuperAdmin"
 
 	// item.TypeName
-	Post        = "post"
-	QualityPost = "quality-post"
-	Comment     = "comment"
+	Post          = "post"
+	QualityPost   = "quality-post"
+	Comment       = "comment"
+	SipScore      = "sip-score"
+	SipScoreEntry = "sip-score-entry"
 
 	Collection        = "collection"
 	CollectionAndLike = "collection-like"
@@ -64,4 +66,18 @@ const (
 	// delete type
 	DeletePost    = "0"
 	RemoveQuality = "1"
+
+	// collection type
+	CollectionPost     = 1
+	CollectionSipScore = 2
+
+	// sort type
+	SortByNewest       = 1
+	SortByHottest      = 2
+	SortByHighestScore = 3
+	SortByLowestScore  = 4
+
+	// page size
+	DefaultPageSize = 10
+	MaxPageSize     = 50
 )

@@ -24,21 +24,60 @@ type Dao struct {
 
 // Interface dao
 type Interface interface {
+	Transaction(fc func(tx *gorm.DB) error) error
+
 	CreatePost(*PostModel) (uint32, error)
 	ListUserCreatedPost(uint32) ([]uint32, error)
 	ListMainPost(*PostModel, string, uint32, uint32, uint32, bool, string, uint32) ([]*PostInfo, error)
 	GetPostInfo(uint32) (*PostInfo, error)
 	GetPost(uint32) (*PostModel, error)
-	IsUserCollectionPost(uint32, uint32) (bool, error)
 	ListPostInfoByPostIds([]uint32, *PostModel, uint32, uint32, uint32, bool) ([]*pb.PostPartInfo, error)
 	DeletePost(uint32, ...*gorm.DB) error
 	ChangeQualityPost(uint32, bool) error
 	CountPostByTime(string, string) (int, error)
 
-	CreateComment(*CommentModel) (uint32, error)
+	CreateSipScore(sipScore *SipScoreModel) (uint32, error)
+	BatchGetOrCreateTags(tags []string) ([]*TagModel, error)
+	BatchCreateSipScoreTags(items []*SipScoreTagModel, tx ...*gorm.DB) error
+	BatchAddTagsToSortedSet(tagIDs []uint32, category string) error
+	BatchRemoveTagsFromSortedSet(tagIDs []uint32, category string) error
+	UpdateSipScore(id uint32, update map[string]interface{}, tx ...*gorm.DB) error
+	ListTagIDsBySipScoreId(sipScoreId uint32, tx ...*gorm.DB) ([]uint32, error)
+	ListTagsBySipScoreId(sipScoreId uint32, tx ...*gorm.DB) ([]string, []uint32, error)
+	DeleteSipScoreTagsBySipScoreId(sipScoreId uint32, tx ...*gorm.DB) error
+	GetSipScore(id uint32, tx ...*gorm.DB) (*SipScoreModel, error)
+	BatchCreateSipScoreEntries(entries []*SipScoreEntryModel, tx ...*gorm.DB) error
+	IncrSipScoreEntryCount(id uint32, incr int64, tx ...*gorm.DB) error
+	UpdateSipScoreEntry(sipScoreID, entryID uint32, update map[string]interface{}, tx ...*gorm.DB) error
+	IncrSipScoreCollectCount(sipScoreID uint32, tx ...*gorm.DB) error
+	DecrSipScoreCollectCount(sipScoreID uint32, tx ...*gorm.DB) error
+	ListSipScoreEntriesNewest(sipScoreID, limit uint32, tx ...*gorm.DB) ([]*SipScoreEntryModel, error)
+	ListSipScoreEntriesNewestWithCursor(sipScoreID, lastEntryID uint32, lastUpdatedAt time.Time, limit uint32, tx ...*gorm.DB) ([]*SipScoreEntryModel, error)
+	ListSipScoreEntriesHottest(sipScoreID, limit uint32, tx ...*gorm.DB) ([]*SipScoreEntryModel, error)
+	ListSipScoreEntriesHottestWithCursor(sipScoreID, lastID uint32, lastCount uint32, limit uint32, tx ...*gorm.DB) ([]*SipScoreEntryModel, error)
+	ListSipScoreEntriesHighestScore(sipScoreID, limit uint32, tx ...*gorm.DB) ([]*SipScoreEntryModel, error)
+	ListSipScoreEntriesHighestScoreWithCursor(sipScoreID, lastID uint32, lastScore uint32, limit uint32, tx ...*gorm.DB) ([]*SipScoreEntryModel, error)
+	ListSipScoreEntriesLowestScore(sipScoreID, limit uint32, tx ...*gorm.DB) ([]*SipScoreEntryModel, error)
+	ListSipScoreEntriesLowestScoreWithCursor(sipScoreID, lastID uint32, lastScore uint32, limit uint32, tx ...*gorm.DB) ([]*SipScoreEntryModel, error)
+	DeleteSipScore(id uint32, tx ...*gorm.DB) error
+	GetSipScoreEntryIDs(sipScoreID uint32, entryIDs []uint32, tx ...*gorm.DB) ([]uint32, error)
+	DeleteSipScoreEntries(sipScoreID uint32, entryIDs []uint32, tx ...*gorm.DB) error
+	GetSipScoreEntryStats(sipScoreID uint32, entryIDs []uint32, tx ...*gorm.DB) (entryCount uint32, participantCount uint32, err error)
+	DecrSipScoreStats(sipScoreID uint32, entryCount uint32, participantCount uint32, tx ...*gorm.DB) error
+	ListSipScoreNewest(limit uint32, tx ...*gorm.DB) ([]*SipScoreModel, error)
+	ListSipScoreNewestWithCursor(lastID uint32, lastUpdatedAt time.Time, limit uint32, tx ...*gorm.DB) ([]*SipScoreModel, error)
+	ListSipScoreHottest(limit uint32, tx ...*gorm.DB) ([]*SipScoreModel, error)
+	ListSipScoreHottestWithCursor(lastID uint32, lastCount uint32, limit uint32, tx ...*gorm.DB) ([]*SipScoreModel, error)
+	BatchListSipScoreEntriesHottest(sipScoreIDs []uint32, limit uint32, tx ...*gorm.DB) (map[uint32][]*SipScoreEntryModel, error)
+	GetSipScoreEntry(sipScoreID, entryID uint32, tx ...*gorm.DB) (*SipScoreEntryModel, error)
+	CreateSipScoreEntryCommentRating(rating *SipScoreEntryCommentRating, tx ...*gorm.DB) (uint32, error)
+	IncrSipScoreParticipantCount(sipScoreID uint32, incr int64, tx ...*gorm.DB) error
+	IncrSipScoreEntryScore(sipScoreID, entryID uint32, scoreIncr uint32, participantIncr uint32, tx ...*gorm.DB) error
+
+	CreateComment(comment *CommentModel, tx ...*gorm.DB) (uint32, error)
 	GetCommentInfo(uint32) (*CommentInfo, error)
 	GetComment(uint32) (*CommentModel, error)
-	ListCommentByPostId(uint32) ([]*CommentInfo, error)
+	ListCommentByPostId(postId uint32) ([]*CommentInfo, error)
 	GetCommentNumByPostId(uint32) (uint32, error)
 	DeleteComment(uint32, ...*gorm.DB) error
 
@@ -56,10 +95,14 @@ type Interface interface {
 	AddTagToSortedSet(uint32, string) error
 	ListPopularTags(string) ([]string, error)
 
-	CreateCollection(*CollectionModel) (uint32, error)
-	DeleteCollection(*CollectionModel) error
-	GetCollectionNumByPostId(uint32) (uint32, error)
-	ListCollectionByUserId(uint32) ([]uint32, error)
+	CreateCollection(collection *CollectionModel, tx ...*gorm.DB) (uint32, error)
+	TryCreateCollection(collection *CollectionModel, tx ...*gorm.DB) (bool, error)
+	DeleteCollection(collection *CollectionModel, tx ...*gorm.DB) error
+	TryDeleteCollection(collection *CollectionModel, tx ...*gorm.DB) (bool, error)
+	GetCollectionNum(contentType uint32, contentId uint32) (uint32, error)
+	ListCollectionByUserId(userId uint32, contentType uint32) ([]uint32, error)
+	IsUserCollected(userID uint32, contentType uint32, contentID uint32, tx ...*gorm.DB) (bool, error)
+	ListIsUserCollected(userID, contentType uint32, contentIDs []uint32, tx ...*gorm.DB) (map[uint32]bool, error)
 
 	ChangePostScore(uint32, int) error
 	AddChangeRecord(uint32) error
@@ -115,7 +158,7 @@ func GetDao() *Dao {
 	return dao
 }
 
-func (d Dao) DeletePost(id uint32, tx ...*gorm.DB) error {
+func (d *Dao) DeletePost(id uint32, tx ...*gorm.DB) error {
 	db := d.DB
 	if len(tx) == 1 {
 		db = tx[0]
@@ -170,7 +213,7 @@ func (d Dao) DeletePost(id uint32, tx ...*gorm.DB) error {
 	return d.Redis.ZRem("posts:", id).Err()
 }
 
-func (d Dao) DeleteComment(id uint32, tx ...*gorm.DB) error {
+func (d *Dao) DeleteComment(id uint32, tx ...*gorm.DB) error {
 	db := d.DB
 	if len(tx) == 1 {
 		db = tx[0]
@@ -184,5 +227,16 @@ func (d Dao) DeleteComment(id uint32, tx ...*gorm.DB) error {
 		return err
 	}
 
-	return d.ChangePostScore(comment.PostId, -constvar.CommentScore)
+	return d.ChangePostScore(comment.TargetID, -constvar.CommentScore)
+}
+
+func (d *Dao) Transaction(fc func(tx *gorm.DB) error) error {
+	return d.DB.Transaction(fc)
+}
+
+func (d *Dao) getDB(tx ...*gorm.DB) *gorm.DB {
+	if len(tx) > 0 && tx[0] != nil {
+		return tx[0]
+	}
+	return d.DB
 }

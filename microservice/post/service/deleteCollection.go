@@ -10,11 +10,13 @@ import (
 	"forum/pkg/errno"
 )
 
+// DeleteCollection
+// NOTE: 这个好像没有用到，废弃废弃
 func (s *PostService) DeleteCollection(_ context.Context, req *pb.Request, _ *pb.Response) error {
 	logger.Info("PostService DeleteCollection")
 
 	collection := &dao.CollectionModel{
-		Id: req.Id,
+		ID: req.Id,
 	}
 
 	if err := s.Dao.DeleteCollection(collection); err != nil {

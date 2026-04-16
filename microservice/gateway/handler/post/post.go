@@ -17,15 +17,25 @@ func New(i dao.Interface) *Api {
 	return api
 }
 
-type UpdateInfoRequest struct {
-	Id       uint32   `json:"id" binding:"required"`
-	Domain   string   `json:"domain" binding:"required"`
-	Content  string   `json:"content" binding:"required"`
-	Title    string   `json:"title" binding:"required"`
-	Category string   `json:"category" binding:"required"`
-	Summary  string   `json:"summary"`
-	Tags     []string `json:"tags" binding:"required"`
+// =====================
+// Common
+// =====================
+type info struct {
+	Id            uint32 `json:"id"`
+	Content       string `json:"content"`
+	Time          string `json:"time"`
+	CreatorId     uint32 `json:"creator_id"`
+	CreatorName   string `json:"creator_name"`
+	CreatorAvatar string `json:"creator_avatar"`
+	LikeNum       uint32 `json:"like_num"`
+	IsLiked       bool   `json:"is_liked"`
 }
+
+// =====================
+// Post Domain
+// =====================
+
+// ---- model ----
 
 type Post struct {
 	Id            uint32             `json:"id"`
@@ -46,9 +56,22 @@ type Post struct {
 	CollectionNum uint32             `json:"collection_num"`
 }
 
-type TrimHtmlRequest struct {
-	Data string `json:"data" binding:"required"`
+type PostPartInfo struct {
+	Id            uint32   `json:"id"`
+	Title         string   `json:"title"`
+	Summary       string   `json:"summary"`
+	Category      string   `json:"category"`
+	Time          string   `json:"time"`
+	CreatorId     uint32   `json:"creator_id"`
+	CreatorName   string   `json:"creator_name"`
+	CreatorAvatar string   `json:"creator_avatar"`
+	CommentNum    uint32   `json:"comment_num"`
+	CollectionNum uint32   `json:"collection_num"`
+	LikeNum       uint32   `json:"like_num"`
+	Tags          []string `json:"tags"`
 }
+
+// ---- request ----
 
 type CreateRequest struct {
 	Domain          string   `json:"domain" binding:"required"` // normal -> 团队外; muxi -> 团队内 (type_name暂时均填normal)
@@ -60,6 +83,22 @@ type CreateRequest struct {
 	Summary         string   `json:"summary" binding:"required"`
 	Tags            []string `json:"tags" binding:"required"`
 }
+
+type UpdateInfoRequest struct {
+	Id       uint32   `json:"id" binding:"required"`
+	Domain   string   `json:"domain" binding:"required"`
+	Content  string   `json:"content" binding:"required"`
+	Title    string   `json:"title" binding:"required"`
+	Category string   `json:"category" binding:"required"`
+	Summary  string   `json:"summary"`
+	Tags     []string `json:"tags" binding:"required"`
+}
+
+type TrimHtmlRequest struct {
+	Data string `json:"data" binding:"required"`
+}
+
+// ---- response ----
 
 type GetPostResponse struct {
 	info
@@ -74,6 +113,20 @@ type GetPostResponse struct {
 	Summary         string     `json:"summary"`
 	CollectionNum   uint32     `json:"collection_num"`
 }
+
+type PostPartInfoResponse struct {
+	Posts []*PostPartInfo `json:"posts"`
+}
+
+type ListMainPostResponse struct {
+	Posts []*Post `json:"posts"`
+}
+
+// =====================
+// Comment Domain
+// =====================
+
+// ---- model ----
 
 type SubPost struct {
 	info
@@ -90,30 +143,12 @@ type Comment struct {
 	BeRepliedUserName string `json:"be_replied_user_name"`
 }
 
-type info struct {
-	Id            uint32 `json:"id"`
-	Content       string `json:"content"`
-	Time          string `json:"time"`
-	CreatorId     uint32 `json:"creator_id"`
-	CreatorName   string `json:"creator_name"`
-	CreatorAvatar string `json:"creator_avatar"`
-	LikeNum       uint32 `json:"like_num"`
-	IsLiked       bool   `json:"is_liked"`
-}
+// =====================
+// Other Common Response
+// =====================
 
-type PostPartInfo struct {
-	Id            uint32   `json:"id"`
-	Title         string   `json:"title"`
-	Summary       string   `json:"summary"`
-	Category      string   `json:"category"`
-	Time          string   `json:"time"`
-	CreatorId     uint32   `json:"creator_id"`
-	CreatorName   string   `json:"creator_name"`
-	CreatorAvatar string   `json:"creator_avatar"`
-	CommentNum    uint32   `json:"comment_num"`
-	CollectionNum uint32   `json:"collection_num"`
-	LikeNum       uint32   `json:"like_num"`
-	Tags          []string `json:"tags"`
+type QiNiuToken struct {
+	Token string `json:"token"`
 }
 
 type UnReadNum struct {
@@ -121,17 +156,17 @@ type UnReadNum struct {
 	Category string `json:"category"`
 }
 
-type PostPartInfoResponse struct {
-	Posts []*PostPartInfo `json:"posts"`
-}
-
-type ListMainPostResponse struct {
-	Posts []*Post `json:"posts"`
+type IdResponse struct {
+	Id uint32 `json:"id"`
 }
 
 type UnReadNumResponse struct {
 	UnReadNum []*UnReadNum `json:"un_read_num"`
 }
+
+// =====================
+// internal util
+// =====================
 
 // 这里用了 generics and reflect, 更一般的写法应该是用interface
 func setInfo[T pb.CommentInfo | pb.Post](info *info, comment *T) {
@@ -161,12 +196,4 @@ func setInfo[T pb.CommentInfo | pb.Post](info *info, comment *T) {
 			info.Time = v.String()
 		}
 	}
-}
-
-type QiNiuToken struct {
-	Token string `json:"token"`
-}
-
-type IdResponse struct {
-	Id uint32 `json:"id"`
 }
