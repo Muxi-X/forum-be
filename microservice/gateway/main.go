@@ -38,7 +38,7 @@ var (
 )
 
 func init() {
-	// 预加载.env文件,用于本地开发.
+	// 预加载.env文件,用于本地开发
 	_ = godotenv.Load()
 }
 
