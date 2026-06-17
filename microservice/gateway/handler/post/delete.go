@@ -5,7 +5,6 @@ import (
 	"forum-gateway/util"
 	pb "forum-post/proto"
 	"forum/log"
-	"forum/model"
 	"forum/pkg/constvar"
 	"forum/pkg/errno"
 	"strconv"
@@ -37,17 +36,6 @@ func (a *Api) Delete(c *gin.Context) {
 		return
 	}
 
-	ok, err := model.Enforce(userId, constvar.Post, id, constvar.Write)
-	if err != nil {
-		SendError(c, errno.ErrCasbin, nil, err.Error(), GetLine())
-		return
-	}
-
-	if !ok {
-		SendError(c, errno.ErrPermissionDenied, nil, "权限不足", GetLine())
-		return
-	}
-
 	quality := c.DefaultQuery("quality", constvar.DeletePost)
 
 	deleteReq := &pb.DeleteItemRequest{
@@ -57,17 +45,6 @@ func (a *Api) Delete(c *gin.Context) {
 	}
 
 	if quality == constvar.RemoveQuality {
-		ok, err := model.HasRole(userId, constvar.NormalAdminRole)
-		if err != nil {
-			SendError(c, errno.ErrCasbin, nil, err.Error(), GetLine())
-			return
-		}
-
-		if !ok {
-			SendError(c, errno.ErrPermissionDenied, nil, "权限不足", GetLine())
-			return
-		}
-
 		deleteReq.TypeName = constvar.QualityPost
 	}
 

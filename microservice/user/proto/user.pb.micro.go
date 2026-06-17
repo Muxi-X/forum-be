@@ -36,8 +36,8 @@ func NewUserServiceEndpoints() []*api.Endpoint {
 // Client API for UserService service
 
 type UserService interface {
-	TeamLogin(ctx context.Context, in *TeamLoginRequest, opts ...client.CallOption) (*LoginResponse, error)
-	StudentLogin(ctx context.Context, in *StudentLoginRequest, opts ...client.CallOption) (*LoginResponse, error)
+	Login(ctx context.Context, in *LoginRequest, opts ...client.CallOption) (*LoginResponse, error)
+	Register(ctx context.Context, in *RegisterRequest, opts ...client.CallOption) (*RegisterResponse, error)
 	GetInfo(ctx context.Context, in *GetInfoRequest, opts ...client.CallOption) (*UserInfoResponse, error)
 	GetProfile(ctx context.Context, in *GetRequest, opts ...client.CallOption) (*UserProfile, error)
 	ToggleFollow(ctx context.Context, in *FollowRequest, opts ...client.CallOption) (*FollowResponse, error)
@@ -65,8 +65,8 @@ func NewUserService(name string, c client.Client) UserService {
 	}
 }
 
-func (c *userService) TeamLogin(ctx context.Context, in *TeamLoginRequest, opts ...client.CallOption) (*LoginResponse, error) {
-	req := c.c.NewRequest(c.name, "UserService.TeamLogin", in)
+func (c *userService) Login(ctx context.Context, in *LoginRequest, opts ...client.CallOption) (*LoginResponse, error) {
+	req := c.c.NewRequest(c.name, "UserService.Login", in)
 	out := new(LoginResponse)
 	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
@@ -75,9 +75,9 @@ func (c *userService) TeamLogin(ctx context.Context, in *TeamLoginRequest, opts 
 	return out, nil
 }
 
-func (c *userService) StudentLogin(ctx context.Context, in *StudentLoginRequest, opts ...client.CallOption) (*LoginResponse, error) {
-	req := c.c.NewRequest(c.name, "UserService.StudentLogin", in)
-	out := new(LoginResponse)
+func (c *userService) Register(ctx context.Context, in *RegisterRequest, opts ...client.CallOption) (*RegisterResponse, error) {
+	req := c.c.NewRequest(c.name, "UserService.Register", in)
+	out := new(RegisterResponse)
 	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
 		return nil, err
@@ -218,8 +218,8 @@ func (c *userService) UpdateInfo(ctx context.Context, in *UpdateInfoRequest, opt
 // Server API for UserService service
 
 type UserServiceHandler interface {
-	TeamLogin(context.Context, *TeamLoginRequest, *LoginResponse) error
-	StudentLogin(context.Context, *StudentLoginRequest, *LoginResponse) error
+	Login(context.Context, *LoginRequest, *LoginResponse) error
+	Register(context.Context, *RegisterRequest, *RegisterResponse) error
 	GetInfo(context.Context, *GetInfoRequest, *UserInfoResponse) error
 	GetProfile(context.Context, *GetRequest, *UserProfile) error
 	ToggleFollow(context.Context, *FollowRequest, *FollowResponse) error
@@ -237,8 +237,8 @@ type UserServiceHandler interface {
 
 func RegisterUserServiceHandler(s server.Server, hdlr UserServiceHandler, opts ...server.HandlerOption) error {
 	type userService interface {
-		TeamLogin(ctx context.Context, in *TeamLoginRequest, out *LoginResponse) error
-		StudentLogin(ctx context.Context, in *StudentLoginRequest, out *LoginResponse) error
+		Login(ctx context.Context, in *LoginRequest, out *LoginResponse) error
+		Register(ctx context.Context, in *RegisterRequest, out *RegisterResponse) error
 		GetInfo(ctx context.Context, in *GetInfoRequest, out *UserInfoResponse) error
 		GetProfile(ctx context.Context, in *GetRequest, out *UserProfile) error
 		ToggleFollow(ctx context.Context, in *FollowRequest, out *FollowResponse) error
@@ -264,12 +264,12 @@ type userServiceHandler struct {
 	UserServiceHandler
 }
 
-func (h *userServiceHandler) TeamLogin(ctx context.Context, in *TeamLoginRequest, out *LoginResponse) error {
-	return h.UserServiceHandler.TeamLogin(ctx, in, out)
+func (h *userServiceHandler) Login(ctx context.Context, in *LoginRequest, out *LoginResponse) error {
+	return h.UserServiceHandler.Login(ctx, in, out)
 }
 
-func (h *userServiceHandler) StudentLogin(ctx context.Context, in *StudentLoginRequest, out *LoginResponse) error {
-	return h.UserServiceHandler.StudentLogin(ctx, in, out)
+func (h *userServiceHandler) Register(ctx context.Context, in *RegisterRequest, out *RegisterResponse) error {
+	return h.UserServiceHandler.Register(ctx, in, out)
 }
 
 func (h *userServiceHandler) GetInfo(ctx context.Context, in *GetInfoRequest, out *UserInfoResponse) error {

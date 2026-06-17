@@ -1,43 +1,16 @@
 package user
 
-// TeamLoginRequest login 请求
-type TeamLoginRequest struct {
-	OauthCode string `json:"oauth_code"`
-} // @name TeamLoginRequest
+// LoginRequest 用户登录请求
+type LoginRequest struct {
+	Username string `json:"username" binding:"required"`
+	Password string `json:"password" binding:"required"`
+} // @name LoginRequest
 
-// StudentLoginRequest StudentLogin 请求
-type StudentLoginRequest struct {
-	StudentId        string `json:"student_id"`
-	Password         string `json:"password"`
-	Action           string `json:"action"`
-	SessionId        string `json:"session_id"`
-	Captcha          string `json:"captcha"`
-	SecondAuthMethod string `json:"second_auth_method"`
-	SecondAuthCode   string `json:"second_auth_code"`
-	Provider         string `json:"provider"`
-	OauthCode        string `json:"oauth_code"`
-	CallbackURL      string `json:"callback_url"`
-} // @name StudentLoginRequest
-
-// TeamLoginResponse login 请求响应
-type TeamLoginResponse struct {
-	Token       string `json:"token"`
-	RedirectURL string `json:"redirect_url"`
-} // @name TeamLoginResponse
-
-// StudentLoginResponse login 请求响应
-type StudentLoginResponse struct {
-	RedirectURL                string   `json:"redirect_url"`
-	Token                      string   `json:"token"`
-	SessionId                  string   `json:"session_id"`
-	Status                     string   `json:"status"`
-	Message                    string   `json:"message"`
-	CaptchaImageBase64         string   `json:"captcha_image_base64"`
-	AvailableSecondAuthMethods []string `json:"available_second_auth_methods"`
-	CurrentSecondAuthMethod    string   `json:"current_second_auth_method"`
-	SecondAuthSMSTarget        string   `json:"second_auth_sms_target"`
-	SecondAuthEmailTarget      string   `json:"second_auth_email_target"`
-} // @name StudentLoginResponse
+// RegisterRequest 用户注册请求
+type RegisterRequest struct {
+	Username string `json:"username" binding:"required"`
+	Password string `json:"password" binding:"required"`
+} // @name RegisterRequest
 
 // GetInfoRequest 获取 info 请求
 type GetInfoRequest struct {
@@ -157,14 +130,10 @@ type CreateMessageRequest struct {
 
 type CreatePrivateMessageRequest struct {
 	ReceiveUserid  uint32 `json:"receive_userid" binding:"required"`
-	Type           string `json:"type" binding:"required"` // comment/like/collection/reply_comment
+	Type           string `json:"type" binding:"required"`
 	Content        string `json:"content"`
 	PostId         uint32 `json:"post_id" binding:"required"`
 	CommentId      uint32 `json:"comment_id"`
 	PostTitle      string `json:"post_title" binding:"required"`
 	CommentContent string `json:"comment_content"`
-}
-
-type AddRoleRequest struct {
-	Role string `json:"role" binding:"required"`
 }
