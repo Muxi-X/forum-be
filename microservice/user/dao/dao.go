@@ -59,6 +59,7 @@ func Init() {
 
 	// init db
 	model.DB.Init()
+	model.DB.Self.AutoMigrate(&UserModel{}, &UserFollowModel{})
 
 	// init redis
 	model.RedisDB.Init()

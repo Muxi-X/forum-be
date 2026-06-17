@@ -7,7 +7,7 @@ import (
 )
 
 type UserModel struct {
-	ID                        uint32 `gorm:"column:id;primaryKey;not null"`
+	Id                        uint32 `gorm:"column:id;primaryKey;not null"`
 	Email                     string `gorm:"column:email;default:null"`
 	Name                      string `gorm:"column:name;"`
 	Avatar                    string `gorm:"column:avatar;"`
