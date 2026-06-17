@@ -43,6 +43,9 @@ func Load(g *gin.Engine, mw ...gin.HandlerFunc) *gin.Engine {
 	// 内部监控端点
 	g.GET("/api/v1/metrics", middleware.MetricsHandler())
 
+	// 登录态校验（仅解析token，不校验权限）
+	loginRequired := middleware.AuthMiddleware()
+
 	// auth 模块
 	authRouter := g.Group("api/v1/auth")
 	{
@@ -52,6 +55,7 @@ func Load(g *gin.Engine, mw ...gin.HandlerFunc) *gin.Engine {
 
 	// user 模块
 	userRouter := g.Group("api/v1/user")
+	userRouter.Use(loginRequired)
 	{
 		userRouter.GET("/profile/:id", user.GetProfile)
 		userRouter.GET("/myprofile", user.GetMyProfile)
@@ -69,6 +73,7 @@ func Load(g *gin.Engine, mw ...gin.HandlerFunc) *gin.Engine {
 	}
 
 	chatRouter := g.Group("api/v1/chat")
+	chatRouter.Use(loginRequired)
 	{
 		chatRouter.GET("/history/:id", chat.ListHistory)
 		chatRouter.GET("/ws", chat.WsHandler)
@@ -78,6 +83,7 @@ func Load(g *gin.Engine, mw ...gin.HandlerFunc) *gin.Engine {
 
 	postRouter := g.Group("api/v1/post")
 	postApi := post.New(dao.GetDao())
+	postRouter.Use(loginRequired)
 	{
 		postRouter.GET("/list/:domain", postApi.ListMainPost)
 		postRouter.GET("/published/:user_id", postApi.ListUserPost)
@@ -93,6 +99,7 @@ func Load(g *gin.Engine, mw ...gin.HandlerFunc) *gin.Engine {
 
 	sipScoreRouter := g.Group("api/v1/sip-score")
 	sipScoreApi := sipscore.New(dao.GetDao())
+	sipScoreRouter.Use(loginRequired)
 	{
 		sipScoreRouter.POST("", sipScoreApi.CreateSipScore)
 		sipScoreRouter.PUT("", sipScoreApi.UpdateSipScore)
@@ -118,6 +125,7 @@ func Load(g *gin.Engine, mw ...gin.HandlerFunc) *gin.Engine {
 
 	commentRouter := g.Group("api/v1/comment")
 	commentApi := comment.New(dao.GetDao())
+	commentRouter.Use(loginRequired)
 	{
 		commentRouter.GET("/:comment_id", commentApi.Get)
 		commentRouter.POST("", commentApi.Create)
@@ -127,6 +135,7 @@ func Load(g *gin.Engine, mw ...gin.HandlerFunc) *gin.Engine {
 
 	likeRouter := g.Group("api/v1/like")
 	likeApi := like.New(dao.GetDao())
+	likeRouter.Use(loginRequired)
 	{
 		likeRouter.GET("/list/:user_id", likeApi.GetUserLikeList)
 		likeRouter.POST("", likeApi.CreateOrRemove)
@@ -135,6 +144,7 @@ func Load(g *gin.Engine, mw ...gin.HandlerFunc) *gin.Engine {
 	// feed
 	feedRouter := g.Group("api/v1/feed")
 	feedApi := feed.New(dao.GetDao())
+	feedRouter.Use(loginRequired)
 	{
 		feedRouter.GET("/list/:user_id", feedApi.List)
 	}
@@ -142,6 +152,7 @@ func Load(g *gin.Engine, mw ...gin.HandlerFunc) *gin.Engine {
 	// collection
 	collectionRouter := g.Group("api/v1/collection")
 	collectionApi := collection.New(dao.GetDao())
+	collectionRouter.Use(loginRequired)
 	{
 		collectionRouter.GET("/list/:user_id", collectionApi.List)
 		collectionRouter.POST("", collectionApi.CreateOrRemove)
@@ -150,6 +161,7 @@ func Load(g *gin.Engine, mw ...gin.HandlerFunc) *gin.Engine {
 	// report
 	reportRouter := g.Group("api/v1/report")
 	reportApi := report.New(dao.GetDao())
+	reportRouter.Use(loginRequired)
 	{
 		reportRouter.POST("", reportApi.Create)
 		reportRouter.GET("/list", reportApi.List)
@@ -158,6 +170,7 @@ func Load(g *gin.Engine, mw ...gin.HandlerFunc) *gin.Engine {
 
 	feedbackRouter := g.Group("api/v1/feedback")
 	feedbackApi := feedback.New(dao.GetDao())
+	feedbackRouter.Use(loginRequired)
 	{
 		feedbackRouter.POST("", feedbackApi.Create)
 	}
