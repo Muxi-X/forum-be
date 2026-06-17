@@ -35,7 +35,7 @@ func (d *Dao) BatchGetUser(ids []uint32) (map[uint32]*UserModel, error) {
 
 	userMap := make(map[uint32]*UserModel, len(users))
 	for _, user := range users {
-		userMap[user.Id] = user
+		userMap[user.ID] = user
 	}
 
 	return userMap, nil

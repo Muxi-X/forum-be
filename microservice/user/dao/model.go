@@ -35,7 +35,7 @@ func (u *UserModel) Save() error {
 }
 
 func (u *UserModel) Update() error {
-	err := dao.DB.Table("users").Where("id = ?", u.Id).Updates(map[string]interface{}{
+	err := dao.DB.Table("users").Where("id = ?", u.ID).Updates(map[string]interface{}{
 		"name":                          u.Name,
 		"avatar":                        u.Avatar,
 		"signature":                     u.Signature,
