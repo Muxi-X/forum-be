@@ -16,7 +16,6 @@ import (
 	"forum-gateway/handler/sipscore"
 	"forum-gateway/handler/user"
 	"forum-gateway/router/middleware"
-	"forum/pkg/constvar"
 	"forum/pkg/errno"
 
 	"github.com/gin-gonic/gin"
@@ -41,25 +40,18 @@ func Load(g *gin.Engine, mw ...gin.HandlerFunc) *gin.Engine {
 	// swagger API doc
 	g.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
-	// 权限要求，普通用户/管理员/超管
-	normalRequired := middleware.AuthMiddleware(constvar.AuthLevelNormal)
-	adminRequired := middleware.AuthMiddleware(constvar.AuthLevelAdmin)
-	// superAdminRequired := middleware.AuthMiddleware(constvar.AuthLevelSuperAdmin)
-
 	// 内部监控端点
 	g.GET("/api/v1/metrics", middleware.MetricsHandler())
 
 	// auth 模块
 	authRouter := g.Group("api/v1/auth")
 	{
-		authRouter.POST("/login/student", user.StudentLogin)
-		authRouter.POST("/login/team", user.TeamLogin)
-		authRouter.POST("/set_role/:id", adminRequired, user.SetRole)
+		authRouter.POST("/login", user.Login)
+		authRouter.POST("/register", user.Register)
 	}
 
 	// user 模块
 	userRouter := g.Group("api/v1/user")
-	userRouter.Use(normalRequired)
 	{
 		userRouter.GET("/profile/:id", user.GetProfile)
 		userRouter.GET("/myprofile", user.GetMyProfile)
@@ -70,14 +62,13 @@ func Load(g *gin.Engine, mw ...gin.HandlerFunc) *gin.Engine {
 		userRouter.GET("/following/:id", user.ListFollowing)
 		userRouter.GET("/followers/:id", user.ListFollowers)
 		userRouter.POST("/private_message", user.CreatePrivateMessage)
-		userRouter.POST("/message", adminRequired, user.CreateMessage)
+		userRouter.POST("/message", user.CreateMessage)
 		userRouter.PATCH("/private_message/read", user.ReadPrivateMessage)
 		userRouter.DELETE("/private_message", user.DeletePrivateMessage)
 		userRouter.GET("/private_message/list", user.ListPrivateMessage)
 	}
 
 	chatRouter := g.Group("api/v1/chat")
-	chatRouter.Use(normalRequired)
 	{
 		chatRouter.GET("/history/:id", chat.ListHistory)
 		chatRouter.GET("/ws", chat.WsHandler)
@@ -87,7 +78,6 @@ func Load(g *gin.Engine, mw ...gin.HandlerFunc) *gin.Engine {
 
 	postRouter := g.Group("api/v1/post")
 	postApi := post.New(dao.GetDao())
-	postRouter.Use(normalRequired)
 	{
 		postRouter.GET("/list/:domain", postApi.ListMainPost)
 		postRouter.GET("/published/:user_id", postApi.ListUserPost)
@@ -103,7 +93,6 @@ func Load(g *gin.Engine, mw ...gin.HandlerFunc) *gin.Engine {
 
 	sipScoreRouter := g.Group("api/v1/sip-score")
 	sipScoreApi := sipscore.New(dao.GetDao())
-	sipScoreRouter.Use(normalRequired)
 	{
 		sipScoreRouter.POST("", sipScoreApi.CreateSipScore)
 		sipScoreRouter.PUT("", sipScoreApi.UpdateSipScore)
@@ -129,7 +118,6 @@ func Load(g *gin.Engine, mw ...gin.HandlerFunc) *gin.Engine {
 
 	commentRouter := g.Group("api/v1/comment")
 	commentApi := comment.New(dao.GetDao())
-	commentRouter.Use(normalRequired)
 	{
 		commentRouter.GET("/:comment_id", commentApi.Get)
 		commentRouter.POST("", commentApi.Create)
@@ -139,7 +127,6 @@ func Load(g *gin.Engine, mw ...gin.HandlerFunc) *gin.Engine {
 
 	likeRouter := g.Group("api/v1/like")
 	likeApi := like.New(dao.GetDao())
-	likeRouter.Use(normalRequired)
 	{
 		likeRouter.GET("/list/:user_id", likeApi.GetUserLikeList)
 		likeRouter.POST("", likeApi.CreateOrRemove)
@@ -148,7 +135,6 @@ func Load(g *gin.Engine, mw ...gin.HandlerFunc) *gin.Engine {
 	// feed
 	feedRouter := g.Group("api/v1/feed")
 	feedApi := feed.New(dao.GetDao())
-	feedRouter.Use(normalRequired)
 	{
 		feedRouter.GET("/list/:user_id", feedApi.List)
 	}
@@ -156,7 +142,6 @@ func Load(g *gin.Engine, mw ...gin.HandlerFunc) *gin.Engine {
 	// collection
 	collectionRouter := g.Group("api/v1/collection")
 	collectionApi := collection.New(dao.GetDao())
-	collectionRouter.Use(normalRequired)
 	{
 		collectionRouter.GET("/list/:user_id", collectionApi.List)
 		collectionRouter.POST("", collectionApi.CreateOrRemove)
@@ -166,14 +151,13 @@ func Load(g *gin.Engine, mw ...gin.HandlerFunc) *gin.Engine {
 	reportRouter := g.Group("api/v1/report")
 	reportApi := report.New(dao.GetDao())
 	{
-		reportRouter.POST("", normalRequired, reportApi.Create)
-		reportRouter.GET("/list", adminRequired, reportApi.List)
-		reportRouter.PUT("", adminRequired, reportApi.Handle)
+		reportRouter.POST("", reportApi.Create)
+		reportRouter.GET("/list", reportApi.List)
+		reportRouter.PUT("", reportApi.Handle)
 	}
 
 	feedbackRouter := g.Group("api/v1/feedback")
 	feedbackApi := feedback.New(dao.GetDao())
-	feedbackRouter.Use(normalRequired)
 	{
 		feedbackRouter.POST("", feedbackApi.Create)
 	}

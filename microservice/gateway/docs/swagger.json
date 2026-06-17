@@ -9,9 +9,8 @@
     "host": "forum.muxixyz.com",
     "basePath": "/api/v1",
     "paths": {
-        "/auth/login/student": {
+        "/api/v1/auth/login": {
             "post": {
-                "description": "login the student-forum",
                 "consumes": [
                     "application/json"
                 ],
@@ -21,15 +20,15 @@
                 "tags": [
                     "auth"
                 ],
-                "summary": "学生登录 api",
+                "summary": "用户登录",
                 "parameters": [
                     {
-                        "description": "login_request",
-                        "name": "object",
+                        "description": "登录信息",
+                        "name": "login",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/StudentLoginRequest"
+                            "$ref": "#/definitions/LoginRequest"
                         }
                     }
                 ],
@@ -37,15 +36,14 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/StudentLoginResponse"
+                            "$ref": "#/definitions/Response"
                         }
                     }
                 }
             }
         },
-        "/auth/login/team": {
+        "/api/v1/auth/register": {
             "post": {
-                "description": "login the team-forum",
                 "consumes": [
                     "application/json"
                 ],
@@ -55,15 +53,15 @@
                 "tags": [
                     "auth"
                 ],
-                "summary": "团队登录 api",
+                "summary": "用户注册",
                 "parameters": [
                     {
-                        "description": "login_request",
-                        "name": "object",
+                        "description": "注册信息",
+                        "name": "register",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/TeamLoginRequest"
+                            "$ref": "#/definitions/RegisterRequest"
                         }
                     }
                 ],
@@ -71,7 +69,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/TeamLoginResponse"
+                            "$ref": "#/definitions/Response"
                         }
                     }
                 }
@@ -2660,6 +2658,21 @@
                 }
             }
         },
+        "LoginRequest": {
+            "type": "object",
+            "required": [
+                "password",
+                "username"
+            ],
+            "properties": {
+                "password": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
         "MyProfile": {
             "type": "object",
             "properties": {
@@ -2701,6 +2714,21 @@
                 }
             }
         },
+        "RegisterRequest": {
+            "type": "object",
+            "required": [
+                "password",
+                "username"
+            ],
+            "properties": {
+                "password": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
         "Response": {
             "type": "object",
             "properties": {
@@ -2723,98 +2751,6 @@
                     "type": "string"
                 },
                 "type_name": {
-                    "type": "string"
-                }
-            }
-        },
-        "StudentLoginRequest": {
-            "type": "object",
-            "properties": {
-                "action": {
-                    "type": "string"
-                },
-                "callback_url": {
-                    "type": "string"
-                },
-                "captcha": {
-                    "type": "string"
-                },
-                "oauth_code": {
-                    "type": "string"
-                },
-                "password": {
-                    "type": "string"
-                },
-                "provider": {
-                    "type": "string"
-                },
-                "second_auth_code": {
-                    "type": "string"
-                },
-                "second_auth_method": {
-                    "type": "string"
-                },
-                "session_id": {
-                    "type": "string"
-                },
-                "student_id": {
-                    "type": "string"
-                }
-            }
-        },
-        "StudentLoginResponse": {
-            "type": "object",
-            "properties": {
-                "available_second_auth_methods": {
-                    "type": "array",
-                    "items": {
-                        "type": "string"
-                    }
-                },
-                "captcha_image_base64": {
-                    "type": "string"
-                },
-                "current_second_auth_method": {
-                    "type": "string"
-                },
-                "message": {
-                    "type": "string"
-                },
-                "redirect_url": {
-                    "type": "string"
-                },
-                "second_auth_email_target": {
-                    "type": "string"
-                },
-                "second_auth_sms_target": {
-                    "type": "string"
-                },
-                "session_id": {
-                    "type": "string"
-                },
-                "status": {
-                    "type": "string"
-                },
-                "token": {
-                    "type": "string"
-                }
-            }
-        },
-        "TeamLoginRequest": {
-            "type": "object",
-            "properties": {
-                "oauth_code": {
-                    "type": "string"
-                }
-            }
-        },
-        "TeamLoginResponse": {
-            "type": "object",
-            "properties": {
-                "redirect_url": {
-                    "type": "string"
-                },
-                "token": {
                     "type": "string"
                 }
             }

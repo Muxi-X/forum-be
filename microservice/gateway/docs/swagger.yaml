@@ -87,6 +87,16 @@ definitions:
           $ref: '#/definitions/user'
         type: array
     type: object
+  LoginRequest:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - password
+    - username
+    type: object
   MyProfile:
     properties:
       avatar:
@@ -114,6 +124,16 @@ definitions:
       student_id:
         type: string
     type: object
+  RegisterRequest:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - password
+    - username
+    type: object
   Response:
     properties:
       code:
@@ -129,66 +149,6 @@ definitions:
       name:
         type: string
       type_name:
-        type: string
-    type: object
-  StudentLoginRequest:
-    properties:
-      action:
-        type: string
-      callback_url:
-        type: string
-      captcha:
-        type: string
-      oauth_code:
-        type: string
-      password:
-        type: string
-      provider:
-        type: string
-      second_auth_code:
-        type: string
-      second_auth_method:
-        type: string
-      session_id:
-        type: string
-      student_id:
-        type: string
-    type: object
-  StudentLoginResponse:
-    properties:
-      available_second_auth_methods:
-        items:
-          type: string
-        type: array
-      captcha_image_base64:
-        type: string
-      current_second_auth_method:
-        type: string
-      message:
-        type: string
-      redirect_url:
-        type: string
-      second_auth_email_target:
-        type: string
-      second_auth_sms_target:
-        type: string
-      session_id:
-        type: string
-      status:
-        type: string
-      token:
-        type: string
-    type: object
-  TeamLoginRequest:
-    properties:
-      oauth_code:
-        type: string
-    type: object
-  TeamLoginResponse:
-    properties:
-      redirect_url:
-        type: string
-      token:
         type: string
     type: object
   UpdateInfoRequest:
@@ -1144,48 +1104,46 @@ info:
   title: forum-gateway
   version: "1.0"
 paths:
-  /auth/login/student:
+  /api/v1/auth/login:
     post:
       consumes:
       - application/json
-      description: login the student-forum
       parameters:
-      - description: login_request
+      - description: 登录信息
         in: body
-        name: object
+        name: login
         required: true
         schema:
-          $ref: '#/definitions/StudentLoginRequest'
+          $ref: '#/definitions/LoginRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/StudentLoginResponse'
-      summary: 学生登录 api
+            $ref: '#/definitions/Response'
+      summary: 用户登录
       tags:
       - auth
-  /auth/login/team:
+  /api/v1/auth/register:
     post:
       consumes:
       - application/json
-      description: login the team-forum
       parameters:
-      - description: login_request
+      - description: 注册信息
         in: body
-        name: object
+        name: register
         required: true
         schema:
-          $ref: '#/definitions/TeamLoginRequest'
+          $ref: '#/definitions/RegisterRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/TeamLoginResponse'
-      summary: 团队登录 api
+            $ref: '#/definitions/Response'
+      summary: 用户注册
       tags:
       - auth
   /auth/set_role/{id}:

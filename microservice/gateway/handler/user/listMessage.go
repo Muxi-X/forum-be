@@ -65,7 +65,7 @@ func ListMessage(c *gin.Context) {
 // @Param Authorization header string true "token 用户令牌"
 // @Param limit query string false "limit"
 // @Param page query string false "page"
-// @Success 200 {object} ListMessageResponse
+// @Success 200 {object} ListPrivateMessageResponse
 // @Router /user/private_message/list [get]
 func ListPrivateMessage(c *gin.Context) {
 	log.Info("User ListPrivateMessage function called.", zap.String("X-Request-Id", util.GetReqID(c)))
@@ -96,5 +96,5 @@ func ListPrivateMessage(c *gin.Context) {
 		return
 	}
 
-	SendMicroServiceResponse(c, nil, listResp, ListMessageResponse{})
+	SendMicroServiceResponse(c, nil, listResp, ListPrivateMessageResponse{})
 }
