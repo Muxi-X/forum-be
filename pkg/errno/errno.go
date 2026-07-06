@@ -40,6 +40,9 @@ var (
 	ErrListPostInfoByPostIds = &Errno{Code: 10404, Message: "Error list post info by post_ids"}
 	ErrRepeatReport          = &Errno{Code: 10405, Message: "Error repeat report the same post"}
 
+	// aduit
+	ErrAuditService = &Errno{Code: 10501, Message: "Error auditing service"}
+
 	// ---------------------------------------------------------------------------
 
 	ErrBadRequest           = &Errno{Code: 20001, Message: "Request error"}
@@ -49,6 +52,7 @@ var (
 	ErrAuthToken            = &Errno{Code: 20005, Message: "Error occurred while handling the auth token"}
 	ErrPermissionDenied     = &Errno{Code: 20006, Message: "Permission denied."}
 	ErrExceededTrafficLimit = &Errno{Code: 20006, Message: "Exceeded traffic limit"}
+	ErrSensitiveContent     = &Errno{Code: 20007, Message: "含敏感词无法发表"}
 
 	// user
 	ErrUserNotExisted    = &Errno{Code: 20101, Message: "User not existed"}

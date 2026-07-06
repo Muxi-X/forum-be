@@ -12,9 +12,9 @@ replace forum-feed => ./microservice/feed
 
 replace forum-ocr => ./microservice/ocr
 
-go 1.23.0
+go 1.24.4
 
-toolchain go1.24.4
+toolchain go1.24.7
 
 require (
 	forum v0.0.0-00010101000000-000000000000
@@ -115,6 +115,7 @@ require (
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
+	github.com/muxi-Infra/auditor-Backend/sdk v0.0.0-20260411143806-306797ef9654 // indirect
 	github.com/ncruces/go-strftime v0.1.9 // indirect
 	github.com/nxadm/tail v1.4.8 // indirect
 	github.com/oxtoacart/bpool v0.0.0-20190530202638-03653db5a59c // indirect

@@ -33,6 +33,9 @@ func DecodeErr(err error) (int, string) {
 	case *Errno:
 		return typed.Code, typed.Message
 	case *errors.Error:
+		if typed.Detail == "" {
+			return int(typed.Code), typed.Status
+		}
 		return int(typed.Code), typed.Status + " : " + typed.Detail
 	default:
 		return InternalServerError.Code, err.Error()

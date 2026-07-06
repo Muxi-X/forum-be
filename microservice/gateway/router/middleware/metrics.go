@@ -85,20 +85,12 @@ func Metrics() gin.HandlerFunc {
 		start := time.Now()
 		path := c.Request.URL.Path
 
-		// Skip swagger docs
-		if regexp.MustCompile("swagger").MatchString(path) {
+		if !regexp.MustCompile(`^/api/v1($|/)`).MatchString(path) {
 			c.Next()
 			return
 		}
 
-		// Skip health check requests
-		if path == "/sd/health" || path == "/sd/ram" || path == "/sd/cpu" || path == "/sd/disk" {
-			c.Next()
-			return
-		}
-
-		// Skip websocket requests
-		if len(path) >= 3 && path[len(path)-3:] == "/ws" {
+		if path == "/api/v1/metrics" || path == "/api/v1/ws" || path == "/api/v1/webhook" {
 			c.Next()
 			return
 		}

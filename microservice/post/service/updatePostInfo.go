@@ -36,7 +36,7 @@ func (s *PostService) UpdatePostInfo(_ context.Context, req *pb.UpdatePostInfoRe
 	post.Summary = req.Summary
 
 	if err := post.Update(); err != nil {
-		return errno.ServerErr(errno.ErrDatabase, err.Error())
+		return databaseErr(err)
 	}
 
 	return nil

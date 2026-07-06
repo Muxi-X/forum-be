@@ -34,7 +34,7 @@ func (s *PostService) CreatePost(_ context.Context, req *pb.CreatePostRequest, r
 
 	postId, err := s.Dao.CreatePost(data)
 	if err != nil {
-		return errno.ServerErr(errno.ErrDatabase, err.Error())
+		return databaseErr(err)
 	}
 
 	if err := model.AddPolicy(req.UserId, constvar.Post, postId, constvar.Write); err != nil {

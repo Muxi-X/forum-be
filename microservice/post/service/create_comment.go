@@ -94,7 +94,7 @@ func (s *PostService) createPostComment(req *pb.CreateCommentRequest, resp *pb.C
 
 	commentId, err := s.Dao.CreateComment(data)
 	if err != nil {
-		return errno.ServerErr(errno.ErrDatabase, err.Error())
+		return databaseErr(err)
 	}
 
 	// 二级评论需要递增父评论的子评论数
@@ -120,7 +120,7 @@ func (s *PostService) createPostComment(req *pb.CreateCommentRequest, resp *pb.C
 
 	commentInfo, err := s.Dao.GetCommentInfo(commentId)
 	if err != nil {
-		return errno.ServerErr(errno.ErrDatabase, err.Error())
+		return databaseErr(err)
 	}
 
 	resp.Id = commentId
@@ -173,7 +173,7 @@ func (s *PostService) createSipScoreEntryCommentRatingComment(req *pb.CreateComm
 		return nil
 	})
 	if err != nil {
-		return errno.ServerErr(errno.ErrDatabase, err.Error())
+		return databaseErr(err)
 	}
 
 	if err := model.AddPolicy(req.CreatorId, constvar.Comment, commentId, constvar.Write); err != nil {

@@ -4,6 +4,7 @@ import (
 	"forum-gateway/dao"
 	_ "forum-gateway/docs"
 	"forum-gateway/handler"
+	"forum-gateway/handler/audit"
 	"forum-gateway/handler/chat"
 	"forum-gateway/handler/collection"
 	"forum-gateway/handler/comment"
@@ -46,12 +47,21 @@ func Load(g *gin.Engine, mw ...gin.HandlerFunc) *gin.Engine {
 	adminRequired := middleware.AuthMiddleware(constvar.AuthLevelAdmin)
 	// superAdminRequired := middleware.AuthMiddleware(constvar.AuthLevelSuperAdmin)
 
+	// 内部监控端点
+	g.GET("/api/v1/metrics", middleware.MetricsHandler())
+
 	// auth 模块
 	authRouter := g.Group("api/v1/auth")
 	{
 		authRouter.POST("/login/student", user.StudentLogin)
 		authRouter.POST("/login/team", user.TeamLogin)
 		authRouter.POST("/set_role/:id", adminRequired, user.SetRole)
+	}
+
+	auditRouter := g.Group("api/v1/audit")
+	auditApi := audit.New(dao.GetDao())
+	{
+		auditRouter.POST("/webhook", middleware.WebhookGuard(), auditApi.Webhook)
 	}
 
 	// user 模块
@@ -89,7 +99,7 @@ func Load(g *gin.Engine, mw ...gin.HandlerFunc) *gin.Engine {
 		postRouter.GET("/list/:domain", postApi.ListMainPost)
 		postRouter.GET("/published/:user_id", postApi.ListUserPost)
 		postRouter.GET("/:post_id", postApi.Get)
-		postRouter.POST("", postApi.Create)
+		postRouter.POST("", middleware.Audit(auditApi), postApi.Create)
 		postRouter.DELETE("/:post_id", postApi.Delete)
 		postRouter.PUT("", postApi.UpdateInfo)
 		postRouter.GET("/popular_tag", postApi.ListPopularTag)
@@ -184,11 +194,5 @@ func Load(g *gin.Engine, mw ...gin.HandlerFunc) *gin.Engine {
 		svcd.GET("/ram", sd.RAMCheck)
 	}
 
-	return g
-}
-
-// LoadMetrics loads only the metrics endpoint on a dedicated engine (internal port).
-func LoadMetrics(g *gin.Engine) *gin.Engine {
-	g.GET("/metrics", middleware.MetricsHandler())
 	return g
 }

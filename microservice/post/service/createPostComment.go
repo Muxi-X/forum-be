@@ -76,7 +76,7 @@ func (s *PostService) CreatePostComment(_ context.Context, req *pb.CreatePostCom
 
 	commentId, err := s.Dao.CreateComment(data)
 	if err != nil {
-		return errno.ServerErr(errno.ErrDatabase, err.Error())
+		return databaseErr(err)
 	}
 
 	// 二级评论需要递增父评论的子评论数

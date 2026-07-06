@@ -12,9 +12,9 @@ replace forum-feed => ../feed
 
 replace forum-ocr => ../ocr
 
-go 1.23.0
+go 1.24.4
 
-toolchain go1.23.3
+toolchain go1.24.7
 
 require (
 	forum v0.0.0-00010101000000-000000000000
@@ -29,6 +29,7 @@ require (
 	github.com/golang/protobuf v1.5.4
 	github.com/gorilla/websocket v1.5.3
 	github.com/joho/godotenv v1.5.1
+	github.com/muxi-Infra/auditor-Backend/sdk v0.0.0-20260411143806-306797ef9654
 	github.com/opentracing-contrib/go-gin v0.0.0-20241203023905-a5650667207a
 	github.com/opentracing/opentracing-go v1.2.0
 	github.com/prometheus/client_golang v1.23.2
@@ -43,6 +44,7 @@ require (
 	github.com/willf/pad v0.0.0-20200313202418-172aa767f2a4
 	go-micro.dev/v4 v4.11.0
 	go.uber.org/zap v1.27.0
+	google.golang.org/protobuf v1.36.8
 )
 
 require (
@@ -54,6 +56,7 @@ require (
 	github.com/ProtonMail/go-crypto v1.1.6 // indirect
 	github.com/PuerkitoBio/purell v1.1.1 // indirect
 	github.com/PuerkitoBio/urlesc v0.0.0-20170810143723-de5bf2ad4578 // indirect
+	github.com/alibabacloud-go/tea v1.5.2 // indirect
 	github.com/aliyun/alibaba-cloud-sdk-go v1.61.976 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/bitly/go-simplejson v0.5.0 // indirect
@@ -195,7 +198,6 @@ require (
 	google.golang.org/genproto/googleapis/api v0.0.0-20241209162323-e6fa225c2576 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20241223144023-3abc09e42ca8 // indirect
 	google.golang.org/grpc v1.67.3 // indirect
-	google.golang.org/protobuf v1.36.8 // indirect
 	gopkg.in/ini.v1 v1.66.4 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0 // indirect
 	gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 // indirect

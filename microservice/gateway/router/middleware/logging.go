@@ -52,6 +52,12 @@ func Logging() gin.HandlerFunc {
 			return
 		}
 
+		// Skip for the metrics endpoint (binary/text body, not JSON).
+		if path == "/api/v1/metrics" {
+			c.Next()
+			return
+		}
+
 		// Read the Body content
 		var bodyBytes []byte
 		if c.Request.Body != nil {

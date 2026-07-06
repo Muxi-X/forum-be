@@ -10,7 +10,9 @@ replace forum-feed => ../feed
 
 replace forum-ocr => ../ocr
 
-go 1.23.0
+go 1.24.4
+
+toolchain go1.24.7
 
 require (
 	forum v0.0.0-00010101000000-000000000000

@@ -23,6 +23,8 @@ type PostModel struct {
 	CompiledContent string
 	Summary         string
 	Score           uint32
+	ReplyNum        uint32
+	HotScore        float64
 	IsReport        bool
 	Quality         bool
 }
@@ -139,13 +141,18 @@ func (d *Dao) ListMainPost(filter *PostModel, typeName string, offset, limit, la
 	}
 
 	if searchContent != "" {
-		// query = query.Where("MATCH (content, title) AGAINST (?)", searchContent) // MySQL 5.7.6 才支持中文全文索引
-		key := "%" + searchContent + "%"
-		query = query.Where("posts.content LIKE ? OR posts.title LIKE ? OR posts.summary LIKE ?", key, key, key)
+		// Use MySQL FULLTEXT relevance for keyword search.
+		relevanceExpr := "MATCH(posts.title, posts.content) AGAINST(? IN NATURAL LANGUAGE MODE)"
+		query = query.Select(
+			"posts.id id, title, category, compiled_content, content, last_edit_time, creator_id, u.name creator_name, u.avatar creator_avatar, content_type, summary, domain, "+relevanceExpr+" AS relevance",
+			searchContent,
+		).Where(relevanceExpr, searchContent)
 	}
 
-	if typeName == "hot" {
-		query = query.Order("posts.score DESC")
+	if searchContent != "" {
+		query = query.Order("relevance DESC, posts.hot_score DESC, posts.id DESC")
+	} else if typeName == "hot" {
+		query = query.Order("posts.hot_score DESC, posts.id DESC")
 	} else if typeName == "quality" {
 		query = query.Where("quality = ?", true).Order("posts.id DESC")
 	} else {

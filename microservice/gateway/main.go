@@ -9,6 +9,7 @@ import (
 	forumclient "forum/client"
 	"forum/config"
 	"forum/log"
+	"forum/pkg/audit"
 	"forum/pkg/handler"
 	"forum/pkg/tracer"
 	"net/http"
@@ -107,6 +108,9 @@ func main() {
 	forumclient.ChatInit(service)
 	forumclient.PostInit(service)
 	forumclient.FeedInit(service)
+
+	audit.InitAuditClient(viper.GetString("audit.audit_api_key"), viper.GetString("audit.hook_url"), viper.GetString("audit.region"), viper.GetInt("audit.connect_timeout"))
+
 	dao.Init()
 	// Set gin mode.
 	gin.SetMode(viper.GetString("runmode"))
@@ -125,13 +129,6 @@ func main() {
 		middleware.RequestId(),
 		middleware.Metrics(),
 	)
-
-	// Start metrics server on internal port (not exposed to public).
-	metricsG := gin.New()
-	router.LoadMetrics(metricsG)
-	go func() {
-		log.Info(http.ListenAndServe(":9091", metricsG).Error())
-	}()
 
 	// Ping the server to make sure the router is working.
 	go func() {
