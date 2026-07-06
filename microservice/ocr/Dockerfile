@@ -1,4 +1,4 @@
-ARG GO_IMAGE=golang:1.23
+ARG GO_IMAGE=golang:1.26.4
 ARG PYTHON_IMAGE=python:3.10-slim-bookworm
 
 FROM ${GO_IMAGE} AS builder

@@ -1,5 +1,5 @@
 # 第一阶段：构建可执行文件
-FROM golang:1.23 AS builder
+FROM golang:1.26.4 AS builder
 
 # 设置工作目录
 WORKDIR /app
