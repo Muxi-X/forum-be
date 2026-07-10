@@ -1,12 +1,16 @@
 package audit
 
 import (
+	"encoding/json"
+
+	"forum-gateway/dao"
 	. "forum-gateway/handler"
+	"forum-gateway/handler/post"
+	"forum-gateway/handler/sipscore"
 	pb "forum-post/proto"
 	"forum/client"
 	"forum/log"
 	"forum/pkg/errno"
-	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/muxi-Infra/auditor-Backend/sdk/v2/api/request"
@@ -14,13 +18,6 @@ import (
 )
 
 // Webhook 审核结果回调
-// @Summary 审核结果回调接口
-// @Tags audit
-// @Accept application/json
-// @Produce application/json
-// @Param object body request.HookPayload true "审核回调数据"
-// @Success 200 {object} Response
-// @Router /audit/webhook [post]
 func (a *Api) Webhook(c *gin.Context) {
 	var req *request.HookPayload
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -32,14 +29,17 @@ func (a *Api) Webhook(c *gin.Context) {
 
 	switch req.Data.Status {
 	case "Pass", "pass", "通过":
-		a.createItem(c, pendingID)
+		a.handleItem(c, pendingID)
 
 	case "Reject", "reject", "不通过":
+		_, prefix, err := a.Dao.FindPending(pendingID)
+		if err == nil {
+			_ = a.Dao.DeletePending(prefix, pendingID)
+		}
 		log.Error("审核不通过",
 			zap.Uint("pending_id", pendingID),
 			zap.String("reason", req.Data.Msg),
 		)
-		_ = a.Dao.DeletePendingPost(pendingID)
 		SendResponse(c, nil, nil)
 
 	default:
@@ -51,9 +51,9 @@ func (a *Api) Webhook(c *gin.Context) {
 	}
 }
 
-// handlePass 审核通过后创建帖子
-func (a *Api) createItem(c *gin.Context, pendingID uint) {
-	pendingData, err := a.Dao.GetPendingPost(pendingID)
+// handleItem 审核通过后根据资源类型分发处理
+func (a *Api) handleItem(c *gin.Context, pendingID uint) {
+	pendingData, prefix, err := a.Dao.FindPending(pendingID)
 	if err != nil {
 		log.Error("获取待审核数据失败",
 			zap.Uint("pending_id", pendingID),
@@ -63,45 +63,132 @@ func (a *Api) createItem(c *gin.Context, pendingID uint) {
 		return
 	}
 
-	parts := strings.SplitN(pendingData.Title, ":", 2)
-	if len(parts) != 2 {
-		parts = append(parts, "")
-	}
-
-	switch parts[0] {
-	case "post":
-		createReq := &pb.CreatePostRequest{
-			UserId:          pendingData.UserId,
-			Content:         pendingData.Content,
-			Domain:          pendingData.Domain,
-			Title:           parts[1],
-			Category:        pendingData.Category,
-			ContentType:     pendingData.ContentType,
-			Tags:            pendingData.Tags,
-			CompiledContent: pendingData.CompiledContent,
-			Summary:         pendingData.Summary,
-		}
-
-		resp, err := client.PostClient.CreatePost(c.Request.Context(), createReq)
-		if err != nil {
-			log.Error("创建帖子失败",
-				zap.Uint("pending_id", pendingID),
-				zap.Error(err),
-			)
-			SendError(c, err, nil, "", GetLine())
-			return
-		}
-
-		_ = a.Dao.DeletePendingPost(pendingID)
-
-		log.Info("审核通过，帖子已创建",
-			zap.Uint("pending_id", pendingID),
-			zap.Uint32("post_id", resp.Id),
-		)
-
-		SendResponse(c, nil, resp)
-
+	switch pendingData.ResourceType {
+	case "post:create":
+		a.createPost(c, pendingID, prefix, pendingData)
+	case "post:update":
+		a.updatePost(c, pendingID, prefix, pendingData)
+	case "sipscore:create":
+		a.createSipScore(c, pendingID, prefix, pendingData)
+	case "sipscore:update":
+		a.updateSipScore(c, pendingID, prefix, pendingData)
 	default:
+		log.Error("未知资源类型",
+			zap.Uint("pending_id", pendingID),
+			zap.String("resource_type", pendingData.ResourceType),
+		)
 		SendResponse(c, nil, nil)
 	}
+}
+
+func (a *Api) createPost(c *gin.Context, pendingID uint, prefix string, d *dao.PendingData) {
+	var req post.CreateRequest
+	if err := json.Unmarshal(d.RawRequest, &req); err != nil {
+		log.Error("反序列化请求失败", zap.Error(err))
+		SendError(c, errno.ErrBind, nil, err.Error(), GetLine())
+		return
+	}
+
+	createReq := &pb.CreatePostRequest{
+		UserId:          d.UserId,
+		Content:         req.Content,
+		Domain:          req.Domain,
+		Title:           req.Title,
+		Category:        req.Category,
+		ContentType:     req.ContentType,
+		Tags:            req.Tags,
+		CompiledContent: req.CompiledContent,
+		Summary:         req.Summary,
+	}
+
+	resp, err := client.PostClient.CreatePost(c.Request.Context(), createReq)
+	if err != nil {
+		SendError(c, err, nil, "", GetLine())
+		return
+	}
+
+	_ = a.Dao.DeletePending(prefix, pendingID)
+	SendResponse(c, nil, resp)
+}
+
+func (a *Api) updatePost(c *gin.Context, pendingID uint, prefix string, d *dao.PendingData) {
+	var req post.UpdateInfoRequest
+	if err := json.Unmarshal(d.RawRequest, &req); err != nil {
+		SendError(c, errno.ErrBind, nil, err.Error(), GetLine())
+		return
+	}
+
+	updateReq := &pb.UpdatePostInfoRequest{
+		Id:       req.Id,
+		Content:  req.Content,
+		Title:    req.Title,
+		Domain:   req.Domain,
+		UserId:   d.UserId,
+		Category: req.Category,
+		Tags:     req.Tags,
+		Summary:  req.Summary,
+	}
+
+	_, err := client.PostClient.UpdatePostInfo(c.Request.Context(), updateReq)
+	if err != nil {
+		SendError(c, err, nil, "", GetLine())
+		return
+	}
+
+	_ = a.Dao.DeletePending(prefix, pendingID)
+	SendResponse(c, nil, nil)
+}
+
+func (a *Api) createSipScore(c *gin.Context, pendingID uint, prefix string, d *dao.PendingData) {
+	var req sipscore.CreateSipScoreRequest
+	if err := json.Unmarshal(d.RawRequest, &req); err != nil {
+		SendError(c, errno.ErrBind, nil, err.Error(), GetLine())
+		return
+	}
+
+	createReq := &pb.CreateSipScoreRequest{
+		Name:        req.Name,
+		Description: req.Description,
+		CoverImg:    req.CoverImg,
+		Domain:      req.Domain,
+		Category:    req.Category,
+		Tags:        req.Tags,
+		CreatorId:   d.UserId,
+	}
+
+	resp, err := client.PostClient.CreateSipScore(c.Request.Context(), createReq)
+	if err != nil {
+		SendError(c, err, nil, "", GetLine())
+		return
+	}
+
+	_ = a.Dao.DeletePending(prefix, pendingID)
+	SendResponse(c, nil, resp)
+}
+
+func (a *Api) updateSipScore(c *gin.Context, pendingID uint, prefix string, d *dao.PendingData) {
+	var req sipscore.UpdateSipScoreRequest
+	if err := json.Unmarshal(d.RawRequest, &req); err != nil {
+		SendError(c, errno.ErrBind, nil, err.Error(), GetLine())
+		return
+	}
+
+	updateReq := &pb.UpdateSipScoreInfoRequest{
+		Id:          req.Id,
+		Name:        req.Name,
+		Description: *req.Description,
+		CoverImg:    req.CoverImg,
+		Domain:      req.Domain,
+		Category:    req.Category,
+		Tags:        req.Tags,
+	}
+
+	_, err := client.PostClient.UpdateSipScoreInfo(c.Request.Context(), updateReq)
+	if err != nil {
+		SendError(c, err, nil, "", GetLine())
+		return
+	}
+
+	_ = a.Dao.DeletePending(prefix, pendingID)
+	SendResponse(c, nil, nil)
 }
