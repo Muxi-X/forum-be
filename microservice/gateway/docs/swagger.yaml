@@ -238,6 +238,13 @@ definitions:
       signature:
         type: string
     type: object
+  auth.ExchangeFeedbackTokenRequest:
+    properties:
+      table_identity:
+        type: string
+    required:
+    - table_identity
+    type: object
   chat.Message:
     properties:
       content:
@@ -254,6 +261,7 @@ definitions:
       avatar:
         type: string
       id:
+        format: int32
         type: integer
       name:
         type: string
@@ -1144,6 +1152,49 @@ info:
   title: forum-gateway
   version: "1.0"
 paths:
+  /auth/feedback/token:
+    post:
+      consumes:
+      - application/json
+      description: 使用当前 forum-be 登录态，为指定的反馈表换取短期反馈中台访问令牌。forum-faq 仅授予只读权限。
+      parameters:
+      - description: forum-be 用户令牌
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: feedback_token_request
+        in: body
+        name: object
+        required: true
+        schema:
+          $ref: '#/definitions/auth.ExchangeFeedbackTokenRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/Response'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Response'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/Response'
+      summary: 换取反馈中台 Token
+      tags:
+      - auth
   /auth/login/student:
     post:
       consumes:

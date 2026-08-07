@@ -39,8 +39,20 @@ oss:
   bucket_name: 12345
   domain_name: http://12345 # CDN 域名
 
-
 etcd:
   addr: "127.0.0.1:2379"
   username: "root"
   password: "123456"
+
+# 反馈中台 Go SDK 配置。私钥建议通过 assertion_private_key_file 挂载，禁止提交到仓库。
+feedback_service:
+  base_url: "http://127.0.0.1:8080"
+  project_id: "replace-with-project-id"
+  assertion_key_id: "replace-with-key-id"
+  assertion_issuer: "replace-with-issuer"
+  assertion_audience: "feedback-center"
+  assertion_private_key_file: "/path/to/feedback-private-key.pem"
+  assertion_ttl: 1m
+  table_identities:
+    - "forum"
+    - "forum-faq"

@@ -15,6 +15,71 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/auth/feedback/token": {
+            "post": {
+                "description": "使用当前 forum-be 登录态，为指定的反馈表换取短期反馈中台访问令牌。forum-faq 仅授予只读权限。",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "auth"
+                ],
+                "summary": "换取反馈中台 Token",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "forum-be 用户令牌",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "feedback_token_request",
+                        "name": "object",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/auth.ExchangeFeedbackTokenRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/Response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/Response"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/Response"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/Response"
+                        }
+                    }
+                }
+            }
+        },
         "/auth/login/student": {
             "post": {
                 "description": "login the student-forum",
@@ -2897,6 +2962,17 @@ const docTemplate = `{
                 }
             }
         },
+        "auth.ExchangeFeedbackTokenRequest": {
+            "type": "object",
+            "required": [
+                "table_identity"
+            ],
+            "properties": {
+                "table_identity": {
+                    "type": "string"
+                }
+            }
+        },
         "chat.Message": {
             "type": "object",
             "properties": {
@@ -2921,7 +2997,8 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "id": {
-                    "type": "integer"
+                    "type": "integer",
+                    "format": "int32"
                 },
                 "name": {
                     "type": "string"

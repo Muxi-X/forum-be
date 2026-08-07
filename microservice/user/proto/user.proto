@@ -22,6 +22,10 @@ service UserService {
   rpc MarkPrivateMessageRead(DeletePrivateMessageRequest)returns (Response) {}
 
   rpc UpdateInfo(UpdateInfoRequest) returns (Response) {}
+
+  // todo 这个接口用于获取用户的学号等信息，用来给反馈做后续处理。
+  // todo 后续的话需要和其他的获取信息结合一下，避免代码冗余
+  rpc GetUserIdentity(GetUserIdentityRequest) returns (GetUserIdentityResponse);
 }
 
 message CreateMessageRequest {
@@ -209,4 +213,13 @@ message User {
   string email = 4;
   string avatar = 5;
   string role = 6;
+}
+
+message GetUserIdentityRequest {
+  uint32 user_id = 1;
+}
+
+message GetUserIdentityResponse {
+  uint32 user_id = 1;
+  string student_id = 2;
 }
