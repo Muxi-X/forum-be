@@ -238,13 +238,6 @@ definitions:
       signature:
         type: string
     type: object
-  auth.ExchangeFeedbackTokenRequest:
-    properties:
-      table_identity:
-        type: string
-    required:
-    - table_identity
-    type: object
   chat.Message:
     properties:
       content:
@@ -1156,19 +1149,14 @@ paths:
     post:
       consumes:
       - application/json
-      description: 使用当前 forum-be 登录态，为指定的反馈表换取短期反馈中台访问令牌。forum-faq 仅授予只读权限。
+      description: 使用当前 forum-be 登录态兑换短期反馈中台访问令牌。用户身份由 forum-be 后端确认，前端无需也不能传入 student_id
+        或表格标识。
       parameters:
       - description: forum-be 用户令牌
         in: header
         name: Authorization
         required: true
         type: string
-      - description: feedback_token_request
-        in: body
-        name: object
-        required: true
-        schema:
-          $ref: '#/definitions/auth.ExchangeFeedbackTokenRequest'
       produces:
       - application/json
       responses:

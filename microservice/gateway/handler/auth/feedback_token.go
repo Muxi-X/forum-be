@@ -16,12 +16,11 @@ import (
 
 // ExchangeFeedbackToken ... 为反馈中台换取访问令牌
 // @Summary 换取反馈中台 Token
-// @Description 使用当前 forum-be 登录态，为指定的反馈表换取短期反馈中台访问令牌。forum-faq 仅授予只读权限。
+// @Description 使用当前 forum-be 登录态兑换短期反馈中台访问令牌。用户身份由 forum-be 后端确认，前端无需也不能传入 student_id 或表格标识。
 // @Tags auth
 // @Accept application/json
 // @Produce application/json
 // @Param Authorization header string true "forum-be 用户令牌"
-// @Param object body ExchangeFeedbackTokenRequest true "feedback_token_request"
 // @Success 200 {object} Response
 // @Failure 400 {object} Response
 // @Failure 401 {object} Response
@@ -30,12 +29,6 @@ import (
 // @Router /auth/feedback/token [post]
 func (a *Api) ExchangeFeedbackToken(c *gin.Context) {
 	log.Info("Auth ExchangeFeedbackToken function called.", zap.String("X-Request-Id", util.GetReqID(c)))
-
-	var req ExchangeFeedbackTokenRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		SendError(c, errno.ErrBind, &EmptyResponse{}, err.Error(), GetLine())
-		return
-	}
 
 	userID := c.MustGet("userId").(uint32)
 
@@ -56,7 +49,7 @@ func (a *Api) ExchangeFeedbackToken(c *gin.Context) {
 		return
 	}
 
-	feedbackToken, err := service.ExchangeFeedbackToken(c.Request.Context(), studentID, req.TableIdentity)
+	feedbackToken, err := service.ExchangeFeedbackToken(c.Request.Context(), studentID)
 	if err != nil {
 		SendError(c, err, &EmptyResponse{}, "", GetLine())
 		return

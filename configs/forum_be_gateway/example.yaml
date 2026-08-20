@@ -51,6 +51,3 @@ feedback_service:
   project_id: "replace-with-project-id"
   key_id: "replace-with-key-id"
   api_key: "replace-with-api-key"
-  table_identities:
-    - "forum"
-    - "forum-faq"

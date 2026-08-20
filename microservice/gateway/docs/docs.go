@@ -17,7 +17,7 @@ const docTemplate = `{
     "paths": {
         "/auth/feedback/token": {
             "post": {
-                "description": "使用当前 forum-be 登录态，为指定的反馈表换取短期反馈中台访问令牌。forum-faq 仅授予只读权限。",
+                "description": "使用当前 forum-be 登录态兑换短期反馈中台访问令牌。用户身份由 forum-be 后端确认，前端无需也不能传入 student_id 或表格标识。",
                 "consumes": [
                     "application/json"
                 ],
@@ -35,15 +35,6 @@ const docTemplate = `{
                         "name": "Authorization",
                         "in": "header",
                         "required": true
-                    },
-                    {
-                        "description": "feedback_token_request",
-                        "name": "object",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/auth.ExchangeFeedbackTokenRequest"
-                        }
                     }
                 ],
                 "responses": {
@@ -2958,17 +2949,6 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "signature": {
-                    "type": "string"
-                }
-            }
-        },
-        "auth.ExchangeFeedbackTokenRequest": {
-            "type": "object",
-            "required": [
-                "table_identity"
-            ],
-            "properties": {
-                "table_identity": {
                     "type": "string"
                 }
             }

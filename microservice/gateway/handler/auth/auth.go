@@ -21,7 +21,3 @@ func New(i dao.Interface) *Api {
 // ---- response ----
 
 type EmptyResponse struct{}
-
-type ExchangeFeedbackTokenRequest struct {
-	TableIdentity string `json:"table_identity" binding:"required"`
-}

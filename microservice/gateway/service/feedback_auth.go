@@ -14,7 +14,7 @@ import (
 type FeedbackTokenResponse = feedbacksdk.Token
 
 // ExchangeFeedbackToken 使用反馈 SDK 生成 HMAC 签名并兑换反馈中台 Token。
-func ExchangeFeedbackToken(ctx context.Context, studentID, tableIdentity string) (*FeedbackTokenResponse, error) {
+func ExchangeFeedbackToken(ctx context.Context, studentID string) (*FeedbackTokenResponse, error) {
 	baseURL := strings.TrimRight(strings.TrimSpace(viper.GetString("feedback_service.base_url")), "/")
 	if baseURL == "" {
 		return nil, fmt.Errorf("feedback_service.base_url 未配置")
@@ -28,11 +28,6 @@ func ExchangeFeedbackToken(ctx context.Context, studentID, tableIdentity string)
 	keyID := strings.TrimSpace(viper.GetString("feedback_service.key_id"))
 	if keyID == "" {
 		return nil, fmt.Errorf("feedback_service.key_id 未配置")
-	}
-
-	tableIdentity = strings.TrimSpace(tableIdentity)
-	if !allowedFeedbackTable(tableIdentity) {
-		return nil, fmt.Errorf("feedback_service.table_identity 不允许")
 	}
 
 	studentID = strings.TrimSpace(studentID)
@@ -55,21 +50,10 @@ func ExchangeFeedbackToken(ctx context.Context, studentID, tableIdentity string)
 		return nil, fmt.Errorf("初始化反馈 SDK 失败: %w", err)
 	}
 	token, err := sdkClient.Exchange(ctx, feedbacksdk.Identity{
-		StudentID:     studentID,
-		TableIdentity: tableIdentity,
+		StudentID: studentID,
 	})
 	if err != nil {
 		return nil, err
 	}
 	return &token, nil
-}
-
-func allowedFeedbackTable(tableIdentity string) bool {
-	for _, allowed := range viper.GetStringSlice("feedback_service.table_identities") {
-		if strings.TrimSpace(allowed) == tableIdentity {
-			return true
-		}
-	}
-	legacy := strings.TrimSpace(viper.GetString("feedback_service.table_identify"))
-	return legacy != "" && legacy == tableIdentity
 }
