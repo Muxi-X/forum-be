@@ -2,11 +2,6 @@ package feedback
 
 import "forum-gateway/dao"
 
-const (
-	defaultTableIdentify = "forum"
-	placeholderStudentID = "0000000000"
-)
-
 type Api struct {
 	Dao dao.Interface
 }

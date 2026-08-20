@@ -29,6 +29,7 @@ require (
 	github.com/golang/protobuf v1.5.4
 	github.com/gorilla/websocket v1.5.3
 	github.com/joho/godotenv v1.5.1
+	github.com/luyb177/feedback-sdk v0.4.0
 	github.com/muxi-Infra/auditor-Backend/sdk v0.0.0-20260411143806-306797ef9654
 	github.com/opentracing-contrib/go-gin v0.0.0-20241203023905-a5650667207a
 	github.com/opentracing/opentracing-go v1.2.0

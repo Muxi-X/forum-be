@@ -39,8 +39,15 @@ oss:
   bucket_name: 12345
   domain_name: http://12345 # CDN 域名
 
-
 etcd:
   addr: "127.0.0.1:2379"
   username: "root"
   password: "123456"
+
+# 反馈中台 Go SDK 配置。API Key 只能配置在项目后端环境中，禁止提交真实密钥。
+feedback_service:
+  base_url: "http://127.0.0.1:8080"
+  upload_parent_node: "xxxxxx"
+  project_id: "replace-with-project-id"
+  key_id: "replace-with-key-id"
+  api_key: "replace-with-api-key"
