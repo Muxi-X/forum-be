@@ -4,6 +4,7 @@ import (
 	"context"
 	"forum-post/dao"
 	pb "forum-post/proto"
+	"forum-post/worker"
 	logger "forum/log"
 	"forum/model"
 	"forum/pkg/constvar"
@@ -112,11 +113,14 @@ func (s *PostService) createPostComment(req *pb.CreateCommentRequest, resp *pb.C
 		return errno.ServerErr(errno.ErrCasbin, err.Error())
 	}
 
-	go func() {
-		if err := s.Dao.ChangePostScore(req.TargetId, constvar.CommentScore); err != nil {
-			logger.Error(errno.ErrChangeScore.Error(), logger.String(err.Error()))
-		}
-	}()
+	err = worker.PublishPostInteraction(worker.PostInteractionWriter, &worker.InteractionMessage{
+		Type:   worker.TypeComment,
+		PostId: req.TargetId,
+		Score:  constvar.CommentScore,
+	})
+	if err != nil {
+		logger.Error("publish post interaction error", logger.String(err.Error()))
+	}
 
 	commentInfo, err := s.Dao.GetCommentInfo(commentId)
 	if err != nil {

@@ -4,6 +4,7 @@ import (
 	"context"
 	"forum-post/dao"
 	pb "forum-post/proto"
+	"forum-post/worker"
 	logger "forum/log"
 	"forum/pkg/constvar"
 	"forum/pkg/errno"
@@ -46,15 +47,15 @@ func (s *PostService) createOrRemovePostLike(req *pb.LikeRequest) error {
 		return errno.ServerErr(errno.ErrRedis, err.Error())
 	}
 
-	go func() {
-		if err := s.Dao.AddChangeRecord(req.Item.TargetId); err != nil {
-			logger.Error(errno.ErrRedis.Error(), logger.String(err.Error()))
-		}
-
-		if err := s.Dao.ChangePostScore(req.Item.TargetId, score); err != nil {
-			logger.Error(errno.ErrChangeScore.Error(), logger.String(err.Error()))
-		}
-	}()
+	err = worker.PublishPostInteraction(worker.PostInteractionWriter, &worker.InteractionMessage{
+		Type:       worker.TypeLike,
+		PostId:     req.Item.TargetId,
+		Score:      score,
+		NeedRecord: true,
+	})
+	if err != nil {
+		logger.Error("publish post interaction error", logger.String(err.Error()))
+	}
 
 	return nil
 }

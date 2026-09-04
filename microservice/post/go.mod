@@ -21,6 +21,7 @@ require (
 	github.com/go-micro/plugins/v4/registry/kubernetes v1.1.2
 	github.com/go-micro/plugins/v4/wrapper/trace/opentracing v1.2.0
 	github.com/go-redis/redis v6.15.9+incompatible
+	github.com/google/uuid v1.6.0
 	github.com/joho/godotenv v1.5.1
 	github.com/opentracing/opentracing-go v1.2.0
 	github.com/spf13/viper v1.12.0
@@ -77,7 +78,6 @@ require (
 	github.com/golang/groupcache v0.0.0-20241129210726-2c02b8208cf8 // indirect
 	github.com/golang/mock v1.6.0 // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
-	github.com/google/uuid v1.6.0 // indirect
 	github.com/gorilla/handlers v1.5.1 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/imdario/mergo v0.3.13 // indirect

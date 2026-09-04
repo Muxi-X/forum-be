@@ -4,6 +4,7 @@ import (
 	"context"
 	"forum-post/dao"
 	pb "forum-post/proto"
+	"forum-post/worker"
 	logger "forum/log"
 	"forum/model"
 	"forum/pkg/constvar"
@@ -27,11 +28,14 @@ func (s *PostService) DeleteCollection(_ context.Context, req *pb.Request, _ *pb
 		return errno.ServerErr(errno.ErrCasbin, err.Error())
 	}
 
-	go func() {
-		if err := s.Dao.ChangePostScore(req.Id, -constvar.CollectionScore); err != nil {
-			logger.Error(errno.ErrChangeScore.Error(), logger.String(err.Error()))
-		}
-	}()
+	err := worker.PublishPostInteraction(worker.PostInteractionWriter, &worker.InteractionMessage{
+		Type:   worker.TypeCollection,
+		PostId: req.Id,
+		Score:  -constvar.CollectionScore,
+	})
+	if err != nil {
+		logger.Error("publish post interaction error", logger.String(err.Error()))
+	}
 
 	return nil
 }
