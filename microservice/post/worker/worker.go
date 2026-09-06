@@ -15,6 +15,7 @@ func Run() {
 	})
 
 	go postInteractionReader.BeginConsume(
+		nil, // 追求强一致的情景再防止重复消费吧
 		handlePostInteraction,
 		writer.DefaultEnterDeadLetter,
 		reader.DefaultErrorHandler,

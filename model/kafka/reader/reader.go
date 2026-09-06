@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"forum/log"
+	"forum/model"
 
 	"github.com/segmentio/kafka-go"
 	"github.com/segmentio/kafka-go/sasl/plain"
@@ -24,6 +25,7 @@ type KafkaReader struct {
 const (
 	backoff       = 5 * time.Second
 	commitTimeout = 5 * time.Second
+	dedupTTL      = 24 * time.Hour
 )
 
 func NewKafkaReader(tg *TopicsAndGroup) *KafkaReader {
@@ -62,7 +64,11 @@ const (
 	ActionStop                     // kafka错误，退出循环
 )
 
+// PreventDuplicate 防止重复消费
+type PreventDuplicate func(msg kafka.Message) (duplicated bool, err error)
+
 func (r *KafkaReader) BeginConsume(
+	preventDuplicate PreventDuplicate,
 	consumeLogic func(msg kafka.Message) error,
 	deadLetter func(msg kafka.Message, err error),
 	onError ErrorHandler,
@@ -77,6 +83,17 @@ func (r *KafkaReader) BeginConsume(
 		if err != nil {
 			log.Error("Kafka fetch message failed", log.String(err.Error()))
 			return
+		}
+
+		duplicated, err := preventDuplicate(msg)
+		if err != nil {
+			log.Error("Kafka prevent duplicate failed", log.String(err.Error()))
+		} else if duplicated {
+			if err := r.MarkConsumeComplete(msg); err != nil {
+				log.Error("Kafka mark consume failed", log.String(err.Error()))
+				return
+			}
+			continue
 		}
 
 		var lastErr error
@@ -126,4 +143,15 @@ func DefaultErrorHandler(msg kafka.Message, err error) Action {
 	log.Error(fmt.Sprintf("Kafka消费失败(Topic: %s)", msg.Topic), log.String(err.Error()))
 
 	return ActionDeadLetter
+}
+
+// ---------------- 默认防重处理 ----------------
+
+func DefaultPreventDuplicate(msg kafka.Message) (bool, error) {
+	key := fmt.Sprintf("forum:kafka_dedup:%s:%d:%d", msg.Topic, msg.Partition, msg.Offset)
+	ok, err := model.RedisDB.Self.SetNX(key, 1, dedupTTL).Result()
+	if err != nil {
+		return false, err
+	}
+	return !ok, nil
 }
