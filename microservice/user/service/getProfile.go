@@ -52,5 +52,11 @@ func (s *UserService) GetProfile(_ context.Context, req *pb.GetRequest, resp *pb
 		}
 	}
 
+	//若查询者非本人，则清除敏感信息
+	if req.ViewerId != user.Id {
+		resp.Email = ""
+		resp.StudentId = placeholderStudentID
+	}
+
 	return nil
 }
