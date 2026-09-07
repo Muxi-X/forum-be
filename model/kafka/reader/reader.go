@@ -54,8 +54,6 @@ func (r *KafkaReader) Close() error {
 	return r.Self.Close()
 }
 
-type ErrorHandler func(msg kafka.Message, err error) Action
-
 type Action int
 
 const (
@@ -64,18 +62,33 @@ const (
 	ActionStop                     // kafka错误，退出循环
 )
 
-// PreventDuplicate 防止重复消费
 type PreventDuplicate func(msg kafka.Message) (duplicated bool, err error)
+type ErrorHandler func(msg kafka.Message, err error) Action
+type DeadLetterHandler func(msg kafka.Message, err error)
+type ConsumeHandler func(msg kafka.Message) error
 
 func (r *KafkaReader) BeginConsume(
 	preventDuplicate PreventDuplicate,
-	consumeLogic func(msg kafka.Message) error,
-	deadLetter func(msg kafka.Message, err error),
+	consumeLogic ConsumeHandler,
+	deadLetter DeadLetterHandler,
 	onError ErrorHandler,
 	maxAttempts int,
 ) {
 	if maxAttempts < 1 {
 		maxAttempts = 1
+	}
+
+	if consumeLogic == nil {
+		panic("consumeLogic handler cannot be nil")
+	}
+
+	// 不是所有消费场景都是非幂等的，故 preventDuplicate 允许为 nil
+	if preventDuplicate == nil {
+		preventDuplicate = func(msg kafka.Message) (duplicated bool, err error) { return false, nil }
+	}
+
+	if onError == nil {
+		onError = DefaultErrorHandler
 	}
 
 	for {
