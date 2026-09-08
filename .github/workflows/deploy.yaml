@@ -1,4 +1,4 @@
-name: CI/CD
+name: DEPLOY
 
 on:
   push:
@@ -58,7 +58,7 @@ jobs:
               SERVICES=$(echo "$CHANGED" \
                 | awk -F/ '/^microservice\/[^\/]+/ && $2 != "ocr" {print $2}' \
                 | sort -u)
-              if [ -z "$SERVICES" ] && echo "$CHANGED" | grep -qE '^(Dockerfile|Makefile|go\\.(mod|sum)|pkg/|model/|client/|config/|log/|util/)'; then
+              if [ -z "$SERVICES" ] && echo "$CHANGED" | grep -qE '^(Dockerfile|Makefile|go\.(mod|sum)|pkg/|model/|client/|config/|log/|util/)'; then
                 SERVICES="chat feed gateway post user"
               fi
             fi
