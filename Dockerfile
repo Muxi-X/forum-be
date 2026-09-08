@@ -9,7 +9,7 @@ COPY . /app/
 
 # 设置 Go 环境变量
 ARG service_name
-RUN go env -w GOPROXY="https://goproxy.cn,direct"
+RUN go env -w GOPROXY="https://proxy.golang.org,direct"
 
 # 切换到具体服务的目录
 WORKDIR /app/microservice/$service_name
