@@ -16,6 +16,7 @@ import (
 	"forum-feed/dao"
 	pb "forum-feed/proto"
 	"forum-feed/service"
+	"forum-feed/worker"
 	"forum/config"
 	logger "forum/log"
 	"forum/pkg/handler"
@@ -74,7 +75,7 @@ func main() {
 	if *subFg {
 		// sub-service
 		logger.Info("Subscribe service start...")
-		service.SubServiceRun()
+		worker.Run()
 		return
 	}
 	r := etcd.NewRegistry(

@@ -278,3 +278,11 @@ func (d *Dao) getDB(tx ...*gorm.DB) *gorm.DB {
 	}
 	return d.DB
 }
+
+func (d *Dao) SetNX(key string, value interface{}, expiration time.Duration) (bool, error) {
+	return d.Redis.SetNX(key, value, expiration).Result()
+}
+
+func (d *Dao) Exists(key string) (int64, error) {
+	return d.Redis.Exists(key).Result()
+}

@@ -4,6 +4,7 @@ import (
 	"context"
 	"forum-post/dao"
 	pb "forum-post/proto"
+	"forum-post/worker"
 	logger "forum/log"
 	"forum/pkg/constvar"
 	"forum/pkg/errno"
@@ -54,11 +55,14 @@ func (s *PostService) createOrRemovePostCollection(collection *dao.CollectionMod
 	targetID := req.GetTargetId()
 	scoreCopy := score
 
-	go func() {
-		if err := s.Dao.ChangePostScore(targetID, scoreCopy); err != nil {
-			logger.Error(errno.ErrChangeScore.Error(), logger.String(err.Error()))
-		}
-	}()
+	err = worker.PublishPostInteraction(worker.PostInteractionWriter, &worker.InteractionMessage{
+		Type:   worker.TypeCollection,
+		PostId: targetID,
+		Score:  scoreCopy,
+	})
+	if err != nil {
+		logger.Error("publish post interaction error", logger.String(err.Error()))
+	}
 
 	post, err := s.Dao.GetPost(req.GetTargetId())
 	if err != nil {

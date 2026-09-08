@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - main
+      - dev
+
+jobs:
+  build:
+    if: github.repository == 'Muxi-X/forum-be'
+    runs-on: ubuntu-latest
+    env:
+      GOPROXY: "https://proxy.golang.org,direct"
+    strategy:
+      fail-fast: false
+      matrix:
+        service: [chat, feed, gateway, post, user]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.26.4'
+          cache: true
+          cache-dependency-path: microservice/${{ matrix.service }}/go.sum
+
+      - name: Build
+        run: |
+          cd microservice/${{ matrix.service }}
+          go build ./...
+
+      - name: Vet
+        run: |
+          cd microservice/${{ matrix.service }}
+          go vet ./...

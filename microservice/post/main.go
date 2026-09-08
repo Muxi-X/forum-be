@@ -4,6 +4,7 @@ import (
 	"forum-post/dao"
 	pb "forum-post/proto"
 	"forum-post/service"
+	"forum-post/worker"
 	"forum/config"
 	logger "forum/log"
 	"forum/pkg/handler"
@@ -46,6 +47,11 @@ func main() {
 
 	// set var t to Global Tracer (opentracing single instance mode)
 	opentracing.SetGlobalTracer(t)
+
+	dao.Init()
+
+	worker.Run()
+
 	r := etcd.NewRegistry(
 		registry.Addrs(viper.GetString("etcd.addr")),
 		etcd.Auth(viper.GetString("etcd.username"), viper.GetString("etcd.password")),
@@ -69,7 +75,6 @@ func main() {
 	// Init will parse the command line flags.
 	srv.Init()
 	client.UserInit(srv)
-	dao.Init()
 
 	// Register handler
 	if err := pb.RegisterPostServiceHandler(srv.Server(), service.New(dao.GetDao())); err != nil {

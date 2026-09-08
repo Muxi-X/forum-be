@@ -36,3 +36,5 @@ configs/forum_be_post/config.yaml
 # Agent
 .github/copilot-instructions.md
 AGENTS.md
+CLAUDE.md
+.claude
