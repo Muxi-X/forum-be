@@ -3,10 +3,12 @@ package service
 import (
 	"context"
 	"encoding/json"
+	"forum-feed/worker"
 	"forum-user/pkg/role"
 	pbu "forum-user/proto"
 	"forum/pkg/errno"
 	"forum/util"
+	"strconv"
 
 	"forum-feed/dao"
 	pb "forum-feed/proto"
@@ -39,7 +41,7 @@ func (s *FeedService) Push(_ context.Context, req *pb.PushRequest, _ *pb.Respons
 
 	msg, _ := json.Marshal(feed)
 
-	if err := s.Dao.PublishMsg(msg); err != nil {
+	if err := worker.PublishFeedMessage(worker.FeedWriter, strconv.Itoa(int(feed.UserId)), string(msg)); err != nil {
 		return errno.ServerErr(errno.ErrPublishMsg, err.Error())
 	}
 
