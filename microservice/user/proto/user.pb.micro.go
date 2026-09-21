@@ -51,6 +51,9 @@ type UserService interface {
 	DeletePrivateMessage(ctx context.Context, in *DeletePrivateMessageRequest, opts ...client.CallOption) (*Response, error)
 	MarkPrivateMessageRead(ctx context.Context, in *DeletePrivateMessageRequest, opts ...client.CallOption) (*Response, error)
 	UpdateInfo(ctx context.Context, in *UpdateInfoRequest, opts ...client.CallOption) (*Response, error)
+	// todo 这个接口用于获取用户的学号等信息，用来给反馈做后续处理。
+	// todo 后续的话需要和其他的获取信息结合一下，避免代码冗余
+	GetUserIdentity(ctx context.Context, in *GetUserIdentityRequest, opts ...client.CallOption) (*GetUserIdentityResponse, error)
 }
 
 type userService struct {
@@ -215,6 +218,16 @@ func (c *userService) UpdateInfo(ctx context.Context, in *UpdateInfoRequest, opt
 	return out, nil
 }
 
+func (c *userService) GetUserIdentity(ctx context.Context, in *GetUserIdentityRequest, opts ...client.CallOption) (*GetUserIdentityResponse, error) {
+	req := c.c.NewRequest(c.name, "UserService.GetUserIdentity", in)
+	out := new(GetUserIdentityResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // Server API for UserService service
 
 type UserServiceHandler interface {
@@ -233,6 +246,9 @@ type UserServiceHandler interface {
 	DeletePrivateMessage(context.Context, *DeletePrivateMessageRequest, *Response) error
 	MarkPrivateMessageRead(context.Context, *DeletePrivateMessageRequest, *Response) error
 	UpdateInfo(context.Context, *UpdateInfoRequest, *Response) error
+	// todo 这个接口用于获取用户的学号等信息，用来给反馈做后续处理。
+	// todo 后续的话需要和其他的获取信息结合一下，避免代码冗余
+	GetUserIdentity(context.Context, *GetUserIdentityRequest, *GetUserIdentityResponse) error
 }
 
 func RegisterUserServiceHandler(s server.Server, hdlr UserServiceHandler, opts ...server.HandlerOption) error {
@@ -252,6 +268,7 @@ func RegisterUserServiceHandler(s server.Server, hdlr UserServiceHandler, opts .
 		DeletePrivateMessage(ctx context.Context, in *DeletePrivateMessageRequest, out *Response) error
 		MarkPrivateMessageRead(ctx context.Context, in *DeletePrivateMessageRequest, out *Response) error
 		UpdateInfo(ctx context.Context, in *UpdateInfoRequest, out *Response) error
+		GetUserIdentity(ctx context.Context, in *GetUserIdentityRequest, out *GetUserIdentityResponse) error
 	}
 	type UserService struct {
 		userService
@@ -322,4 +339,8 @@ func (h *userServiceHandler) MarkPrivateMessageRead(ctx context.Context, in *Del
 
 func (h *userServiceHandler) UpdateInfo(ctx context.Context, in *UpdateInfoRequest, out *Response) error {
 	return h.UserServiceHandler.UpdateInfo(ctx, in, out)
+}
+
+func (h *userServiceHandler) GetUserIdentity(ctx context.Context, in *GetUserIdentityRequest, out *GetUserIdentityResponse) error {
+	return h.UserServiceHandler.GetUserIdentity(ctx, in, out)
 }

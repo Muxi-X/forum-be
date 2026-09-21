@@ -5,6 +5,7 @@ import (
 	_ "forum-gateway/docs"
 	"forum-gateway/handler"
 	"forum-gateway/handler/audit"
+	authHandler "forum-gateway/handler/auth"
 	"forum-gateway/handler/chat"
 	"forum-gateway/handler/collection"
 	"forum-gateway/handler/comment"
@@ -52,9 +53,11 @@ func Load(g *gin.Engine, mw ...gin.HandlerFunc) *gin.Engine {
 
 	// auth 模块
 	authRouter := g.Group("api/v1/auth")
+	authApi := authHandler.New(dao.GetDao())
 	{
 		authRouter.POST("/login/student", user.StudentLogin)
 		authRouter.POST("/login/team", user.TeamLogin)
+		authRouter.POST("/feedback/token", normalRequired, authApi.ExchangeFeedbackToken)
 		authRouter.POST("/set_role/:id", adminRequired, user.SetRole)
 	}
 

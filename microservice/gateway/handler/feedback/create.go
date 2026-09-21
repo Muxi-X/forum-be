@@ -9,7 +9,6 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
-	"github.com/spf13/viper"
 	"go.uber.org/zap"
 )
 
@@ -53,16 +52,16 @@ func (a *Api) Create(c *gin.Context) {
 
 	studentID := strings.TrimSpace(profile.GetStudentId())
 	if len(studentID) != 10 {
-		studentID = placeholderStudentID
+		SendError(c, errno.ErrBadRequest, nil, "student_id not found", GetLine())
+		return
 	}
 
 	err = service.CreateFeedbackRecord(c.Request.Context(), service.FeedbackRecordRequest{
-		TableIdentify: feedbackTableIdentify(),
-		StudentID:     studentID,
-		Content:       content,
-		ContactInfo:   firstNonEmpty(req.Contact, profile.GetEmail()),
-		ExtraRecord:   extraRecord,
-		ImageURLs:     feedbackImageURLs(req.ImgURL),
+		StudentID:   studentID,
+		Content:     content,
+		ContactInfo: firstNonEmpty(req.Contact, profile.GetEmail()),
+		ExtraRecord: extraRecord,
+		ImageURLs:   feedbackImageURLs(req.ImgURL),
 	})
 	if err != nil {
 		SendError(c, errno.InternalServerError, nil, err.Error(), GetLine())
@@ -80,14 +79,6 @@ func firstNonEmpty(values ...string) string {
 		}
 	}
 	return ""
-}
-
-func feedbackTableIdentify() string {
-	tableIdentify := strings.TrimSpace(viper.GetString("feedback_service.table_identify"))
-	if tableIdentify == "" {
-		return defaultTableIdentify
-	}
-	return tableIdentify
 }
 
 func feedbackImageURLs(imgURL string) []string {

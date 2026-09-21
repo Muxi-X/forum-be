@@ -29,13 +29,12 @@ const (
 )
 
 type FeedbackRecordRequest struct {
-	TableIdentify string         `json:"table_identify"`
-	StudentID     string         `json:"student_id"`
-	Content       string         `json:"content"`
-	Images        []string       `json:"images"`
-	ContactInfo   string         `json:"contact_info"`
-	ExtraRecord   map[string]any `json:"extra_record"`
-	ImageURLs     []string       `json:"-"`
+	StudentID   string         `json:"-"`
+	Content     string         `json:"content"`
+	Images      []string       `json:"images"`
+	ContactInfo string         `json:"contact_info"`
+	ExtraRecord map[string]any `json:"extra_record"`
+	ImageURLs   []string       `json:"-"`
 }
 
 type feedbackEnvelope[T any] struct {
@@ -43,10 +42,6 @@ type feedbackEnvelope[T any] struct {
 	Message string `json:"message"`
 	Msg     string `json:"msg"`
 	Data    T      `json:"data"`
-}
-
-type feedbackTableTokenResp struct {
-	AccessToken string `json:"access_token"`
 }
 
 type feedbackCreateRecordResp struct {
@@ -74,18 +69,18 @@ func CreateFeedbackRecord(ctx context.Context, req FeedbackRecordRequest) error 
 	}
 
 	client := &http.Client{Timeout: feedbackServiceTimeout}
-	token, err := getFeedbackTableToken(ctx, client, baseURL, req.TableIdentify)
+	feedbackToken, err := ExchangeFeedbackToken(ctx, req.StudentID)
 	if err != nil {
 		return err
 	}
 
-	imageTokens, err := feedbackImageTokensFromURLs(ctx, client, baseURL, req.ImageURLs)
+	imageTokens, err := feedbackImageTokensFromURLs(ctx, client, baseURL, feedbackToken.AccessToken, req.ImageURLs)
 	if err != nil {
 		return err
 	}
 	req.Images = append(req.Images, imageTokens...)
 
-	_, err = postFeedbackJSON[feedbackCreateRecordResp](ctx, client, baseURL+"/api/v1/sheet/records", token, req)
+	_, err = postFeedbackJSON[feedbackCreateRecordResp](ctx, client, baseURL+"/api/v3/sheet/feedback/records", feedbackToken.AccessToken, req)
 	return err
 }
 
@@ -97,26 +92,8 @@ func feedbackServiceBaseURL() (string, error) {
 	return baseURL, nil
 }
 
-func getFeedbackTableToken(ctx context.Context, client *http.Client, baseURL string, tableIdentify string) (string, error) {
-	tableIdentify = strings.TrimSpace(tableIdentify)
-	if tableIdentify == "" {
-		return "", fmt.Errorf("feedback_service.table_identify 未配置")
-	}
-
-	resp, err := postFeedbackJSON[feedbackTableTokenResp](ctx, client, baseURL+"/api/v1/auth/table-config/token", "", map[string]string{
-		"table_identify": tableIdentify,
-	})
-	if err != nil {
-		return "", err
-	}
-	if resp.AccessToken == "" {
-		return "", fmt.Errorf("反馈服务未返回访问凭证")
-	}
-	return resp.AccessToken, nil
-}
-
-func getFeedbackTenantToken(ctx context.Context, client *http.Client, baseURL string) (string, error) {
-	resp, err := postFeedbackJSON[feedbackTenantTokenResp](ctx, client, baseURL+"/api/v1/auth/tenant/token", "", nil)
+func getFeedbackTenantToken(ctx context.Context, client *http.Client, baseURL, feedbackToken string) (string, error) {
+	resp, err := postFeedbackJSON[feedbackTenantTokenResp](ctx, client, baseURL+"/api/v3/auth/tenant/token", feedbackToken, nil)
 	if err != nil {
 		return "", err
 	}
@@ -126,7 +103,7 @@ func getFeedbackTenantToken(ctx context.Context, client *http.Client, baseURL st
 	return resp.AccessToken, nil
 }
 
-func feedbackImageTokensFromURLs(ctx context.Context, client *http.Client, baseURL string, imageURLs []string) ([]string, error) {
+func feedbackImageTokensFromURLs(ctx context.Context, client *http.Client, baseURL, feedbackToken string, imageURLs []string) ([]string, error) {
 	if len(imageURLs) == 0 {
 		return nil, nil
 	}
@@ -136,7 +113,7 @@ func feedbackImageTokensFromURLs(ctx context.Context, client *http.Client, baseU
 		return nil, fmt.Errorf("feedback_service.upload_parent_node 未配置")
 	}
 
-	tenantToken, err := getFeedbackTenantToken(ctx, client, baseURL)
+	tenantToken, err := getFeedbackTenantToken(ctx, client, baseURL, feedbackToken)
 	if err != nil {
 		return nil, err
 	}
