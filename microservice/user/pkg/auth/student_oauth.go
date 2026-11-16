@@ -1,8 +1,11 @@
 package auth
 
 import (
+	"crypto/sha1"
+	"encoding/hex"
 	"errors"
 	"net/url"
+	"regexp"
 	"strings"
 
 	"forum-user/util"
@@ -179,7 +182,9 @@ func getStudentOAuthUserInfo(accessToken, userInfoURL string) (*StudentOAuthUser
 	rp.Data.Username = strings.TrimSpace(rp.Data.Username)
 	rp.Data.Name = strings.TrimSpace(rp.Data.Name)
 	if rp.Data.StudentID == "" {
-		rp.Data.StudentID = rp.Data.Username
+		if studentID, ok := studentIDFromCASUsername(rp.Data.Username); ok {
+			rp.Data.StudentID = studentID
+		}
 	}
 	if rp.Data.Username == "" {
 		rp.Data.Username = rp.Data.Name
@@ -188,6 +193,31 @@ func getStudentOAuthUserInfo(accessToken, userInfoURL string) (*StudentOAuthUser
 		return nil, errors.New("student oauth user info missing student_id and email")
 	}
 	return &rp.Data, nil
+}
+
+// casUsernamePattern 对应通行证cas影子账号的命名规则。
+var casUsernamePattern = regexp.MustCompile(`^cas_(.+)_([0-9a-f]{8})$`)
+
+func studentIDFromCASUsername(username string) (string, bool) {
+	matches := casUsernamePattern.FindStringSubmatch(username)
+	if matches == nil {
+		return "", false
+	}
+
+	base, hash := matches[1], matches[2]
+	if base == "" || base == "user" {
+		// 上游对无法规范化的用户名兜底成 "user"，原值已不可还原。
+		return "", false
+	}
+
+	for _, candidate := range []string{base, strings.ToUpper(base)} {
+		sum := sha1.Sum([]byte(candidate))
+		if hex.EncodeToString(sum[:])[:8] == hash {
+			return candidate, true
+		}
+	}
+
+	return "", false
 }
 
 func stringWithDefault(value, fallback string) string {
